@@ -1,0 +1,2 @@
+
+Just some deobfuscation experiments based on [this methodology](https://steakenthusiast.github.io/2022/05/21/Deobfuscating-Javascript-via-AST-An-Introduction-to-Babel/#Conclusion-Additional-Resources)
