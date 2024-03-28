@@ -27,9 +27,10 @@ go install github.com/denandz/sourcemapper@latest
 ```
 <br>
 
-`postMessage-tracker` this is Frans Rosen's extension with a few changes, original [here]().
+`postMessage-tracker` this is Frans Rosen's extension with a few changes, original [here](https://github.com/fransr/postMessage-tracker).
+<br>
 Changes:
-- Filters postMessage handlers registered from extensions
+- Filters postMessage handlers registered by extensions
 - Filters postMessages in the console coming from the following extensions
   - DOMInvador
   - DOMLogger++
