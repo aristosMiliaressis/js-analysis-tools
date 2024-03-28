@@ -43,6 +43,14 @@ Changes:
 
 `hashChange-tracker` just a reap off of postMessage-tracker but for hashchange event
 
+<p align="center">
+  <img src="[images/?raw=true](https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/hashChange-tracker.png?raw=true)">
+</p>
+
 <br>
 
 `iframe-tracker` just a reap off of postMessage-tracker but for tracking and revealing iframes
+
+<p align="center">
+  <img src="[images/?raw=true](https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/iframe-tracker.png?raw=true)">
+</p>
