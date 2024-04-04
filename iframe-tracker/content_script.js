@@ -25,12 +25,12 @@ function getDomPath(el) {
 	return stack.slice(1).join(' > ');
 }
 
-setTimeout(() => {
+setInterval(() => {
 	var details = {}
 	details.origin = window.origin;
 	details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((f) => { return { frame: f.outerHTML, url: document.location, path: getDomPath(f) } })
 	chrome.runtime.sendMessage(details);
-}, 400)
+}, 500)
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	for (var frame of document.getElementsByTagName('iframe')) { 

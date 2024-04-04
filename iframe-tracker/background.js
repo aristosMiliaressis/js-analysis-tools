@@ -3,6 +3,10 @@ var page_frames = {};
 function refreshCount(origin) {
 	count = page_frames[origin] ? page_frames[origin].length : 0;
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		if (new URL(tabs[0].url).origin != origin) {
+			return
+		}
+		
 		if (localStorage.getItem('iframe-tracker-highlight') == 'true') {
 			chrome.tabs.sendMessage(tabs[0].id, {highlight: true}, function(response) {});
 		}

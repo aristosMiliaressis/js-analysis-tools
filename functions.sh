@@ -1,8 +1,9 @@
 
 function unhar() {
-    har_file=$(realpath $1)
+    har_file=$1
+    origin_domain="${1%.har}"
     tmp_file=`mktemp`
-    mkdir site 2>/dev/null
+    mkdir $origin_domain 2>/dev/null
 
     cat $har_file | jq '.log.entries[] | select(._resourceType == "script" or ._resourceType == "document") | select(.response.content.text != null)' > $tmp_file
 
@@ -14,8 +15,8 @@ function unhar() {
         file=$(echo "$url" | unfurl format %p | rev | cut -d / -f 1 | rev)
         filename="${file}"
         [[ ! -z "$query" ]] && filename="$filename%3F$query"
-        filename="site/${domain}${path}/$(echo $filename | head -c 253)"
-        mkdir -p "site/${domain}${path}" 2>/dev/null
+        filename="$origin_domain/${domain}${path}/$(echo $filename | head -c 253)"
+        mkdir -p "$origin_domain/${domain}${path}" 2>/dev/null
         if [[ -d "$filename" ]]
         then
             file=$(echo "$path" | rev | cut -d / -f 1 | rev | tail -c 249).html
@@ -46,4 +47,30 @@ function srcmap() {
 	
     codeql database create codeql -s $domain --language=javascript
     codeql database analyze codeql javascript-lgtm.qls --format=sarif-latest --output=results.sarif
+}
+
+function capture_har() {
+    url=$1
+    domain=$(echo $url | unfurl format %d)
+    
+    google-chrome --remote-debugging-port=9222 --headless &
+    chrome_pid=$!
+    
+    chrome-har-capturer -i -c -g 5000 -t "127.0.0.1" -p 9222 -o ${domain}.har $url
+    kill $chrome_pid
+    
+    if [[ -d $domain ]]
+    then
+        rm -rf $domain/*
+        unhar ${domain}.har
+        cd $domain
+    else
+        unhar ${domain}.har
+        cd $domain
+        git init
+    fi
+    git add .
+    git commit -m "$(date +%s)"
+    cd ..
+    rm ${domain}.har
 }
