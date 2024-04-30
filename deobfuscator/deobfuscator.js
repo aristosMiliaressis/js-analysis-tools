@@ -55,6 +55,12 @@ function deobfuscate(filename, source) {
         },
     };
     
+    // TODO swap undefined & identifier in Binary Expression
+    // TODO swap !![] to false and ![] to true
+    
+    /// ^^^ everythig above is my experiments
+    /// vvv everything bellow is part of the original blog series
+    
     // Visitor for removing string encoding.
     const deobfuscateEncodedStringVisitor = {
         StringLiteral(path) {
@@ -143,9 +149,6 @@ function deobfuscate(filename, source) {
             }
         }
     };
-    
-    // TODO swap undefined & identifier in Binary Expression
-    // TODO swap !![] to false and ![] to true
     
     const ast = parser.parse(source);
     

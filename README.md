@@ -27,6 +27,21 @@ go install github.com/denandz/sourcemapper@latest
 ```
 <br>
 
+`page_monitor.sh` takes a list of urls as input, starts a headless chrome browser, navigates to each url and generates a HAR file for each one, it than extracts each HAR file into a local git repository, detects and notifies if any of the following has changed since the last invocation of the script:
+- status code
+- page title
+- the md5 of all the javascript files concatinated into one stream
+
+Dependencies:
+- git
+- google-chrome
+- jq
+- chrome-har-capturer
+- notify
+- unfurl
+
+<br>
+
 `postMessage-tracker` this is Frans Rosen's extension with a few changes, original [here](https://github.com/fransr/postMessage-tracker).
 <br>
 Changes:
