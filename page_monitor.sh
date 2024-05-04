@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x
 
+NOTIFY_CONFIG='/opt/tools/notify-config.yaml'
+
 function extract_har() {
     har_file=$1
     origin_domain="${1%.har}"
@@ -31,22 +33,11 @@ function extract_har() {
     done <<< $(cat $tmp_file | jq -r '.request.url' | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
 }
 
-function capture_har() {
-    url=$1
-    domain=$(echo $url | unfurl format %d)
-    
-    google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
-    chrome_pid=$!
-    
-    chrome-har-capturer -i -c -g 4000 -t "127.0.0.1" -p 9222 -o ${domain}.har $url
-    kill $chrome_pid
-}
-
 function check() {
-    url=$1
-    base_domain=$(echo $url | unfurl format %d)
+    base_url=$1
+    base_domain=$(echo $base_url | unfurl format %d)
 
-    capture_har $url
+    chrome-har-capturer -i -c -g 4000 -t "127.0.0.1" -p 9222 -o ${base_domain}.har $base_url
     
     if [[ -d $base_domain ]]
     then
@@ -80,32 +71,32 @@ function check() {
 
     if [[ "$md5" != "$prev_md5" ]]
     then 
-        echo "$url changed script_md5 to $md5" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
+        echo "$base_url changed script_md5 to $md5" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         git add .
         git commit -m "$(date +%s)"
     fi
 
-    page_status=$(cat ${base_domain}.har | jq '.log.entries[] | select(._resourceType == "document" and (.response.status >= 400 or .response.status < 300)) | .response.status')
-    page_title=$(cat ${base_domain}.har | jq '.log.entries[] | select(._resourceType == "document" and (.response.status >= 400 or .response.status < 300)) | .response.content.text' | htmlq title)
+    cd ..
 
-    prev_entry=$(cat page_index.json | jq 'select( .Url == "'$url'")')
+    page_status=$(cat ${base_domain}.har | jq '.log.entries[] | select(._resourceType == "document" and (.response.status >= 400 or .response.status < 300)) | .response.status')
+    page_title=$(cat ${base_domain}.har | jq '.log.entries[] | select(._resourceType == "document" and (.response.status >= 400 or .response.status < 300)) | .response.content.text' | htmlq -t title)
+
+    prev_entry=$(cat page_index.json | jq 'select( .Url == "'$base_url'")')
     if [[ ! -z $prev_entry ]]
     then
         prev_status=$(echo $prev_entry | jq -r .status)
         prev_title=$(echo $prev_entry | jq -r .title)
         if [[ $prev_status != $page_status ]]
         then
-            echo "$url changed status code from $prev_status to $page_status" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
+            echo "$base_url changed status code from $prev_status to $page_status" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
         if [[ $prev_title != $page_title ]]
         then 
-            echo "$url changed title from '$prev_title' to '$page_title'" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
+            echo "$base_url changed title from '$prev_title' to '$page_title'" | notify -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
     fi
     
-    echo '{"Url":"'$url'","title":"'$page_title'","status":"'$page_status'"}' >> $tmp_page_index
-        
-    cd ..
+    echo '{"Url":"'$base_url'","title":"'$page_title'","status":"'$page_status'"}' >> $tmp_page_index
     rm ${base_domain}.har
 }
 
@@ -121,15 +112,14 @@ url_file=$1
 mkdir -p $working_directory 2>/dev/null
 cd $working_directory
 
+# TODO try to speed it up by making chrome & extract_har work asynchronously
+google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
+chrome_pid=$!
+
 # kill all children process on exit
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+trap "kill $chrome_pid && kill -- -$$" SIGINT SIGTERM EXIT
 
-# TODO try to speed it up by only spining up chrome once also make chrome & extract_har work asynchronously
-# google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
-# chrome_pid=$!
-# trap "kill $chrome_pid && kill -- -$$" SIGINT SIGTERM EXIT
-
-tmp_page_index=`mktmp`
+tmp_page_index=`mktemp`
 
 cat $url_file | shuf | while read url; do check $url; done
 
