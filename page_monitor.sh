@@ -6,31 +6,32 @@ NOTIFY_CONFIG='/opt/tools/notify-config.yaml'
 function extract_har() {
     har_file=$1
     origin_domain="${1%.har}"
-    tmp_file=`mktemp`
-    trap "rm $tmp_file" EXIT
     mkdir $origin_domain 2>/dev/null
 
+    tmp_file=`mktemp`
     cat $har_file | jq '.log.entries[] | select(._resourceType == "script" or ._resourceType == "document") | select(.response.content.text != null)' > $tmp_file
 
     while read url
     do
-        query=$(echo "$url" | unfurl format %q)
         domain=$(echo "$url" | unfurl format %d)
         path=$(echo "$url" | unfurl format %p | rev | cut -d / -f 2- | rev | head -c 3800)
         file=$(echo "$url" | unfurl format %p | rev | cut -d / -f 1 | rev)
-        filename="${file}"
-        [[ ! -z "$query" ]] && filename="$filename%3F$query"
-        filename="$origin_domain/${domain}${path}/$(echo $filename | head -c 249)"
+        
         mkdir -p "$origin_domain/${domain}${path}" 2>/dev/null
+        
+        filename="$origin_domain/${domain}${path}/$(echo $file | head -c 249)"
         if [[ -d "$filename" ]]
         then
             filename=$filename.html
         fi
+        
         cat $tmp_file | jq -c 'select( .request.url == "'$url'")' \
             | head -n 1 \
             | jq -r '.response.content.text' > "$filename"
+        
         echo "domain: $domain path: $path file: $file"
     done <<< $(cat $tmp_file | jq -r '.request.url' | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
+    rm $tmp_file
 }
 
 function check() {
@@ -41,9 +42,8 @@ function check() {
     
     if [[ -d $base_domain ]]
     then
-        prev_md5=$(find $base_domain -type f -exec file {} \; \
-            | grep "JavaScript source" \
-            | cut -d ':' -f1 \
+        prev_md5=$(find $base_domain -type f \
+            | grep '\.js$' \
             | xargs -I % cat % \
             | md5sum \
             | cut -d ' ' -f1 \
@@ -61,9 +61,8 @@ function check() {
         git commit -m "$(date +%s)"
     fi
     
-    md5=$(find $base_domain -type f -exec file {} \; \
-        | grep "JavaScript source" \
-        | cut -d ':' -f1 \
+    md5=$(find $base_domain -type f \
+        | grep '\.js$' \
         | xargs -I % cat % \
         | md5sum \
         | cut -d ' ' -f1 \
@@ -112,7 +111,6 @@ url_file=$1
 mkdir -p $working_directory 2>/dev/null
 cd $working_directory
 
-# TODO try to speed it up by making chrome & extract_har work asynchronously
 google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
 chrome_pid=$!
 
