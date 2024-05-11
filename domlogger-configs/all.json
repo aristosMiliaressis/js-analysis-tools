@@ -1,0 +1,128 @@
+{
+    "config": {
+      "*": {
+        "!match": [
+          "metamask",
+          "wappalyzer",
+          "google_tag_manager",
+          "bitwarden",
+          "grecaptcha",
+          "domlogger"
+        ],
+        "alert": {
+          "match": [
+            "canary-value"
+          ],
+          "notification": true
+        }
+      },
+      "Window.prototype.addEventListener": {
+        "alert": {
+          "notification": false
+        },
+        "match": [
+          "message",
+          "hashchange",
+          "beforeunload"
+        ]
+      },
+      "event:beforeunload": {
+        "alert": {
+          "notification": false
+        },
+        "hookFunction": "console.log(arguments); return arguments;"
+      }
+    },
+    "hooks": {
+      "EVENT": {
+        "attribute": [
+          "set:window.onhashchange",
+          "set:window.onmessage"
+        ],
+        "class": [
+          "BroadcastChannel",
+          "MessageEvent",
+          "MessagePort"
+        ],
+        "event": [
+          "hashchange",
+          "message",
+          "beforeunload"
+        ],
+        "function": [
+          "postMessage",
+          "Window.prototype.addEventListener"
+        ]
+      },
+      "MISC": {
+        "attribute": [
+          "set:document.cookie"
+        ],
+        "class": [
+          "Worker",
+          "ServiceWorker",
+          "ServiceWorkerContainer"
+        ],
+        "function": [
+          "ServiceWorkerContainer.prototype.register"
+        ]
+      },
+      "REQ": {
+        "class": [
+          "XMLHttpRequest",
+          "WebSocket",
+          "EventSource"
+        ],
+        "function": [
+          "fetch",
+          "navigator.sendBeacon",
+          "XMLHttpRequest.prototype.send",
+          "XMLHttpRequest.prototype.open"
+          
+        ]
+      },
+      "URL params": {
+        "function": [
+          "URLSearchParams.prototype.get",
+          "URLSearchParams.prototype.has"
+        ]
+      },
+      "XSS": {
+        "attribute": [
+          "set:Element.prototype.innerHTML",
+          "set:Element.prototype.outerHTML",
+          "set:HTMLScriptElement.prototype.src",
+          "set:HTMLScriptElement.prototype.text",
+          "set:HTMLScriptElement.prototype.innerText",
+          "set:HTMLScriptElement.prototype.innerHTML",
+          "set:HTMLScriptElement.prototype.textContent",
+          "set:HTMLIFrameElement.prototype.src",
+          "set:HTMLIFrameElement.prototype.srcdoc",
+          "set:CSSRule.prototype.cssText"
+        ],
+        "class": [
+          "Location"
+        ],
+        "function": [
+          "eval",
+          "window.open",
+          "//setTimeout",
+          "setInterval",
+          "setImmediate",
+          "navigation.navigate",
+          "document.write",
+          "document.writeln",
+          "Range.prototype.createContextualFragment",
+          "jQuery.globalEval",
+          "importScripts",
+          "Element.prototype.insertAdjacentHTML"
+        ]
+      },
+      "query selectors": {
+        "function": [
+          "document.querySelector",
+          "document.querySelectorAll"
+        ]
+      }
+    }
+  }
