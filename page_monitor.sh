@@ -37,13 +37,14 @@ function extract_har() {
 function check() {
     base_url=$1
     normalized_url=$(echo $base_url | tr '/' '_')
-
+    apex_domain=$(echo $base_url | unfurl apexes)
+    
     chrome-har-capturer -i -c -g 4000 -t "127.0.0.1" -p 9222 -o ${normalized_url}.har $base_url
     
     if [[ -d $normalized_url ]]
     then
         prev_md5=$(find $normalized_url -type f \
-            | grep '\.js$' \
+            | grep '.*\.'$apex_domain'/.*\.js$' \
             | xargs -I % cat % \
             | md5sum \
             | cut -d ' ' -f1 \
@@ -62,7 +63,7 @@ function check() {
     fi
     
     md5=$(find $normalized_url -type f \
-        | grep '\.js$' \
+        | grep '.*\.'$apex_domain'/.*\.js$' \
         | xargs -I % cat % \
         | md5sum \
         | cut -d ' ' -f1 \
