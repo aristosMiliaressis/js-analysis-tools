@@ -69,7 +69,6 @@
       },
       "REQ": {
         "class": [
-          "XMLHttpRequest",
           "WebSocket",
           "EventSource"
         ],

@@ -113,6 +113,16 @@ url_file=$1
 mkdir -p $working_directory 2>/dev/null
 cd $working_directory
 
+if [[ -f "monitor_trace.log" ]]
+then
+    mv monitor_trace.log monitor_trace.log.bak
+fi
+
+# create log file for stdout & stderr
+exec > >(tee "monitor_trace.log") 2>&1
+
+echo "Started at $(date)"
+
 google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
 chrome_pid=$!
 
