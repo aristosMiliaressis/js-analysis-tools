@@ -44,7 +44,7 @@ function check() {
     if [[ -d $normalized_url ]]
     then
         prev_md5=$(find $normalized_url -type f \
-            | grep '.*\.'$apex_domain'/.*\.js$' \
+            | grep -P "$normalized_url/.+\.$apex_domain/.*\.js"
             | xargs -I % cat % \
             | md5sum \
             | cut -d ' ' -f1 \
@@ -63,7 +63,7 @@ function check() {
     fi
     
     md5=$(find $normalized_url -type f \
-        | grep '.*\.'$apex_domain'/.*\.js$' \
+        | grep -P "$normalized_url/.+\.$apex_domain/.*\.js"
         | xargs -I % cat % \
         | md5sum \
         | cut -d ' ' -f1 \
