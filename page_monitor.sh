@@ -1,6 +1,7 @@
 #!/bin/bash
 set -x
 
+PATH="$PATH:/usr/local/bin:/usr/local/go/bin:/usr/lib/python3.10/bin"
 NOTIFY_CONFIG='/opt/tools/notify-config.yaml'
 
 function extract_har() {
@@ -44,7 +45,8 @@ function check() {
     if [[ -d $normalized_url ]]
     then
         prev_md5=$(find $normalized_url -type f \
-            | grep -P "$normalized_url/.+\.$apex_domain/.*\.js"
+            | grep -P "$normalized_url/.*\.?$apex_domain/.*\.js" \
+            | grep -v '/cdn-cgi/' \
             | xargs -I % cat % \
             | md5sum \
             | cut -d ' ' -f1 \
@@ -63,7 +65,8 @@ function check() {
     fi
     
     md5=$(find $normalized_url -type f \
-        | grep -P "$normalized_url/.+\.$apex_domain/.*\.js"
+        | grep -P "$normalized_url/.*\.?$apex_domain/.*\.js" \
+        | grep -v '/cdn-cgi/' \
         | xargs -I % cat % \
         | md5sum \
         | cut -d ' ' -f1 \
@@ -71,16 +74,16 @@ function check() {
 
     if [[ ! -z "$prev_md5" && "$md5" != "$prev_md5" ]]
     then 
-        echo "$base_url changed script_md5 from $prev_md5 to $md5" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         cd $normalized_url
         git add .
+        printf "$base_url included scripts changed \n$(git status | grep -E '(modified|deleted|added):')" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         git commit -m "$(date +%s)"
         cp ../${normalized_url}.har .
         cd ..
     fi
 
     page_status="$(cat ${normalized_url}.har | jq '.log.entries[] | select(._resourceType == "document" and ._initiator.type == "other" and (.response.status >= 400 or .response.status < 300)) | .response.status' | tr -d '\n')"
-    page_title="\"$(cat ${normalized_url}.har | jq '.log.entries[] | select(._resourceType == "document" and ._initiator.type == "other" and (.response.status >= 400 or .response.status < 300)) | .response.content.text' | htmlq -t title)\""
+    page_title="\"$(cat ${normalized_url}.har | jq '.log.entries[] | select(._resourceType == "document" and ._initiator.type == "other" and (.response.status >= 400 or .response.status < 300)) | .response.content.text' | htmlq -t title | tr -d '\n')\""
 
     prev_entry=$(cat page_index.json | jq 'select( .Url == "'$base_url'")')
     if [[ ! -z $prev_entry ]]
