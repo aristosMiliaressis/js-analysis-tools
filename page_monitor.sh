@@ -75,10 +75,10 @@ function check() {
     if [[ ! -z "$prev_md5" && "$md5" != "$prev_md5" ]]
     then 
         cd $normalized_url
-        git add .
-        printf "$base_url included scripts changed \n$(git status | grep -E '(modified|deleted|added):')" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
-        git commit -m "$(date +%s)"
         cp ../${normalized_url}.har .
+        git add .
+        printf "$base_url included scripts changed \n$(git status | grep -E '(modified|deleted|new file):')" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
+        git commit -m "$(date +%s)"
         cd ..
     fi
 
