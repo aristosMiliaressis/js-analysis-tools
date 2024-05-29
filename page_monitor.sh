@@ -3,6 +3,7 @@ set -x
 
 PATH="$PATH:/usr/local/bin:/usr/local/go/bin:/usr/lib/python3.10/bin"
 NOTIFY_CONFIG='/opt/tools/notify-config.yaml'
+USER_AGENT='Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.113 Mobile Safari/537.36'
 
 function extract_har() {
     har_file=$1
@@ -40,7 +41,7 @@ function check() {
     normalized_url=$(echo $base_url | tr '/' '_')
     apex_domain=$(echo $base_url | unfurl apexes)
     
-    chrome-har-capturer -i -c -g 4000 -t "127.0.0.1" -p 9222 -o ${normalized_url}.har $base_url
+    chrome-har-capturer -A "$USER_AGENT" -i -c -u 10000 -r 3 -e 3000 -g 4000 -t "127.0.0.1" -p 9222 -o ${normalized_url}.har $base_url
     
     if [[ -d $normalized_url ]]
     then
