@@ -1,127 +1,165 @@
 {
-    "config": {
-      "*": {
-        "!match": [
-          "metamask",
-          "wappalyzer",
-          "google_tag_manager",
-          "bitwarden",
-          "grecaptcha",
-          "domlogger"
-        ],
-        "alert": {
-          "match": [
-            "canary-value"
-          ],
-          "notification": true
-        }
-      },
-      "Window.prototype.addEventListener": {
-        "alert": {
-          "notification": false
-        },
+  "config": {
+    "*": {
+      "!match": [
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "bitwarden",
+        "grecaptcha",
+        "domlogger"
+      ],
+      "alert": {
         "match": [
-          "message",
-          "hashchange",
-          "beforeunload"
-        ]
-      },
-      "event:beforeunload": {
-        "alert": {
-          "notification": false
-        },
-        "hookFunction": "console.log(arguments); return arguments;"
+          "canary-value"
+        ],
+        "notification": true
       }
     },
-    "hooks": {
-      "EVENT": {
-        "attribute": [
-          "set:window.onhashchange",
-          "set:window.onmessage"
-        ],
-        "class": [
-          "BroadcastChannel",
-          "MessageEvent",
-          "MessagePort"
-        ],
-        "event": [
-          "hashchange",
-          "message",
-          "beforeunload"
-        ],
-        "function": [
-          "postMessage",
-          "Window.prototype.addEventListener"
-        ]
+    "REFLECTED": {
+      "match": [
+        "exec:return `'${document.location.pathname}'`"
+      ]
+    },
+    "String.prototype.slice": {
+      "alert": {
+        "notification": false
       },
-      "MISC": {
-        "attribute": [
-          "set:document.cookie"
-        ],
-        "class": [
-          "Worker",
-          "ServiceWorker",
-          "ServiceWorkerContainer"
-        ],
-        "function": [
-          "ServiceWorkerContainer.prototype.register"
-        ]
+      "match": [
+        "\\[1\\]"
+      ]
+    },
+    "String.prototype.substring": {
+      "alert": {
+        "notification": false
       },
-      "REQ": {
-        "class": [
-          "WebSocket",
-          "EventSource"
-        ],
-        "function": [
-          "fetch",
-          "navigator.sendBeacon",
-          "XMLHttpRequest.prototype.send",
-          "XMLHttpRequest.prototype.open"
-          
-        ]
+      "match": [
+        "\\[1\\]"
+      ]
+    },
+    "Window.prototype.addEventListener": {
+      "alert": {
+        "notification": false
       },
-      "URL params": {
-        "function": [
-          "URLSearchParams.prototype.get",
-          "URLSearchParams.prototype.has"
-        ]
+      "match": [
+        "message",
+        "hashchange",
+        "beforeunload"
+      ]
+    },
+    "event:beforeunload": {
+      "alert": {
+        "notification": false
       },
-      "XSS": {
-        "attribute": [
-          "set:Element.prototype.innerHTML",
-          "set:Element.prototype.outerHTML",
-          "set:HTMLScriptElement.prototype.src",
-          "set:HTMLScriptElement.prototype.text",
-          "set:HTMLScriptElement.prototype.innerText",
-          "set:HTMLScriptElement.prototype.innerHTML",
-          "set:HTMLScriptElement.prototype.textContent",
-          "set:HTMLIFrameElement.prototype.src",
-          "set:HTMLIFrameElement.prototype.srcdoc",
-          "set:CSSRule.prototype.cssText"
-        ],
-        "class": [
-          "Location"
-        ],
-        "function": [
-          "eval",
-          "window.open",
-          "//setTimeout",
-          "setInterval",
-          "setImmediate",
-          "navigation.navigate",
-          "document.write",
-          "document.writeln",
-          "Range.prototype.createContextualFragment",
-          "jQuery.globalEval",
-          "importScripts",
-          "Element.prototype.insertAdjacentHTML"
-        ]
-      },
-      "query selectors": {
-        "function": [
-          "document.querySelector",
-          "document.querySelectorAll"
-        ]
-      }
+      "hookFunction": "console.log(arguments); return arguments;"
+    }
+  },
+  "hooks": {
+    "EVENT": {
+      "attribute": [
+        "set:window.onhashchange",
+        "set:window.onmessage"
+      ],
+      "class": [
+        "BroadcastChannel",
+        "MessageEvent",
+        "MessagePort"
+      ],
+      "event": [
+        "hashchange",
+        "message",
+        "beforeunload"
+      ],
+      "function": [
+        "postMessage",
+        "Window.prototype.addEventListener"
+      ]
+    },
+    "MISC": {
+      "attribute": [
+        "set:document.cookie"
+      ],
+      "class": [
+        "Worker",
+        "ServiceWorker",
+        "ServiceWorkerContainer"
+      ],
+      "function": [
+        "ServiceWorkerContainer.prototype.register"
+      ]
+    },
+    "REFLECTED": {
+      "attribute": [
+        "document.documentElement.innerHTML"
+      ]
+    },
+    "REQ": {
+      "class": [
+        "WebSocket",
+        "EventSource"
+      ],
+      "function": [
+        "fetch",
+        "navigator.sendBeacon",
+        "XMLHttpRequest.prototype.send",
+        "XMLHttpRequest.prototype.open"
+      ]
+    },
+    "Sources": {
+      "attribute": [
+        "get:window.name"
+      ],
+      "class": [
+        "URLSearchParams"
+      ],
+      "function": [
+        "URLSearchParams.prototype.entries",
+        "URLSearchParams.prototype.get",
+        "URLSearchParams.prototype.getAll",
+        "URLSearchParams.prototype.keys",
+        "URLSearchParams.prototype.has",
+        "URLSearchParams.prototype.values",
+        "URLSearchParams.prototype.toString",
+        "String.prototype.slice",
+        "String.prototype.substring"
+      ]
+    },
+    "XSS": {
+      "attribute": [
+        "set:Element.prototype.innerHTML",
+        "set:Element.prototype.outerHTML",
+        "set:HTMLScriptElement.prototype.src",
+        "set:HTMLScriptElement.prototype.text",
+        "set:HTMLScriptElement.prototype.innerText",
+        "set:HTMLScriptElement.prototype.innerHTML",
+        "set:HTMLScriptElement.prototype.textContent",
+        "set:HTMLIFrameElement.prototype.src",
+        "set:HTMLIFrameElement.prototype.srcdoc",
+        "set:CSSRule.prototype.cssText"
+      ],
+      "class": [
+        "Location"
+      ],
+      "function": [
+        "eval",
+        "window.open",
+        "//setTimeout",
+        "setInterval",
+        "setImmediate",
+        "navigation.navigate",
+        "document.write",
+        "document.writeln",
+        "Range.prototype.createContextualFragment",
+        "jQuery.globalEval",
+        "importScripts",
+        "Element.prototype.insertAdjacentHTML"
+      ]
+    },
+    "query selectors": {
+      "function": [
+        "document.querySelector",
+        "document.querySelectorAll"
+      ]
     }
   }
+}
