@@ -73,12 +73,12 @@ function check() {
         | cut -d ' ' -f1 \
         | tr -d '\n')
 
-    if [[ ! -z "$prev_md5" && "$md5" != "$prev_md5" ]]
+    if [[ -n "$prev_md5" && "$md5" != "$prev_md5" && "$md5" != "d41d8cd98f00b204e9800998ecf8427e" && "$prev_md5" != "d41d8cd98f00b204e9800998ecf8427e" ]]
     then 
         cd $normalized_url
         cp ../${normalized_url}.har .
         git add .
-        printf "$base_url included scripts changed \n$(git status | grep -E '(modified|deleted|new file):')" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
+        printf "$base_url included scripts changed\n$(git status | grep -E '(modified|deleted|new file):')" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         git commit -m "$(date +%s)"
         cd ..
     fi
@@ -87,15 +87,15 @@ function check() {
     page_title="\"$(cat ${normalized_url}.har | jq '.log.entries[] | select(._resourceType == "document" and ._initiator.type == "other" and (.response.status >= 400 or .response.status < 300)) | .response.content.text' | htmlq -t title | tr -d '\n')\""
 
     prev_entry=$(cat page_index.json | jq 'select( .Url == "'$base_url'")')
-    if [[ ! -z $prev_entry ]]
+    if [[ -n $prev_entry ]]
     then
         prev_status=$(echo $prev_entry | jq -r .status)
         prev_title=$(echo $prev_entry | jq .title)
-        if [[ $prev_status != $page_status ]]
+        if [[ $prev_status != $page_status && -n $prev_status && -n $page_status ]]
         then
             echo "$base_url changed status code from $prev_status to $page_status" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
-        if [[ "$prev_title" != "$page_title" ]]
+        if [[ "$prev_title" != "$page_title" && -n $prev_title && -n $page_title ]]
         then 
             echo "$base_url changed title from $prev_title to $page_title" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
@@ -131,7 +131,7 @@ google-chrome --no-sandbox --remote-debugging-port=9222 --headless &
 chrome_pid=$!
 
 # kill all children process on exit
-trap "kill $chrome_pid && kill -- -$$" SIGINT SIGTERM EXIT
+trap "kill -s SIGTERM $chrome_pid && kill -s SIGTERM -- -$$" EXIT
 
 tmp_page_index=`mktemp`
 
