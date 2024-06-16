@@ -32,9 +32,20 @@ setInterval(() => {
 	chrome.runtime.sendMessage(details);
 }, 500)
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	for (var frame of document.getElementsByTagName('iframe')) { 
-		frame.style='border: 3px dashed green; margin: 5px; padding: 5px;'
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	for (var frame of document.getElementsByTagName('iframe')) {
+		var parser = new DOMParser()
+		doc = parser.parseFromString(frame.outerHTML, 'text/html');
+		const attrToRemove = ['style', 'title'];
+		for (const elm of doc.querySelectorAll('*')) {
+			for (const attrib of [...attrToRemove]) {
+				if (elm.hasAttribute(attrib)) {
+					elm.removeAttribute(attrib);
+				}
+			}
+		}
+		frame.setAttribute('title', doc.body.innerHTML);
+		frame.style = 'border: 3px dashed green; margin: 5px; padding: 5px;'
 	}
 });
 
