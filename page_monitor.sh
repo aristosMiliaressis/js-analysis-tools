@@ -95,7 +95,7 @@ function check() {
         then
             echo "$base_url changed status code from $prev_status to $page_status" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
-        if [[ "$prev_title" != "$page_title" && -n $prev_title && -n $page_title ]]
+        if [[ "$prev_title" != "$page_title" && $prev_title != '""' && $page_title != '""' ]]
         then 
             echo "$base_url changed title from $prev_title to $page_title" | notify -bulk -silent -provider-config $NOTIFY_CONFIG -provider discord -id monitor
         fi
