@@ -1,0 +1,18 @@
+{
+  "name": "deobfuscator",
+  "version": "1.0.0",
+  "description": "Just some deobfuscation experiments based on [this methodology](https://steakenthusiast.github.io/2022/05/21/Deobfuscating-Javascript-via-AST-An-Introduction-to-Babel/#Conclusion-Additional-Resources)",
+  "main": "deobfuscator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/generator": "^7.24.7",
+    "@babel/parser": "^7.24.7",
+    "@babel/traverse": "^7.24.7",
+    "@babel/types": "^7.24.7",
+    "js-beautify": "^1.15.1"
+  }
+}

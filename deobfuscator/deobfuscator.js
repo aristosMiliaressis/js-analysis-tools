@@ -1,3 +1,5 @@
+#!/usr/bin/node
+
 const parser = require("@babel/parser");
 const traverse = require("@babel/traverse").default;
 const t = require("@babel/types");
@@ -6,32 +8,50 @@ const beautify = require("js-beautify");
 const { readFileSync, writeFile } = require("fs");
 
 function deobfuscate(filename, source) {
-    
+
+    const uniqueIdentifierNames = {
+        Identifier(path) {
+            if (path.node.name.length <= 2) {
+                const characters = 'abcdefghijklmnopqrstuvwxyz';
+                const charactersLength = characters.length;
+
+                let result = "";
+                let counter = 0;
+                while (result.length < 12) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                    counter += 1;
+                }
+
+                path.scope.rename(path.node.name, result)
+            }
+        }
+    };
+
     // turns "void 0" into "undefined"
     const deobfuscateVoidToUndefinedVisitor = {
-        UnaryExpression(path) { 
+        UnaryExpression(path) {
             const operator = path.get("operator").node;
             if (operator == "void") {
                 let undefinedIdentifier = t.identifier('undefined')
-            
+
                 path.replaceWith(undefinedIdentifier);
-            }         
+            }
         }
     };
-    
+
     // turns "!0" and "!1" into "true" & "false"
     const deobfuscateMinifiedBoolVisitor = {
-        UnaryExpression(path) {           
+        UnaryExpression(path) {
             const operator = path.get("operator").node;
             const argument = path.get("argument").node;
             if (operator == "!" && typeof argument.value == "number") {
                 let boolLiteral = t.booleanLiteral(argument.value == 0)
-            
+
                 path.replaceWith(boolLiteral);
-            }        
+            }
         }
     };
-    
+
     // turns "-1 == x.toString()" into "x.toString() == -1"
     const swapLiteralsInBinaryExpressions = {
         BinaryExpression(path) {
@@ -47,37 +67,37 @@ function deobfuscate(filename, source) {
             }
         },
     };
-    
+
     // Visitor for replacing hex/octal/binary numeric literals with decimal
     const deobfuscateEncodedNumeralsVisitor = {
         NumericLiteral(path) {
             if (path.node.extra) delete path.node.extra;
         },
     };
-    
+
     // TODO swap undefined & identifier in Binary Expression
     // TODO swap !![] to false and ![] to true
-    
+
     /// ^^^ everythig above is my experiments
     /// vvv everything bellow is part of the original blog series
-    
+
     // Visitor for removing string encoding.
     const deobfuscateEncodedStringVisitor = {
         StringLiteral(path) {
             if (path.node.extra) delete path.node.extra;
         },
     };
-    
+
     const deobfuscateStringConcatVisitor = {
         BinaryExpression(path) {
-          let { confident, value } = path.evaluate(); // Evaluate the binary expression
-          if (!confident) return; // Skip if not confident
-          if (typeof value == "string") {
-            path.replaceWith(t.stringLiteral(value)); // Substitute the simplified value
-          }
+            let { confident, value } = path.evaluate(); // Evaluate the binary expression
+            if (!confident) return; // Skip if not confident
+            if (typeof value == "string") {
+                path.replaceWith(t.stringLiteral(value)); // Substitute the simplified value
+            }
         },
     };
-       
+
     // Visitor for constant folding
     const foldConstantsVisitor = {
         BinaryExpression(path) {
@@ -118,14 +138,14 @@ function deobfuscate(filename, source) {
             }
         },
     };
-    
+
     // Visitor for deleting empty statements
     const deleteEmptyStatementsVisitor = {
         EmptyStatement(path) {
             path.remove();
         }
     };
-    
+
     // Visitor for simplifying if statements and logical statements
     const simplifyIfAndLogicalVisitor = {
         "ConditionalExpression|IfStatement"(path) {
@@ -149,9 +169,10 @@ function deobfuscate(filename, source) {
             }
         }
     };
-    
+
     const ast = parser.parse(source);
-    
+
+    traverse(ast, uniqueIdentifierNames);
     traverse(ast, swapLiteralsInBinaryExpressions);
     traverse(ast, deobfuscateMinifiedBoolVisitor);
     traverse(ast, deobfuscateVoidToUndefinedVisitor);
@@ -163,13 +184,13 @@ function deobfuscate(filename, source) {
     traverse(ast, deobfuscateStringConcatVisitor);
 
     let deobfCode = generate(ast, { comments: false }).code;
-    
+
     deobfCode = beautify(deobfCode, {
         indent_size: 4,
         space_in_empty_paren: true,
         break_chained_methods: true
     });
-    
+
     writeCodeToFile(filename, deobfCode);
 }
 
@@ -182,7 +203,7 @@ function writeCodeToFile(filename, code) {
         }
     });
 }
-process.argv.forEach(function(val, index, array) {
+process.argv.forEach(function (val, index, array) {
     if (index < 2) return;
     deobfuscate(val, readFileSync(val, "utf8"));
 });
