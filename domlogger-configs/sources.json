@@ -1,0 +1,31 @@
+{
+  "hooks": {
+    "Sources": {
+      "attribute": [
+        "get:window.name",
+        "get:URL.prototype.search",
+        "get:URL.prototype.searchParams"
+      ],
+      "class": ["URLSearchParams"],
+      "function": ["String.prototype.slice", "String.prototype.substring"]
+    }
+  },
+
+  "config": {
+    "*": {
+      "!match": [
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "bitwarden",
+        "grecaptcha",
+        "domlogger"
+      ]
+    },
+    "String.prototype.substring|String.prototype.slice": {
+      "match": [
+        "exec:return thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
+      ]
+    }
+  }
+}

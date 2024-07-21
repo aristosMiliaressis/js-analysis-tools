@@ -8,96 +8,53 @@
         "bitwarden",
         "grecaptcha",
         "domlogger"
-      ],
-      "alert": {
-        "match": [
-          "canary-value"
-        ],
-        "notification": true
-      }
-    },
-    "REFLECTED": {
-      "match": [
-        "exec:return `'${document.location.pathname}'`"
       ]
     },
-    "String.prototype.slice": {
+    "Document.prototype.createElement": {
       "alert": {
         "notification": false
       },
       "match": [
-        "\\[1\\]"
+        "\\[\"script\"\\]",
+        "\\[\"style\"\\]",
+        "\\[\"iframe\"\\]",
+        "\\[\"a\"\\]",
+        "\\[\"form\"\\]"
       ]
     },
-    "String.prototype.substring": {
-      "alert": {
-        "notification": false
-      },
+    "String.prototype.substring|String.prototype.slice": {
       "match": [
-        "\\[1\\]"
+        "exec:return thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
       ]
     },
     "Window.prototype.addEventListener": {
       "alert": {
         "notification": false
       },
-      "match": [
-        "message",
-        "hashchange",
-        "beforeunload"
-      ]
-    },
-    "event:beforeunload": {
-      "alert": {
-        "notification": false
-      },
-      "hookFunction": "console.log(arguments); return arguments;"
+      "match": ["message", "hashchange", "beforeunload"]
     }
   },
   "hooks": {
     "EVENT": {
-      "attribute": [
-        "set:window.onhashchange",
-        "set:window.onmessage"
-      ],
-      "class": [
-        "BroadcastChannel",
-        "MessageEvent",
-        "MessagePort"
-      ],
-      "event": [
-        "hashchange",
-        "message",
-        "beforeunload"
-      ],
-      "function": [
-        "postMessage",
-        "Window.prototype.addEventListener"
-      ]
+      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
+      "event": ["hashchange", "message", "beforeunload"],
+      "function": ["window.postMessage", "Window.prototype.addEventListener"]
     },
     "MISC": {
-      "attribute": [
-        "set:document.cookie"
-      ],
-      "class": [
-        "Worker",
-        "ServiceWorker",
-        "ServiceWorkerContainer"
-      ],
-      "function": [
-        "ServiceWorkerContainer.prototype.register"
-      ]
+      "attribute": ["set:document.cookie"],
+      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer", "Blob"],
+      "function": ["ServiceWorkerContainer.prototype.register"]
     },
-    "REFLECTED": {
-      "attribute": [
-        "document.documentElement.innerHTML"
+    "NAVIGATION": {
+      "function": [
+        "history.pushState",
+        "history.replaceState",
+        "navigation.navigate",
+        "window.open"
       ]
     },
     "REQ": {
-      "class": [
-        "WebSocket",
-        "EventSource"
-      ],
+      "class": ["WebSocket", "EventSource"],
       "function": [
         "fetch",
         "navigator.sendBeacon",
@@ -107,59 +64,44 @@
     },
     "Sources": {
       "attribute": [
-        "get:window.name"
+        "get:window.name",
+        "get:URL.prototype.search",
+        "get:URL.prototype.searchParams"
       ],
-      "class": [
-        "URLSearchParams"
-      ],
-      "function": [
-        "URLSearchParams.prototype.entries",
-        "URLSearchParams.prototype.get",
-        "URLSearchParams.prototype.getAll",
-        "URLSearchParams.prototype.keys",
-        "URLSearchParams.prototype.has",
-        "URLSearchParams.prototype.values",
-        "URLSearchParams.prototype.toString",
-        "String.prototype.slice",
-        "String.prototype.substring"
-      ]
+      "class": ["URLSearchParams"],
+      "function": ["String.prototype.slice", "String.prototype.substring"]
     },
     "XSS": {
       "attribute": [
         "set:Element.prototype.innerHTML",
         "set:Element.prototype.outerHTML",
+        "set:HTMLAnchorElement.prototype.href",
+        "set:HTMLButtonElement.prototype.formAction",
+        "set:HTMLInputElement.prototype.formAction",
+        "set:HTMLFormElement.prototype.action",
+        "set:HTMLIFrameElement.prototype.src",
+        "set:HTMLIFrameElement.prototype.srcdoc",
         "set:HTMLScriptElement.prototype.src",
         "set:HTMLScriptElement.prototype.text",
         "set:HTMLScriptElement.prototype.innerText",
         "set:HTMLScriptElement.prototype.innerHTML",
         "set:HTMLScriptElement.prototype.textContent",
-        "set:HTMLIFrameElement.prototype.src",
-        "set:HTMLIFrameElement.prototype.srcdoc",
         "set:CSSRule.prototype.cssText"
       ],
-      "class": [
-        "Location"
-      ],
+      "class": ["Location"],
       "function": [
         "eval",
-        "window.open",
-        "//setTimeout",
-        "setInterval",
-        "setImmediate",
+        "Function",
         "navigation.navigate",
         "document.write",
         "document.writeln",
         "Range.prototype.createContextualFragment",
-        "jQuery.globalEval",
-        "importScripts",
-        "Element.prototype.insertAdjacentHTML"
-      ]
-    },
-    "query selectors": {
-      "function": [
-        "document.querySelector",
-        "document.querySelectorAll"
+        "Element.prototype.insertAdjacentHTML",
+        "HTMLScriptElement.prototype.append",
+        "HTMLScriptElement.prototype.appendChild",
+        "Document.prototype.createElement"
       ]
     }
-  }
+  },
+  "removeHeaders": ["content-security-policy"]
 }

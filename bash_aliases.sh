@@ -2,6 +2,7 @@
 function unhar() {
     har_file=$1
     origin_domain="${1%.har}"
+    apex_domain=$(echo $origin_domain | unfurl apexes)
     tmp_file=`mktemp`
     mkdir $origin_domain 2>/dev/null
 
@@ -9,8 +10,11 @@ function unhar() {
 
     while read url
     do
-        query=$(echo "$url" | unfurl format %q)
         domain=$(echo "$url" | unfurl format %d)
+        apex=$(echo $domain | unfurl apexes)
+        if [[ $apex != $apex_domain ]];	then continue; fi
+
+        query=$(echo "$url" | unfurl format %q)
         path=$(echo "$url" | unfurl format %p | rev | cut -d / -f 2- | rev | head -c 3800)
         file=$(echo "$url" | unfurl format %p | rev | cut -d / -f 1 | rev)
         filename="${file}"
@@ -26,9 +30,16 @@ function unhar() {
             | head -n 1 \
             | jq -r '.response.content.text' > "$filename"
         echo "domain: $domain path: $path file: $filename"
+        if [[ -d "$filename" ]]; then continue; fi
         if [[ $(file -- "$filename") == *"JavaScript source"* || "$file" == *".js" ]]
         then
-            js-beautify --outfile="$filename" "$filename"
+            (
+                deobfuscator.js "$filename"
+                if [[ $? -ne 0 ]]
+                then
+                    js-beautify --outfile="$filename" "$filename"
+                fi
+            ) &
         elif [[ $(file -- "$filename") == *"HTML document"* || "$file" == *".html" ]]
         then
             html-beautify --outfile="$filename" "$filename"
@@ -76,6 +87,14 @@ function capture_har() {
 }
 
 function fetch_urls() {
+    tmp=`mktemp`
+    trap "rm $tmp" EXIT
+
+    while read url
+    do
+        echo $url
+    done | tr -d '\r' | unfurl format %s://%a%p > $tmp
+
     while read url
     do
         query=$(echo "$url" | unfurl format %q)
@@ -94,7 +113,7 @@ function fetch_urls() {
         
         if [[ -d "$filename" ]]; then continue; fi
         
-        curl -H 'User-Agent: Mozilla/5.1' $url > "$filename"
+        curl --compressed -H 'User-Agent: Mozilla/5.1' "$url" > "$filename"
         
         if [[ $(file -- "$filename") == *"JavaScript source"* || "$file" == *".js" ]]
         then
@@ -109,5 +128,5 @@ function fetch_urls() {
         then
             html-beautify --outfile="$filename" "$filename"
         fi
-    done < "${1:-/dev/stdin}"
+    done <<< $(cat $tmp | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
 }
