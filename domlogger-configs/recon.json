@@ -1,0 +1,89 @@
+{
+  "config": {
+    "*": {
+      "!match": [
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "bitwarden",
+        "grecaptcha",
+        "domlogger"
+      ]
+    },
+    "String.prototype.split": {
+      "match": ["\\[&\\]"]
+    },
+    "String.prototype.substring|String.prototype.slice": {
+      "match": [
+        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
+      ]
+    },
+    "Window.prototype.addEventListener": {
+      "alert": {
+        "notification": false
+      },
+      "match": ["message", "hashchange", "beforeunload"]
+    }
+  },
+  "hooks": {
+    "CrossWindow": {
+      "attribute": ["get:window.name"],
+      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
+      "event": ["message"],
+      "function": [
+        "window.postMessage",
+        "Window.prototype.addEventListener",
+        "window.open"
+      ]
+    },
+    "NAVIGATION": {
+      "event": ["hashchange", "beforeunload"],
+      "function": [
+        "history.pushState",
+        "history.replaceState",
+        "navigation.navigate"
+      ]
+    },
+    "ParamParsing": {
+      "function": [
+        "String.prototype.slice",
+        "String.prototype.substring",
+        "String.prototype.split"
+      ]
+    },
+    "QueryParams": {
+      "attribute": [
+        "get:URL.prototype.search",
+        "get:URL.prototype.searchParams",
+        "get:URLSearchParams.prototype.get",
+        "get:URLSearchParams.prototype.has"
+      ],
+      "class": ["URLSearchParams"]
+    },
+    "REQ": {
+      "class": ["WebSocket", "EventSource"],
+      "function": [
+        "fetch",
+        "navigator.sendBeacon",
+        "XMLHttpRequest.prototype.send",
+        "XMLHttpRequest.prototype.open"
+      ]
+    },
+    "WebWorker": {
+      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
+      "function": [
+        "Worker.prototype.postMessage",
+        "ServiceWorker.prototype.postMessage",
+        "Worker.prototype.addEventListener",
+        "ServiceWorker.prototype.addEventListener",
+        "ServiceWorkerContainer.prototype.register"
+      ]
+    },
+    "storage": {
+      "attribute": ["get:document.cookie"],
+      "class": ["Blob"],
+      "function": ["localStorage.getItem", "sessionStorage.getItem"]
+    }
+  },
+  "removeHeaders": ["content-security-policy"]
+}

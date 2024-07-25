@@ -15,9 +15,11 @@
           ".includes",
           ".replace",
           ".startsWith",
+          ".search",
           ".innerHTML",
           ".outerHTML",
           "postMessage",
+          "window.origin",
           "opener",
           "eval"
         ],

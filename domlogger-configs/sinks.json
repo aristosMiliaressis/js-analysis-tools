@@ -1,0 +1,65 @@
+{
+  "config": {
+    "*": {
+      "!match": [
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "bitwarden",
+        "grecaptcha",
+        "domlogger"
+      ]
+    },
+    "Document.prototype.createElement": {
+      "alert": {
+        "notification": false
+      },
+      "match": [
+        "\\[\"script\"\\]",
+        "\\[\"style\"\\]",
+        "\\[\"iframe\"\\]",
+        "\\[\"a\"\\]",
+        "\\[\"form\"\\]"
+      ]
+    }
+  },
+  "hooks": {
+    "DOM": {
+      "attribute": [
+        "set:Element.prototype.innerHTML",
+        "set:Element.prototype.outerHTML",
+        "set:HTMLAnchorElement.prototype.href",
+        "set:HTMLButtonElement.prototype.formAction",
+        "set:HTMLInputElement.prototype.formAction",
+        "set:HTMLFormElement.prototype.action",
+        "set:HTMLIFrameElement.prototype.src",
+        "set:HTMLIFrameElement.prototype.srcdoc",
+        "set:HTMLScriptElement.prototype.src",
+        "set:HTMLScriptElement.prototype.text",
+        "set:HTMLScriptElement.prototype.innerText",
+        "set:HTMLScriptElement.prototype.innerHTML",
+        "set:HTMLScriptElement.prototype.textContent"
+      ],
+      "function": [
+        "Element.prototype.insertAdjacentHTML",
+        "HTMLScriptElement.prototype.append",
+        "HTMLScriptElement.prototype.appendChild",
+        "Document.prototype.createElement"
+      ]
+    },
+    "CSS": {
+      "attribute": ["set:CSSRule.prototype.cssText"]
+    },
+    "XSS": {
+      "class": ["Location"],
+      "function": [
+        "eval",
+        "Function",
+        "document.write",
+        "document.writeln",
+        "Range.prototype.createContextualFragment"
+      ]
+    }
+  },
+  "removeHeaders": ["content-security-policy"]
+}
