@@ -6,8 +6,9 @@
         "wappalyzer",
         "google_tag_manager",
         "bitwarden",
+        "messenger_awaiter",
         "grecaptcha",
-        "domlogger"
+        "untrustedTypes"
       ]
     },
     "String.prototype.split": {
@@ -17,12 +18,6 @@
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
       ]
-    },
-    "Window.prototype.addEventListener": {
-      "alert": {
-        "notification": false
-      },
-      "match": ["message", "hashchange", "beforeunload"]
     }
   },
   "hooks": {
@@ -30,11 +25,7 @@
       "attribute": ["get:window.name"],
       "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
       "event": ["message"],
-      "function": [
-        "window.postMessage",
-        "Window.prototype.addEventListener",
-        "window.open"
-      ]
+      "function": ["window.postMessage", "window.open"]
     },
     "NAVIGATION": {
       "event": ["hashchange", "beforeunload"],
@@ -53,6 +44,7 @@
     },
     "QueryParams": {
       "attribute": [
+        "get:URL.prototype.hash",
         "get:URL.prototype.search",
         "get:URL.prototype.searchParams",
         "get:URLSearchParams.prototype.get",
@@ -79,13 +71,13 @@
         "ServiceWorkerContainer.prototype.register"
       ]
     },
+    "clipboard": {
+      "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
+    },
     "storage": {
       "attribute": ["get:document.cookie"],
       "class": ["Blob"],
       "function": ["localStorage.getItem", "sessionStorage.getItem"]
-    },
-    "clipboard": {
-      "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     }
   },
   "removeHeaders": ["content-security-policy"]

@@ -19,7 +19,8 @@
         "\\[\"style\"\\]",
         "\\[\"iframe\"\\]",
         "\\[\"a\"\\]",
-        "\\[\"form\"\\]"
+        "\\[\"form\"\\]",
+        "\\[\"link\"\\]"
       ]
     }
   },
@@ -39,48 +40,41 @@
       "attribute": [
         "set:Element.prototype.innerHTML",
         "set:Element.prototype.outerHTML",
-        "set:HTMLAnchorElement.prototype.href",
-        "set:HTMLButtonElement.prototype.formAction",
-        "set:HTMLInputElement.prototype.formAction",
-        "set:HTMLFormElement.prototype.action",
         "set:HTMLIFrameElement.prototype.src",
-        "set:HTMLIFrameElement.prototype.srcdoc",
+        "set:HTMLIFrameElement.prototype.srcdoc"
+      ],
+      "function": [
+        "Element.prototype.insertAdjacentHTML",
+        "Document.prototype.createElement",
+        "Range.prototype.createContextualFragment",
+        "document.write",
+        "document.writeln"
+      ]
+    },
+    "JS": {
+      "class": ["Location"],
+      "attribute": [
         "set:HTMLScriptElement.prototype.src",
         "set:HTMLScriptElement.prototype.text",
         "set:HTMLScriptElement.prototype.innerText",
         "set:HTMLScriptElement.prototype.innerHTML",
-        "set:HTMLScriptElement.prototype.textContent"
-      ],
-      "function": [
-        "Element.prototype.insertAdjacentHTML",
-        "HTMLScriptElement.prototype.append",
-        "HTMLScriptElement.prototype.appendChild",
-        "Document.prototype.createElement"
-      ]
-    },
-    "XSS": {
-      "class": [
-        "Location"
+        "set:HTMLScriptElement.prototype.textContent",
+        "set:HTMLAnchorElement.prototype.href",
+        "set:HTMLButtonElement.prototype.formAction",
+        "set:HTMLInputElement.prototype.formAction",
+        "set:HTMLFormElement.prototype.action"
       ],
       "function": [
         "eval",
         "Function",
-        "document.write",
-        "document.writeln",
-        "Range.prototype.createContextualFragment"
+        "HTMLScriptElement.prototype.append",
+        "HTMLScriptElement.prototype.appendChild"
       ]
     },
     "storage": {
-      "attribute": [
-        "set:document.cookie"
-      ],
-      "function": [
-        "localStorage.setItem",
-        "sessionStorage.setItem"
-      ]
+      "attribute": ["set:document.cookie"],
+      "function": ["localStorage.setItem", "sessionStorage.setItem"]
     }
   },
-  "removeHeaders": [
-    "content-security-policy"
-  ]
+  "removeHeaders": ["content-security-policy"]
 }
