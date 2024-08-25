@@ -1,0 +1,21 @@
+{
+  "config": {
+    "String.prototype.split": {
+      "match": ["\\[&\\]"]
+    },
+    "String.prototype.substring|String.prototype.slice": {
+      "match": [
+        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
+      ]
+    }
+  },
+  "hooks": {
+    "ParamParsing": {
+      "function": [
+        "String.prototype.slice",
+        "String.prototype.substring",
+        "String.prototype.split"
+      ]
+    }
+  }
+}

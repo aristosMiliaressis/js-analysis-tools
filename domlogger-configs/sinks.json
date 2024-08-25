@@ -24,6 +24,17 @@
     }
   },
   "hooks": {
+    "CSS": {
+      "attribute": [
+        "set:CSSRule.prototype.cssText",
+        "set:HTMLStyleElement.prototype.src",
+        "set:HTMLStyleElement.prototype.text",
+        "set:HTMLStyleElement.prototype.innerText",
+        "set:HTMLStyleElement.prototype.innerHTML",
+        "set:HTMLStyleElement.prototype.textContent",
+        "set:HTMLLinkElement.prototype.href"
+      ]
+    },
     "DOM": {
       "attribute": [
         "set:Element.prototype.innerHTML",
@@ -47,11 +58,10 @@
         "Document.prototype.createElement"
       ]
     },
-    "CSS": {
-      "attribute": ["set:CSSRule.prototype.cssText"]
-    },
     "XSS": {
-      "class": ["Location"],
+      "class": [
+        "Location"
+      ],
       "function": [
         "eval",
         "Function",
@@ -59,7 +69,18 @@
         "document.writeln",
         "Range.prototype.createContextualFragment"
       ]
+    },
+    "storage": {
+      "attribute": [
+        "set:document.cookie"
+      ],
+      "function": [
+        "localStorage.setItem",
+        "sessionStorage.setItem"
+      ]
     }
   },
-  "removeHeaders": ["content-security-policy"]
+  "removeHeaders": [
+    "content-security-policy"
+  ]
 }

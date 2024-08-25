@@ -83,6 +83,9 @@
       "attribute": ["get:document.cookie"],
       "class": ["Blob"],
       "function": ["localStorage.getItem", "sessionStorage.getItem"]
+    },
+    "clipboard": {
+      "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     }
   },
   "removeHeaders": ["content-security-policy"]
