@@ -22,7 +22,12 @@
   },
   "hooks": {
     "CrossWindow": {
-      "attribute": ["get:window.name"],
+      "attribute": [
+        "get:window.name",
+        "get:window.top",
+        "get:window.parent",
+        "get:window.opener"
+      ],
       "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
       "event": ["message"],
       "function": ["window.postMessage", "window.open"]
@@ -46,20 +51,16 @@
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
-        "get:URL.prototype.searchParams",
-        "get:URLSearchParams.prototype.get",
-        "get:URLSearchParams.prototype.has"
+        "get:URL.prototype.searchParams"
       ],
-      "class": ["URLSearchParams"]
+      "class": ["URLSearchParams"],
+      "function": [
+        "URLSearchParams.prototype.get",
+        "URLSearchParams.prototype.has"
+      ]
     },
     "REQ": {
-      "class": ["WebSocket", "EventSource"],
-      "function": [
-        "fetch",
-        "navigator.sendBeacon",
-        "XMLHttpRequest.prototype.send",
-        "XMLHttpRequest.prototype.open"
-      ]
+      "class": ["WebSocket", "EventSource"]
     },
     "WebWorker": {
       "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
@@ -68,16 +69,23 @@
         "ServiceWorker.prototype.postMessage",
         "Worker.prototype.addEventListener",
         "ServiceWorker.prototype.addEventListener",
-        "ServiceWorkerContainer.prototype.register"
+        "navigator.serviceWorker.register",
+        "ServiceWorkerContainer.prototype.register",
+        "ServiceWorkerContainer.prototype.getRegistrations"
       ]
     },
     "clipboard": {
+      "function": ["Object.keys"],
       "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     },
     "storage": {
       "attribute": ["get:document.cookie"],
       "class": ["Blob"],
-      "function": ["localStorage.getItem", "sessionStorage.getItem"]
+      "function": [
+        "localStorage.getItem",
+        "sessionStorage.getItem",
+        "URL.createObjectURL"
+      ]
     }
   },
   "removeHeaders": ["content-security-policy"]

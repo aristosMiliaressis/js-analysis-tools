@@ -40,35 +40,71 @@
       "attribute": [
         "set:Element.prototype.innerHTML",
         "set:Element.prototype.outerHTML",
+        "set:HTMLAnchorElement.prototype.href",
+        "set:HTMLButtonElement.prototype.formAction",
+        "set:HTMLInputElement.prototype.formAction",
+        "set:HTMLFormElement.prototype.action",
         "set:HTMLIFrameElement.prototype.src",
-        "set:HTMLIFrameElement.prototype.srcdoc"
-      ],
-      "function": [
-        "Element.prototype.insertAdjacentHTML",
-        "Document.prototype.createElement",
-        "Range.prototype.createContextualFragment",
-        "document.write",
-        "document.writeln"
-      ]
-    },
-    "JS": {
-      "class": ["Location"],
-      "attribute": [
+        "set:HTMLIFrameElement.prototype.srcdoc",
+        "set:HTMLFrameElement.prototype.src",
+        "set:HTMLFrameElement.prototype.srcdoc",
+        "set:HTMLMediaElement.prototype.src",
+        "set:HTMLSourceElement.prototype.src",
+        "set:HTMLAreaElement.prototype.href",
+        "set:HTMLInputElement.prototype.src",
+        "set:HTMLBaseElement.prototype.href",
+        "set:HTMLTrackElement.prototype.src",
+        "set:HTMLEmbededElement.prototype.src",
         "set:HTMLScriptElement.prototype.src",
         "set:HTMLScriptElement.prototype.text",
         "set:HTMLScriptElement.prototype.innerText",
         "set:HTMLScriptElement.prototype.innerHTML",
-        "set:HTMLScriptElement.prototype.textContent",
-        "set:HTMLAnchorElement.prototype.href",
-        "set:HTMLButtonElement.prototype.formAction",
-        "set:HTMLInputElement.prototype.formAction",
-        "set:HTMLFormElement.prototype.action"
+        "set:HTMLScriptElement.prototype.textContent"
       ],
+      "function": [
+        "Element.prototype.insertAdjacentHTML",
+        "HTMLScriptElement.prototype.append",
+        "HTMLScriptElement.prototype.appendChild",
+        "//Document.prototype.createElement"
+      ]
+    },
+    "JQUERY": {
+      "custom": [
+        "function:$",
+        "function:jQuery",
+        "function:jQuery.globalEval",
+        "function:jQuery.parseHTML",
+        "function:jQuery.prototype.add",
+        "function:jQuery.prototype.after",
+        "function:jQuery.prototype.attr",
+        "function:jQuery.prototype.append",
+        "function:jQuery.prototype.appendTo",
+        "function:jQuery.prototype.before",
+        "function:jQuery.prototype.constructor",
+        "function:jQuery.prototype.has",
+        "function:jQuery.prototype.html",
+        "function:jQuery.prototype.index",
+        "function:jQuery.prototype.init",
+        "function:jQuery.prototype.insertAfter",
+        "function:jQuery.prototype.insertBefore",
+        "function:jQuery.prototype.prepend",
+        "function:jQuery.prototype.prependTo",
+        "function:jQuery.prototype.prop",
+        "function:jQuery.prototype.replaceAll",
+        "function:jQuery.prototype.replaceWith",
+        "function:jQuery.prototype.wrap",
+        "function:jQuery.prototype.wrapAll",
+        "function:jQuery.prototype.wrapInner"
+      ]
+    },
+    "XSS": {
+      "class": ["Location"],
       "function": [
         "eval",
         "Function",
-        "HTMLScriptElement.prototype.append",
-        "HTMLScriptElement.prototype.appendChild"
+        "document.write",
+        "document.writeln",
+        "Range.prototype.createContextualFragment"
       ]
     },
     "storage": {
