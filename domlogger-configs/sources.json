@@ -40,23 +40,26 @@
         "navigation.navigate"
       ]
     },
-    "ParamParsing": {
-      "function": [
-        "String.prototype.slice",
-        "String.prototype.substring",
-        "String.prototype.split"
-      ]
-    },
-    "URLParams": {
+    "Parameters": {
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
         "get:URL.prototype.searchParams"
       ],
-      "class": ["URLSearchParams"],
       "function": [
         "URLSearchParams.prototype.get",
-        "URLSearchParams.prototype.has"
+        "URLSearchParams.prototype.has",
+        "URLSearchParams.prototype.append",
+        "URLSearchParams.prototype.delete",
+        "URLSearchParams.prototype.entries",
+        "URLSearchParams.prototype.forEach",
+        "URLSearchParams.prototype.getAll",
+        "URLSearchParams.prototype.keys",
+        "URLSearchParams.prototype.set",
+        "URLSearchParams.prototype.values",
+        "String.prototype.slice",
+        "String.prototype.substring",
+        "String.prototype.split"
       ]
     },
     "Network": {
@@ -83,7 +86,7 @@
     },
     "misc": {
       "class": ["Blob"],
-      "function": ["URL.createObjectURL", "Object.keys"]
+      "function": ["URL.createObjectURL", "//Object.keys"]
     }
   },
   "removeHeaders": ["content-security-policy"]
