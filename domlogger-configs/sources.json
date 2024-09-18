@@ -16,7 +16,7 @@
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
-        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : null"
+        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
       ]
     }
   },
@@ -47,7 +47,7 @@
         "String.prototype.split"
       ]
     },
-    "QueryParams": {
+    "URLParams": {
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
@@ -59,7 +59,7 @@
         "URLSearchParams.prototype.has"
       ]
     },
-    "REQ": {
+    "Network": {
       "class": ["WebSocket", "EventSource"]
     },
     "WebWorker": {
@@ -75,17 +75,15 @@
       ]
     },
     "clipboard": {
-      "function": ["Object.keys"],
       "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     },
     "storage": {
       "attribute": ["get:document.cookie"],
+      "function": ["localStorage.getItem", "sessionStorage.getItem"]
+    },
+    "misc": {
       "class": ["Blob"],
-      "function": [
-        "localStorage.getItem",
-        "sessionStorage.getItem",
-        "URL.createObjectURL"
-      ]
+      "function": ["URL.createObjectURL", "Object.keys"]
     }
   },
   "removeHeaders": ["content-security-policy"]
