@@ -12,12 +12,17 @@
       ]
     },
     "String.prototype.split": {
-      "match": ["\\[&\\]"]
+      "match": [
+        "\\[&\\]"
+      ]
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
       ]
+    },
+    "history.pushState|history.replaceState": {
+      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
     }
   },
   "hooks": {
@@ -28,42 +33,64 @@
         "get:window.parent",
         "get:window.opener"
       ],
-      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
-      "event": ["message"],
-      "function": ["window.postMessage", "window.open"]
+      "class": [
+        "BroadcastChannel",
+        "MessageEvent",
+        "MessagePort"
+      ],
+      "event": [
+        "message"
+      ],
+      "function": [
+        "window.postMessage",
+        "window.open"
+      ]
     },
     "NAVIGATION": {
-      "event": ["hashchange", "beforeunload"],
+      "event": [
+        "hashchange",
+        "beforeunload"
+      ],
       "function": [
         "history.pushState",
         "history.replaceState",
         "navigation.navigate"
       ]
     },
-    "ParamParsing": {
-      "function": [
-        "String.prototype.slice",
-        "String.prototype.substring",
-        "String.prototype.split"
+    "Network": {
+      "class": [
+        "WebSocket",
+        "EventSource"
       ]
     },
-    "URLParams": {
+    "Parameters": {
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
         "get:URL.prototype.searchParams"
       ],
-      "class": ["URLSearchParams"],
       "function": [
         "URLSearchParams.prototype.get",
-        "URLSearchParams.prototype.has"
+        "URLSearchParams.prototype.has",
+        "URLSearchParams.prototype.append",
+        "URLSearchParams.prototype.delete",
+        "URLSearchParams.prototype.entries",
+        "URLSearchParams.prototype.forEach",
+        "URLSearchParams.prototype.getAll",
+        "URLSearchParams.prototype.keys",
+        "URLSearchParams.prototype.set",
+        "URLSearchParams.prototype.values",
+        "String.prototype.slice",
+        "String.prototype.substring",
+        "String.prototype.split"
       ]
     },
-    "Network": {
-      "class": ["WebSocket", "EventSource"]
-    },
     "WebWorker": {
-      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
+      "class": [
+        "Worker",
+        "ServiceWorker",
+        "ServiceWorkerContainer"
+      ],
       "function": [
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
@@ -75,16 +102,37 @@
       ]
     },
     "clipboard": {
-      "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
-    },
-    "storage": {
-      "attribute": ["get:document.cookie"],
-      "function": ["localStorage.getItem", "sessionStorage.getItem"]
+      "event": [
+        "copy",
+        "cut",
+        "paste",
+        "beforepaste",
+        "drag",
+        "drop"
+      ]
     },
     "misc": {
-      "class": ["Blob"],
-      "function": ["URL.createObjectURL", "Object.keys"]
+      "class": [
+        "Blob"
+      ],
+      "function": [
+        "URL.createObjectURL",
+        "//Object.keys"
+      ]
+    },
+    "storage": {
+      "attribute": [
+        "set:document.cookie"
+      ],
+      "function": [
+        "localStorage.getItem",
+        "localStorage.setItem",
+        "sessionStorage.getItem",
+        "sessionStorage.setItem"
+      ]
     }
   },
-  "removeHeaders": ["content-security-policy"]
+  "removeHeaders": [
+    "content-security-policy"
+  ]
 }
