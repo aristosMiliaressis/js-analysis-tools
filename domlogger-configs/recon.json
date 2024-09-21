@@ -12,9 +12,7 @@
       ]
     },
     "String.prototype.split": {
-      "match": [
-        "\\[&\\]"
-      ]
+      "match": ["\\[&\\]"]
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
@@ -33,24 +31,12 @@
         "get:window.parent",
         "get:window.opener"
       ],
-      "class": [
-        "BroadcastChannel",
-        "MessageEvent",
-        "MessagePort"
-      ],
-      "event": [
-        "message"
-      ],
-      "function": [
-        "window.postMessage",
-        "window.open"
-      ]
+      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
+      "event": ["message"],
+      "function": ["window.postMessage", "window.open"]
     },
     "NAVIGATION": {
-      "event": [
-        "hashchange",
-        "beforeunload"
-      ],
+      "event": ["hashchange", "beforeunload"],
       "function": [
         "history.pushState",
         "history.replaceState",
@@ -58,10 +44,8 @@
       ]
     },
     "Network": {
-      "class": [
-        "WebSocket",
-        "EventSource"
-      ]
+      "class": ["WebSocket", "EventSource"],
+      "function": ["WebSocket.prototype.send"]
     },
     "Parameters": {
       "attribute": [
@@ -86,11 +70,7 @@
       ]
     },
     "WebWorker": {
-      "class": [
-        "Worker",
-        "ServiceWorker",
-        "ServiceWorkerContainer"
-      ],
+      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
       "function": [
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
@@ -102,28 +82,14 @@
       ]
     },
     "clipboard": {
-      "event": [
-        "copy",
-        "cut",
-        "paste",
-        "beforepaste",
-        "drag",
-        "drop"
-      ]
+      "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     },
     "misc": {
-      "class": [
-        "Blob"
-      ],
-      "function": [
-        "URL.createObjectURL",
-        "//Object.keys"
-      ]
+      "class": ["Blob"],
+      "function": ["URL.createObjectURL", "//Object.keys"]
     },
     "storage": {
-      "attribute": [
-        "set:document.cookie"
-      ],
+      "attribute": ["set:document.cookie"],
       "function": [
         "localStorage.getItem",
         "localStorage.setItem",
@@ -132,7 +98,5 @@
       ]
     }
   },
-  "removeHeaders": [
-    "content-security-policy"
-  ]
+  "removeHeaders": ["content-security-policy"]
 }
