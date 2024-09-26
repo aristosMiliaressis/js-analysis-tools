@@ -45,6 +45,7 @@ Dependencies:
 `postMessage-tracker` this is Frans Rosen's extension with a few changes, original [here](https://github.com/fransr/postMessage-tracker).
 <br>
 Changes:
+- Logs message content (not just message handlers) to webhook
 - Filters postMessage handlers registered by extensions
 - Filters postMessages in the console coming from the following extensions
   - DOMInvador

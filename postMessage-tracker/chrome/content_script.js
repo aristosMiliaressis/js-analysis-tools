@@ -134,11 +134,15 @@ var injectedJS = function (pushstate, msgeventlistener, msgporteventlistener) {
 		}
 		var p = (e.ports.length ? '%cport' + e.ports.length + '%c ' : '');
 		var msg = '%cport%c→%c' + h(e.source) + '%c ' + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		var logMsg = "port → " + h(e.source) + " <" + location.href + "> " + (e.ports.length ? 'port' + e.ports.length + ' : ' : ' : ') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: blue", '', "color: red", '', "color: blue", '');
 		} else {
 			console.log(msg, "color: blue", '', "color: red", '');
 		}
+
+		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
+		document.dispatchEvent(storeEvent);
 	};
 	var onmsg = function (e) {
 		if (e.data.wappalyzer !== undefined || e.data.ext == "domlogger" || e.data.ext == "domlogger++" || e.data.untrustedTypes !== undefined) {
@@ -146,11 +150,15 @@ var injectedJS = function (pushstate, msgeventlistener, msgporteventlistener) {
 		}
 		var p = (e.ports.length ? '%cport' + e.ports.length + '%c ' : '');
 		var msg = '%c' + h(e.source) + '%c→%c' + h() + '%c ' + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		var logMsg = h(e.source) + " <" + e.origin + "> → " + h() + " <" + location.href + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: red", '', "color: green", '', "color: blue", '');
 		} else {
 			console.log(msg, "color: red", '', "color: green", '');
 		}
+
+		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
+		document.dispatchEvent(storeEvent);
 	};
 	window.addEventListener('message', onmsg)
 	MessagePort.prototype.addEventListener = function (type, listener, useCapture) {
