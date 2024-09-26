@@ -8,12 +8,13 @@
         "bitwarden",
         "grecaptcha",
         "domlogger"
-      ]
+      ],
+      "alert": {
+        "match": ["ahgsdfykq"],
+        "notification": true
+      }
     },
     "Document.prototype.createElement": {
-      "alert": {
-        "notification": false
-      },
       "match": [
         "\\[\"script\"\\]",
         "\\[\"style\"\\]",
@@ -27,6 +28,7 @@
   "hooks": {
     "CSS": {
       "attribute": [
+        "set:Element.prototype.cssText",
         "set:CSSRule.prototype.cssText",
         "set:HTMLStyleElement.prototype.src",
         "set:HTMLStyleElement.prototype.text",
@@ -63,6 +65,7 @@
       ],
       "function": [
         "Element.prototype.insertAdjacentHTML",
+        "Element.prototype.setAttribute",
         "HTMLScriptElement.prototype.append",
         "HTMLScriptElement.prototype.appendChild",
         "//Document.prototype.createElement"
@@ -71,6 +74,7 @@
     "JQUERY": {
       "custom": [
         "function:$",
+        "function:$.globalEval",
         "function:jQuery",
         "function:jQuery.globalEval",
         "function:jQuery.parseHTML",
@@ -97,9 +101,39 @@
         "function:jQuery.prototype.wrapInner"
       ]
     },
+    "MISC": {
+      "attribute": ["set:document.domain"],
+      "class": [
+        "FileReader",
+        "RegExp",
+        "WebSocket",
+        "EventSource",
+        "BroadcastChannel",
+        "MessageEvent",
+        "MessagePort",
+        "Blob"
+      ],
+      "function": [
+        "document.evaluate",
+        "Element.prototype.evaluate",
+        "fetch",
+        "XMLHttpRequest.prototype.open",
+        "XMLHttpRequest.prototype.send",
+        "XMLHttpRequest.prototype.setRequestHeader",
+        "WebSocket.prototype.send",
+        "URL.createObjectURL",
+        "window.postMessage",
+        "Worker.prototype.postMessage",
+        "ServiceWorker.prototype.postMessage",
+        "navigator.serviceWorker.register",
+        "window.open"
+      ]
+    },
     "XSS": {
       "class": ["Location"],
       "function": [
+        "location.assign",
+        "location.replace",
         "eval",
         "Function",
         "document.write",

@@ -2,13 +2,10 @@
   "config": {
     "*": {
       "!match": [
-        "metamask",
         "wappalyzer",
         "google_tag_manager",
-        "bitwarden",
         "messenger_awaiter",
-        "grecaptcha",
-        "untrustedTypes"
+        "grecaptcha"
       ]
     },
     "String.prototype.split": {
@@ -18,6 +15,12 @@
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
       ]
+    },
+    "history.pushState|history.replaceState": {
+      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
+    },
+    "window.open": {
+      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
     }
   },
   "hooks": {
@@ -39,6 +42,10 @@
         "history.replaceState",
         "navigation.navigate"
       ]
+    },
+    "Network": {
+      "class": ["WebSocket", "EventSource"],
+      "function": ["WebSocket.prototype.send"]
     },
     "Parameters": {
       "attribute": [
@@ -62,14 +69,12 @@
         "String.prototype.split"
       ]
     },
-    "Network": {
-      "class": ["WebSocket", "EventSource"]
-    },
     "WebWorker": {
       "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
       "function": [
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
+        "MessagePort.prototype.addEventListener",
         "Worker.prototype.addEventListener",
         "ServiceWorker.prototype.addEventListener",
         "navigator.serviceWorker.register",
@@ -80,13 +85,18 @@
     "clipboard": {
       "event": ["copy", "cut", "paste", "beforepaste", "drag", "drop"]
     },
-    "storage": {
-      "attribute": ["get:document.cookie"],
-      "function": ["localStorage.getItem", "sessionStorage.getItem"]
-    },
     "misc": {
       "class": ["Blob"],
       "function": ["URL.createObjectURL", "//Object.keys"]
+    },
+    "storage": {
+      "attribute": ["set:document.cookie"],
+      "function": [
+        "localStorage.getItem",
+        "localStorage.setItem",
+        "sessionStorage.getItem",
+        "sessionStorage.setItem"
+      ]
     }
   },
   "removeHeaders": ["content-security-policy"]
