@@ -21,10 +21,10 @@ function refreshCount(origin) {
 	});
 }
 
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-	if (!page_frames[msg.origin]) {
-		page_frames[msg.origin] = [];
-	}
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+	//if (!page_frames[msg.origin]) {
+	page_frames[msg.origin] = [];
+	//}
 	
 	knownFrames = Object.assign({}, ...page_frames[msg.origin].map((f) => ({[f.path+':'+f.url]: f})));
 	currentFrames = Object.assign({}, ...msg.frames.map((f) => ({[f.path+':'+f.url]: f})));
