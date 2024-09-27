@@ -48,6 +48,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	if (msg.message) {
 		logListener(msg);
 	}
+	if (msg.pushState) {
 		tab_push[tabId] = true;
 	}
 	if(msg.changePage) {
