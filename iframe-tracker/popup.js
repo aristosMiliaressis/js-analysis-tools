@@ -2,9 +2,7 @@ var port = chrome.extension.connect({ name: "Sample Communication" });
 
 window.onload = () => {
 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-		chrome.tabs.get(tabs[0].id, function (tab) {
-			port.postMessage({ origin: new URL(tab.url).origin });
-		});
+		port.postMessage({ tabId: tabs[0].id });
 	});
 
 	port.onMessage.addListener(function (msg) {
@@ -37,7 +35,7 @@ function listFrames(frames) {
 
 		bel = document.createElement('b');
 		br = document.createElement('br');
-		bel.innerText = frame.url.pathname;
+		bel.innerText = frame.url.href;
 		win = document.createElement('code');
 		win.innerText = frame.path;
 		el.appendChild(bel);

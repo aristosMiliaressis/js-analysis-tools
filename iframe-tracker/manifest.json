@@ -4,29 +4,18 @@
   "description": "Tracks detected iframes on the current origin",
   "version": "1.0.0",
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content_script.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
       "run_at": "document_idle",
-      "all_frames": false
+      "all_frames": true
     }
   ],
   "browser_action": {
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "tabs",
-    "storage",
-    "http:\/\/*\/",
-    "https:\/\/*\/"
-  ]
+  "permissions": ["tabs", "storage", "http://*/", "https://*/"]
 }

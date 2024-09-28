@@ -27,7 +27,6 @@ function getDomPath(el) {
 
 setInterval(() => {
 	var details = {}
-	details.origin = window.origin;
 	details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((f) => { return { frame: f.outerHTML, url: document.location, path: getDomPath(f) } })
 	chrome.runtime.sendMessage(details);
 }, 500)
@@ -49,4 +48,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	}
 });
 
+var origOnunload = onunload;
+onunload = (e) => {
+	chrome.runtime.sendMessage({ reset: true });
 
+	return origOnunload.apply(this, arguments);
+};
+
+var origPushState = History.prototype.pushState;
+History.prototype.pushState = function (state, title, url) {
+	chrome.runtime.sendMessage({ reset: true });
+
+	return origPushState.apply(this, arguments);
+};
