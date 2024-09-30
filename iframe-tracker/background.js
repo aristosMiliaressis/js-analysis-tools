@@ -11,7 +11,7 @@ function refreshCount(tab) {
 		if (count > 0) {
 			chrome.browserAction.setBadgeBackgroundColor({ color: [0, 255, 0, 255] });
 		} else {
-			chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
+			chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 0, 0] });
 		}
 	}
 }

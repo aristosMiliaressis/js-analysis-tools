@@ -48,11 +48,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	}
 });
 
-var origOnunload = onunload;
 onunload = (e) => {
 	chrome.runtime.sendMessage({ reset: true });
-
-	return origOnunload.apply(this, arguments);
 };
 
 var origPushState = History.prototype.pushState;
