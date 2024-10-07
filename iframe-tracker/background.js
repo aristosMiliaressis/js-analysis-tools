@@ -16,8 +16,28 @@ function refreshCount(tab) {
 	}
 }
 
+function logListener(data) {
+	chrome.storage.sync.get({
+		options: ''
+	}, function (i) {
+		log_url = i.options.log_url;
+		if (!log_url.length) return;
+		data = JSON.stringify({ "markup_tracker": data });
+		try {
+			fetch(log_url, {
+				method: 'post',
+				headers: {
+					"Content-type": "application/json; charset=UTF-8"
+				},
+				body: data
+			});
+		} catch (e) { }
+	});
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	if (msg.reset) {
+		logListener(tab_frames[sender.tab.id])
 		tab_frames[sender.tab.id] = [];
 		refreshCount(sender.tab);
 		return
