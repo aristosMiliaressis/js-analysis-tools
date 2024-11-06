@@ -41,7 +41,7 @@ var injectedJS = function (pushstate, msgeventlistener, msgporteventlistener) {
 		if (!instance || !instance.message || !instance.message.length) return;
 		var j = 0; while (e = instance.message[j++]) {
 			listener = e.handler; if (!listener) return;
-			m({ window: window.top == window ? 'top' : window.name, hops: h(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
+			m({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
 		};
 	};
 	var l = function (listener, pattern_before, additional_offset) {
@@ -71,7 +71,7 @@ var injectedJS = function (pushstate, msgeventlistener, msgporteventlistener) {
 			stack = last;
 		}
 		listener_str = listener.__postmessagetrackername__ || listener.toString();
-		m({ window: window.top == window ? 'top' : window.name, hops: h(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
+		m({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
 	};
 	var jqc = function (key) {
 		m({ log: ['Found key', key, typeof window[key], window[key] ? window[key].toString() : window[key]] });

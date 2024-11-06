@@ -27,9 +27,9 @@
     "CrossWindow": {
       "attribute": [
         "get:window.name",
-        "get:window.top",
+        "//get:window.top",
         "get:window.parent",
-        "get:window.opener"
+        "//get:window.opener"
       ],
       "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
       "event": ["message"],
@@ -51,7 +51,10 @@
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
-        "get:URL.prototype.searchParams"
+        "get:URL.prototype.searchParams",
+        "get:document.documentURI",
+        "get:document.baseURI",
+        "get:document.URL"
       ],
       "function": [
         "URLSearchParams.prototype.get",

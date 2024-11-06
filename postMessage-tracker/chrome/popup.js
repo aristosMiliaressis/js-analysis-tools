@@ -33,7 +33,7 @@ function listListeners(listeners) {
 		bel.innerText = listener.domain + ' ';
 		br = document.createElement('br');
 		win = document.createElement('code');
-		win.innerText = ' ' + (listener.window ? listener.window + ' ' : '') + (listener.hops && listener.hops.length ? listener.hops : '');
+		win.innerText = `${listener.hops} ${listener.window == '' ? '' : ' window.name: ' + listener.window}`;
 		el.appendChild(bel);
 		el.appendChild(win);
 		el.appendChild(br);

@@ -1,28 +1,25 @@
 {
   "config": {
     "*": {
-      "!match": [
-        "metamask",
-        "wappalyzer",
-        "google_tag_manager",
-        "bitwarden",
-        "grecaptcha",
-        "domlogger"
-      ],
-      "alert": {
-        "match": ["ahgsdfykq"],
-        "notification": true
-      }
-    },
-    "Document.prototype.createElement": {
       "match": [
-        "\\[\"script\"\\]",
-        "\\[\"style\"\\]",
-        "\\[\"iframe\"\\]",
-        "\\[\"a\"\\]",
-        "\\[\"form\"\\]",
-        "\\[\"link\"\\]"
+        "exec:a='';try{a=JSON.stringify(args)}catch{a=`${args}`}return a.includes(domlogger.globals.canary) ? /3313377/ : /^$/"
       ]
+    },
+    "Element.prototype.setAttribute": {
+      "match": [
+        "exec:return args[0] == 'href' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'src' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'action' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'formaction' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'srcdoc' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'style' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/"
+      ]
+    },
+    "get:document.cookie": {
+      "hookFunction": "thisArg = thisArg.replace(/=[^;]*(;|$)/g, '=3313377;')"
+    },
+    "get:window.name": {
+      "hookFunction": "thisArg = domlogger.globals.canary;"
     }
   },
   "hooks": {
@@ -67,8 +64,7 @@
         "Element.prototype.insertAdjacentHTML",
         "Element.prototype.setAttribute",
         "HTMLScriptElement.prototype.append",
-        "HTMLScriptElement.prototype.appendChild",
-        "//Document.prototype.createElement"
+        "HTMLScriptElement.prototype.appendChild"
       ]
     },
     "JQUERY": {
@@ -105,7 +101,6 @@
       "attribute": ["set:document.domain"],
       "class": [
         "FileReader",
-        "RegExp",
         "WebSocket",
         "EventSource",
         "BroadcastChannel",
@@ -129,22 +124,30 @@
         "window.open"
       ]
     },
+    "REGEX": {
+      "class": ["RegExp"]
+    },
+    "STORAGE": {
+      "attribute": [
+        "set:document.cookie",
+        "get:document.cookie",
+        "get:window.name"
+      ],
+      "function": ["localStorage.setItem", "sessionStorage.setItem"]
+    },
     "XSS": {
       "class": ["Location"],
       "function": [
         "location.assign",
         "location.replace",
         "eval",
-        "Function",
+        "//Function",
         "document.write",
         "document.writeln",
         "Range.prototype.createContextualFragment"
       ]
-    },
-    "storage": {
-      "attribute": ["set:document.cookie"],
-      "function": ["localStorage.setItem", "sessionStorage.setItem"]
     }
   },
+  "globals": { "canary": "3313377" },
   "removeHeaders": ["content-security-policy"]
 }
