@@ -1,28 +1,4 @@
 {
-  "config": {
-    "*": {
-      "!match": [
-        "wappalyzer",
-        "google_tag_manager",
-        "messenger_awaiter",
-        "grecaptcha"
-      ]
-    },
-    "String.prototype.split": {
-      "match": ["\\[&\\]"]
-    },
-    "String.prototype.substring|String.prototype.slice": {
-      "match": [
-        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
-      ]
-    },
-    "history.pushState|history.replaceState": {
-      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
-    },
-    "window.open": {
-      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
-    }
-  },
   "hooks": {
     "CrossWindow": {
       "attribute": [
@@ -100,6 +76,49 @@
         "sessionStorage.getItem",
         "sessionStorage.setItem"
       ]
+    }
+  },
+  "config": {
+    "*": {
+      "!match": [
+        "facebook",
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "googletagmanager",
+        "bitwarden",
+        "messenger_awaiter",
+        "grecaptcha",
+        "hcaptcha"
+      ],
+      "!matchTrace": [
+        "facebook",
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "googletagmanager",
+        "bitwarden",
+        "messenger_awaiter",
+        "grecaptcha",
+        "hcaptcha"
+      ]
+    },
+    "String.prototype.split": {
+      "match": ["\\[&\\]"]
+    },
+    "String.prototype.substring|String.prototype.slice": {
+      "match": [
+        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
+      ]
+    },
+    "history.pushState|history.replaceState": {
+      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
+    },
+    "storage": {
+      "hideThis": true
+    },
+    "window.open": {
+      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
     }
   },
   "removeHeaders": ["content-security-policy"]

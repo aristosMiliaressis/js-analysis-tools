@@ -1,27 +1,4 @@
 {
-  "config": {
-    "*": {
-      "match": [
-        "exec:a='';try{a=JSON.stringify(args)}catch{a=`${args}`}return a.includes(domlogger.globals.canary) ? /3313377/ : /^$/"
-      ]
-    },
-    "Element.prototype.setAttribute": {
-      "match": [
-        "exec:return args[0] == 'href' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
-        "exec:return args[0] == 'src' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
-        "exec:return args[0] == 'action' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
-        "exec:return args[0] == 'formaction' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
-        "exec:return args[0] == 'srcdoc' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
-        "exec:return args[0] == 'style' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/"
-      ]
-    },
-    "get:document.cookie": {
-      "hookFunction": "thisArg = thisArg.replace(/=[^;]*(;|$)/g, '=3313377;')"
-    },
-    "get:window.name": {
-      "hookFunction": "thisArg = domlogger.globals.canary;"
-    }
-  },
   "hooks": {
     "CSS": {
       "attribute": [
@@ -146,6 +123,51 @@
         "document.writeln",
         "Range.prototype.createContextualFragment"
       ]
+    }
+  },
+  "config": {
+    "*": {
+      "!match": [
+        "facebook",
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "googletagmanager",
+        "bitwarden",
+        "messenger_awaiter",
+        "grecaptcha",
+        "hcaptcha"
+      ],
+      "!matchTrace": [
+        "facebook",
+        "metamask",
+        "wappalyzer",
+        "google_tag_manager",
+        "googletagmanager",
+        "bitwarden",
+        "messenger_awaiter",
+        "grecaptcha",
+        "hcaptcha"
+      ]
+    },
+    "Element.prototype.setAttribute": {
+      "match": [
+        "exec:return args[0] == 'href' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'src' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'action' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'formaction' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'srcdoc' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
+        "exec:return args[0] == 'style' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/"
+      ]
+    },
+    "get:document.cookie": {
+      "hookFunction": "thisArg = thisArg.replace(/=[^;]*(;|$)/g, '=3313377;')"
+    },
+    "get:window.name": {
+      "hookFunction": "thisArg = domlogger.globals.canary;"
+    },
+    "STORAGE": {
+      "hideThis": true
     }
   },
   "globals": { "canary": "3313377" },
