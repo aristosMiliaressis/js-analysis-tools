@@ -1,4 +1,5 @@
 var tab_frames = {};
+var tab_dom = {};
 
 function refreshCount(tab) {
 	count = tab_frames[tab.id] ? tab_frames[tab.id].length : 0;
@@ -16,13 +17,14 @@ function refreshCount(tab) {
 	}
 }
 
-function logListener(data) {
+function logListener(msg) {
 	chrome.storage.sync.get({
 		options: ''
 	}, function (i) {
 		log_url = i.options.log_url;
 		if (!log_url.length) return;
-		data = JSON.stringify({ "markup_tracker": data });
+
+		var data = JSON.stringify(msg);
 		try {
 			fetch(log_url, {
 				method: 'post',
@@ -37,7 +39,8 @@ function logListener(data) {
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	if (msg.reset) {
-		logListener(tab_frames[sender.tab.id])
+		logListener({ iframes: tab_frames[sender.tab.id] })
+		logListener(tab_dom[sender.tab.id])
 		tab_frames[sender.tab.id] = [];
 		refreshCount(sender.tab);
 		return
@@ -45,6 +48,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 	if (!tab_frames[sender.tab.id]) {
 		tab_frames[sender.tab.id] = [];
+		tab_dom[sender.tab.id] = [];
 	}
 
 	knownFrames = Object.assign({}, ...tab_frames[sender.tab.id].map((f) => ({ [f.path + ':' + f.url.href]: f })));
@@ -52,6 +56,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	mergedFrames = Object.values(Object.assign({}, knownFrames, currentFrames));
 
 	tab_frames[sender.tab.id] = mergedFrames;
+	tab_dom[sender.tab.id] = { dom: msg.dom, path: msg.path };
 
 	refreshCount(sender.tab);
 });

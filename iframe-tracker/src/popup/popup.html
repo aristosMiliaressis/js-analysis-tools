@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<link rel="stylesheet" href="lib/doco.min.css">
-	<script src="lib/highlight.min.js"></script>
-	<script type="text/javascript" src="popup.js"></script>
-	<style type="text/css">
-		h3 {  font-weight: normal; width: 250px; overflow: hidden; white-space: normal; word-wrap: break-word; max-height: 96px; display:inline-block;margin-right:30px; }
-		h3 code { font-size: 15px; }
-		#content { min-height: 400px; max-height: 800px; padding: 0 10px 10px; }
-		ol { padding: 0 0 0 10px; max-width: 500px; width: 350px; margin: 0; }
-		li i { font-size: 10px; }
-		li pre { white-space: pre-wrap; word-wrap: break-word; background: #f2f2f2; padding: 2px 5px 5px; margin: 0; }
-		li { margin: 0 0 5px; padding: 0; white-space: pre-wrap; word-wrap: break-word; }
-		li span { font-size: 10px; line-height: 12px; margin: 0 0 2px; }
-	</style>
-</head>
-<body>
-	<div id="content">
-		<h3 id="h"></h3>
-		<label for="highlight">highlight:</label>
-		<input type="checkbox" id="highlight">
-		<ol id="x"></ol>
-	</div>
-</body>
+	<head>
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="../lib/doco.min.css">
+	</head>
+	<body>
+		<div id="content">
+			<div class="tab">
+				<button id=iframeTabButton class="tablinks">IFRAMES</button>
+				<button id=targetTabButton class="tablinks">TARGET</button>
+				<button id=rpoTabButton class="tablinks">RPO</button>
+			</div>
+			
+			<div id="iframe" class="tabcontent">
+				<label for="highlight">highlight:</label>
+				<input type="checkbox" name="highlight">
+				<hr>
+			</div>
+			
+			<div id="target" class="tabcontent">
+				<label for="highlight">highlight:</label>
+				<input type="checkbox" name="highlight">
+				<hr>
+			</div>
+			
+			<div id="rpo" class="tabcontent">
+				<label for="highlight">highlight:</label>
+				<input type="checkbox" name="highlight">
+				<hr>
+			</div>
+		</div>
+		
+		<script type="text/javascript" src="js/main.js"></script>
+		<script src="../lib/highlight.min.js"></script>
+	</body>
 </html>

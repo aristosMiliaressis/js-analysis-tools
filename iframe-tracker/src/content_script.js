@@ -25,11 +25,23 @@ function getDomPath(el) {
 	return stack.slice(1).join(' > ');
 }
 
+function getCrossWindowTargetingElements() {
+	return [];
+}
+
+function getPathRelativeUriTargetingElements() {
+	return [];
+}
+
 setInterval(() => {
 	var details = {}
-	details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((f) => { return { frame: f.outerHTML, url: document.location, path: getDomPath(f) } })
+	details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((elm) => { return { frame: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+	details.target = getCrossWindowTargetingElements().map((elm) => { return { frame: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+	details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { frame: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+	details.dom = document.documentElement.outerHTML;
+	details.path = document.location.pathname;
 	chrome.runtime.sendMessage(details);
-}, 500)
+}, 500);
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	for (var frame of document.getElementsByTagName('iframe')) {
