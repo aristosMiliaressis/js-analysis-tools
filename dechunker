@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+var fs = require('fs');
+
+prefix = '';
+if (process.argv.length > 2)
+	prefix = process.argv[2]
+
+var data = fs.readFileSync(0, 'utf-8');
+
+numbers = [...data.matchAll(/(\d{1,10}): ["']/g)].map((e)=>e[1])
+numbers = numbers.filter((item,index) => numbers.indexOf(item) === index);
+eval(data)
+functionName = "u"
+f = eval(functionName)
+output = ""
+for (var i = 0;i<numbers.length;i++){
+    output = output + prefix + f(numbers[i])+"\n"
+}
+console.log(output)

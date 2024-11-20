@@ -1,5 +1,5 @@
 
-`functions.sh` contains some functions that help you extract the sites js/html content from a HAR file  & unminify it also contains a function to extract any source maps if present.<br>
+`bash_functions.sh` contains some functions that help you extract the sites js/html content from a HAR file & unminify it, also contains a function to extract any source maps if present.<br>
 Intended Workflow:
 - open devtools
 - check "Preserve Log" & "Disable Cache" in network tab
@@ -25,20 +25,6 @@ npm install -g html-beutify
 ```bash
 go install github.com/denandz/sourcemapper@latest
 ```
-<br>
-
-`page_monitor.sh` takes a list of urls as input, starts a headless chrome browser, navigates to each url and generates a HAR file for each one, it than extracts each HAR file into a local git repository, detects and notifies if any of the following has changed since the last invocation of the script:
-- status code
-- page title
-- the md5 of all the javascript files concatinated into one stream
-
-Dependencies:
-- git
-- google-chrome
-- jq
-- chrome-har-capturer
-- notify
-- unfurl
 
 <br>
 
@@ -66,7 +52,8 @@ Changes:
 <br>
 
 `iframe-tracker` just a rip off of postMessage-tracker but for tracking and revealing iframes
-
+- also supports send iframes & the fully rendered DOM to a webhook
+  
 <p align="center">
   <img src="https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/iframe-tracker.png?raw=true">
 </p>
