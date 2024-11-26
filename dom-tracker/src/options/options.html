@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
-	<head></head>
-	<body>
+	<body style="overflow: hidden">
 		<fieldset>
 			<legend>Popup Options</legend>
-			<input type="checkbox" id="popup_iframe" checked />
+			<input type="checkbox" id="popup_iframe" />
 			<label for="scales">iframe</label>
 			<input type="checkbox" id="popup_target" />
 			<label for="scales">target</label>
@@ -13,22 +12,22 @@
 		</fieldset>
 		<fieldset>
 			<legend>WebHook Options</legend>
-			<input type="checkbox" id="webhook_iframe" checked />
+			<input type="checkbox" id="webhook_iframe" />
 			<label for="scales">iframe</label>
-			<input type="checkbox" id="webhook_target" checked />
+			<input type="checkbox" id="webhook_target" />
 			<label for="scales">target</label>
-			<input type="checkbox" id="webhook_rpo" checked />
+			<input type="checkbox" id="webhook_rpo" />
 			<label for="scales">rpo</label>
-			<input type="checkbox" id="webhook_dom" checked />
+			<input type="checkbox" id="webhook_dom" />
 			<label for="scales">dom</label>
 			<br>
-			Log-URL:
-			<input type="text" id="log-url" placeholder="https://au8m79l2j6iu1azns4acy754pvvnjl7a.oastify.com" size="40" />
+			URL:
+			<input type="text" id="webhook_url" placeholder="https://au8m79l2j6iu1azns4acy754pvvnjl7a.oastify.com" size="40" />
 		</fieldset>
-		<button style="width:100%" id="save">Save</button>
+		<button id="save" type="button" style="width:100%">Save</button>
 		<br>
-		<div id="status"></div>
-		
+		<div id="statusMsg"></div>
+
 		<script src="js/main.js"></script>
 	</body>
 </html>

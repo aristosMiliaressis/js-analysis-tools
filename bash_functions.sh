@@ -125,43 +125,43 @@ function fetch_urls() {
     done <<<$(cat $tmp | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
 }
 
-# generates wbhook url for use with postMessage-tracker/iframe-tracker and extracts messages with appropriate file structure
+# generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
 function logMsg() {
-    interactsh-client -json -o data.json &
-    time=$(date +%s)
+	interactsh-client -json -o data.json &
+	time=$(date +%s)
 
-    while true; do
-        sleep 5
-        cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee ${time}_messagelog.txt
-        cat data.json | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
-            while read -r msg; do
-                href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
-                hops=$(echo $msg | jq -r .hops | sed 's,\%,%%,g')
-                stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
-                listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
-                printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
-            done | tee ${time}_message_listeners.md
-        cat data.json |
-            jq -r '."raw-request"' |
-            grep '{"' |
-            jq -c 'select(.iframes != null) | .iframes[]' |
-            while read -r msg; do
-                html=$(echo $msg | jq -r .frame | sed 's,\%,%%,g')
-                domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
-                href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
-                printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
-            done | tee ${time}_iframes.md
+	while true; do
+		sleep 5
+		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee ${time}_messagelog.txt
+		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
+			while read -r msg; do
+				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
+				hops=$(echo $msg | jq -r .hops | sed 's,\%,%%,g')
+				stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
+				listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
+				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
+			done | tee ${time}_message_listeners.md
+		cat data.json |
+			jq -r '."raw-request"' |
+			grep '{"' |
+			jq -c 'select(.iframes != null) | .frames[]' |
+			while read -r msg; do
+				html=$(echo $msg | jq -r .frame | sed 's,\%,%%,g')
+				domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
+				href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
+				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
+			done | tee ${time}_iframes.md
 
-        cat data.json |
-            jq -r '."raw-request"' |
-            grep '{"' |
-            jq -c 'select(.dom != null)' |
-            while read -r msg; do
-                dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
-                path=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
-                basePath=".$(echo "$path" | rev | cut -d / -f 2- | rev)"
-                mkdir -p "$basePath" 2>/dev/null
-                echo "$dom" >".$path"
-            done
-    done
+		cat data.json |
+			jq -r '."raw-request"' |
+			grep '{"' |
+			jq -c 'select(.dom != null)' |
+			while read -r msg; do
+				dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
+				path=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
+				basePath=".$(echo "$path" | rev | cut -d / -f 2- | rev)"
+				mkdir -p "$basePath" 2>/dev/null
+				echo "$dom" > ".$path"
+			done
+	done
 }

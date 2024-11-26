@@ -13,6 +13,29 @@ var injectedJS = function(pushstate, eventlistener) {
 		var storeEvent = new CustomEvent('hashChangeTracker', {'detail':detail});
 		document.dispatchEvent(storeEvent);
 	};
+	var h = function (p) {
+		var hops = "";
+		try {
+			if (!p) p = window;
+			if (p.top != p && p.top == window.top) {
+				var w = p;
+				while (top != w) {
+					var x = 0;
+					for (var i = 0; i < w.parent.frames.length; i++) {
+						if (w == w.parent.frames[i]) x = i;
+					};
+					hops = "frames[" + x + "]" + (hops.length ? '.' : '') + hops;
+					w = w.parent;
+				};
+				hops = "top" + (hops.length ? '.' + hops : '')
+			} else {
+				hops = p.top == window.top ? "top" : "diffwin";
+			}
+		} catch (e) {
+
+		}
+		return hops;
+	};
 	var l = function(listener, pattern_before, additional_offset) {
 		offset = 0 + (additional_offset||0)
 		try { throw new Error(''); } catch (error) { stack = error.stack || ''; }
@@ -36,7 +59,7 @@ var injectedJS = function(pushstate, eventlistener) {
 		}
 		listener_str = listener.__hashchangetrackername__ || listener.toString();
 
-		m({window:window.top==window?'top':window.name,domain:document.domain,stack:stack,fullstack:fullstack,listener:listener_str});
+		m({window:window.top==window?'':window.name, hops: h(),domain:document.domain,stack:stack,fullstack:fullstack,listener:listener_str});
 	};
 	History.prototype.pushState = function(state, title, url) {
 		m({pushState:true});

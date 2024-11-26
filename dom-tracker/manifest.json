@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "dom-tracker",
+  "version": "1.0.0",
+  "description": "Trackts several interesting elements in the DOM",
+  "icons": {
+    "512": "icons/icon.png"
+  },
+  
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "512": "icons/icon.png"
+    },
+    "default_title": "dom-tracker"
+  },
+  
+  "options_ui": {
+    "page": "src/options/options.html"
+  },
+  
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "run_at": "document_idle",
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": ["src/content_script.js"]
+    }
+  ],
+  
+  "permissions": [
+    "tabs", 
+    "storage"
+  ], 
+  
+  "host_permissions":[
+    "http://*/*", 
+    "https://*/*"
+  ]
+}

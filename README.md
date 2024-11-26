@@ -51,9 +51,9 @@ Changes:
 
 <br>
 
-`iframe-tracker` just a rip off of postMessage-tracker but for tracking and revealing iframes
+`dom-tracker` just a rip off of postMessage-tracker but for tracking and revealing iframes
 - also supports send iframes & the fully rendered DOM to a webhook
   
 <p align="center">
-  <img src="https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/iframe-tracker.png?raw=true">
+  <img src="https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/dom-tracker.png?raw=true">
 </p>

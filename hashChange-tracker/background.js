@@ -8,7 +8,7 @@ function refreshCount() {
 		if (!chrome.runtime.lastError) {
 			chrome.browserAction.setBadgeText({"text": ''+txt, tabId: selectedId});
 			if(txt > 0) {
-				chrome.browserAction.setBadgeBackgroundColor({ color: [255, 255, 0, 255]});
+				chrome.browserAction.setBadgeBackgroundColor({ color: [0, 255, 0, 255]});
 			} else {
 				chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
 			}
