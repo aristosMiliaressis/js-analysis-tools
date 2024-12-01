@@ -128,13 +128,11 @@ function fetch_urls() {
 # generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
 function logMsg() {
 	interactsh-client -json -o data.json >/dev/null &
-	time=$(date +%s)
 	trap "rm data.json" EXIT
 
-	#set -x
 	while true; do
 		sleep 5
-		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee ${time}_messagelog.txt
+		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee messagelog.txt
 		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
 			while read -r msg; do
 				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
@@ -142,7 +140,7 @@ function logMsg() {
 				stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
 				listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
 				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
-			done | tee ${time}_message_listeners.md
+			done | tee message_listeners.md
 		cat data.json |
 			jq -r '."raw-request"' |
 			grep '{"' |
@@ -152,7 +150,7 @@ function logMsg() {
 				domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
 				href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
 				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
-			done | tee ${time}_iframes.md
+			done | tee iframes.md
 
 		cat data.json |
 			jq -r '."raw-request"' |
@@ -168,6 +166,36 @@ function logMsg() {
 				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
 				echo "$dom" > "$path"
+			done
+
+		cat data.json |
+			jq -r '."raw-request"' |
+			grep '{"' |
+			jq -c 'select(.localStorage != null)' |
+			while read -r msg; do
+				storage=$(echo $msg | jq -r .localStorage | sed 's,\%,%%,g')
+				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew localStorage.tsv
+			done
+
+		cat data.json |
+			jq -r '."raw-request"' |
+			grep '{"' |
+			jq -c 'select(.sessionStorage != null)' |
+			while read -r msg; do
+				storage=$(echo $msg | jq -r .sessionStorage | sed 's,\%,%%,g')
+				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew sessionStorage.tsv
+			done
+
+		cat data.json |
+			jq -r '."raw-request"' |
+			grep '{"' |
+			jq -c 'select(.cookies != null)' |
+			while read -r msg; do
+				storage=$(echo $msg | jq -r .cookies | sed 's,\%,%%,g')
+				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				echo "$location"$(printf "\t")"$storage" | anew cookies.tsv
 			done
 	done
 }
