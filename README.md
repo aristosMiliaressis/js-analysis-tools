@@ -51,8 +51,7 @@ Changes:
 
 <br>
 
-`dom-tracker` just a rip off of postMessage-tracker but for tracking and revealing iframes
-- also supports send iframes & the fully rendered DOM to a webhook
+`dom-tracker` tracks several potentially interesting elements like iframes, any element with a target attribute and any element with a path relative uri, also detects quirks mode and supports sending localStorage, sessionStorage, cookies & full DOM to a webhook.
   
 <p align="center">
   <img src="https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/dom-tracker.png?raw=true">
