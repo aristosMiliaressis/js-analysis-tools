@@ -23,6 +23,7 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		if(msg.listener == 'function () { [native code] }') return;
 		msg.parent_url = sender.tab.url;
 		if(!tab_listeners[tabId]) tab_listeners[tabId] = [];
+		if (tab_listeners[tabId].some(l => l.hops == msg.hops && l.stack == msg.stack)) return;
 		tab_listeners[tabId][tab_listeners[tabId].length] = msg;
 	}
 	if(msg.pushState) {
