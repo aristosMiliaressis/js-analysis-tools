@@ -127,9 +127,11 @@ function fetch_urls() {
 
 # generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
 function logMsg() {
-	interactsh-client -json -o data.json &
+	interactsh-client -json -o data.json >/dev/null &
 	time=$(date +%s)
+	trap "rm data.json" EXIT
 
+	#set -x
 	while true; do
 		sleep 5
 		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee ${time}_messagelog.txt
@@ -158,10 +160,14 @@ function logMsg() {
 			jq -c 'select(.dom != null)' |
 			while read -r msg; do
 				dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
-				path=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
-				basePath=".$(echo "$path" | rev | cut -d / -f 2- | rev)"
+				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				domain=$(echo $location | unfurl domains)
+				path=$(echo $location | unfurl path)
+				path="./$domain$path"
+				if [[ -d "$path" ]]; then path=$(echo $path | sed 's,/$,,').html; fi
+				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
-				echo "$dom" > ".$path"
+				echo "$dom" > "$path"
 			done
 	done
 }

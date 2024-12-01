@@ -7,7 +7,10 @@ var interval = setInterval(() => {
 	details.targets = getCrossWindowTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
 	details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
 	details.dom = document.documentElement.outerHTML;
-	details.path = document.location.pathname + document.location.search;
+	details.location = document.location.href;
+	details.localStorage = localStorage;
+	details.sessionStorage = sessionStorage;
+	details.cookies = document.cookie;
 	extensionAPI.runtime.sendMessage(details);
 }, 500);
 
@@ -30,8 +33,8 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	if (document.getElementById('dom-tracker-stylesheet') == null) {
 		var style = document.createElement('style');
 		style.id = 'dom-tracker-stylesheet';
-		css = `iframe.dom-tracker-highlight {border: 3px dashed green; margin: 5px; padding: 5px;}	
-	a.dom-tracker-highlight, form.dom-tracker-highlight, area.dom-tracker-highlight {border: 3px dashed yellow; margin: 5px; padding: 5px;}`;
+		css = `iframe.dom-tracker-highlight {border: 3px dashed green !important; margin: 5px; padding: 5px;}	
+	a.dom-tracker-highlight, form.dom-tracker-highlight, area.dom-tracker-highlight {border: 3px dashed yellow !important; margin: 5px; padding: 5px;}`;
 		style.appendChild(document.createTextNode(css));
 		document.body.appendChild(style);
 	}
@@ -56,17 +59,11 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 		}
 	}
 	
-	if (msg.highlight_rpo) {
-		for (var elem of getPathRelativeUriTargetingElements()) {
-			elem.classList.add('dom-tracker-highlight');
-		}
-	} else {
-		for (var elem of getPathRelativeUriTargetingElements()) {
-			elem.classList.remove('dom-tracker-highlight');
-		}
+	if (msg.detect_quirks_mode) {
+		// detects quirks mode for PRSSI exploitation
+		document.compatMode != 'CSS1Compat' && alert(`${location.href} page is in quirks mode!`);
 	}
 });
-
 
 /// UTILITY FUNCTIONS ///
 function getWindowPath() {

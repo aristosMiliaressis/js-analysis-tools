@@ -8,8 +8,8 @@ function refreshCount(tab) {
 	targetCount = tab_data[tab.id]?.targets ? tab_data[tab.id].targets.length : 0;
 	rpoCount = tab_data[tab.id]?.rpo ? tab_data[tab.id].rpo.length : 0;
 
-	extensionAPI.storage.sync.get({
-		options: {}
+	extensionAPI.storage.local.get({
+		options: { popup_iframe: true, popup_target: true, popup_rpo: true }
 	}, function (i) {
 		if (i.options.popup_iframe) badgeCounters.push(frameCount);
 		if (i.options.popup_target) badgeCounters.push(targetCount);
@@ -23,14 +23,17 @@ function refreshCount(tab) {
 }
 
 function logToWebhook(msg) {
-	extensionAPI.storage.sync.get({
+	extensionAPI.storage.local.get({
 		options: {}
 	}, function (i) {
-		if (i.options.webhook_url == "") return;
+		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
 		if (!i.options.webhook_iframe) msg.iframes = undefined;
 		if (!i.options.webhook_target) msg.targets = undefined;
 		if (!i.options.webhook_rpo) msg.rpo = undefined;
 		if (!i.options.webhook_dom) msg.dom = undefined;
+		if (!i.options.webhook_local_storage) msg.localStorage = undefined;
+		if (!i.options.webhook_session_storage) msg.sessionStorage = undefined;
+		if (!i.options.webhook_cookies) msg.cookies = undefined;
 
 		var data = JSON.stringify(msg);
 		try {
@@ -70,7 +73,10 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	tab_data[sender.tab.id].targets = Object.values(Object.assign({}, knownTargets, currentTargets));
 	tab_data[sender.tab.id].rpo = Object.values(Object.assign({}, knownRPO, currentRPO));
 	tab_data[sender.tab.id].dom = msg.dom;
-	tab_data[sender.tab.id].path = msg.path;
+	tab_data[sender.tab.id].location = msg.location;
+	tab_data[sender.tab.id].localStorage = msg.localStorage;
+	tab_data[sender.tab.id].sessionStorage = msg.sessionStorage;
+	tab_data[sender.tab.id].cookies = msg.cookies;
 
 	refreshCount(sender.tab);
 });
@@ -80,14 +86,14 @@ extensionAPI.tabs.onUpdated.addListener(function (tabId, props) {
 		extensionAPI.tabs.get(tabId, function (tab) {
 			refreshCount(tab);
 			
-			extensionAPI.storage.sync.get({
+			extensionAPI.storage.local.get({
 				options: {}
 			}, function (i) {
 				extensionAPI.tabs.sendMessage(tabId, 
 				{ 
 					highlight_iframe: i.options.highlight_iframe,
 					highlight_target: i.options.highlight_target,
-					highlight_rpo: i.options.highlight_rpo
+					detect_quirks_mode: i.options.detect_quirks_mode
 				});
 			});
 		});

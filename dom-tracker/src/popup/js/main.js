@@ -4,8 +4,8 @@ iframeTabButton.onclick = (evt) => openTab('iframe');
 targetTabButton.onclick = (evt) => openTab('target');
 rpoTabButton.onclick = (evt) => openTab('rpo');
 
-extensionAPI.storage.sync.get({
-	options: {}
+extensionAPI.storage.local.get({
+	options: { popup_iframe: true, popup_target: true, popup_rpo: true }
 }, function (i) {
 	if (!i.options.popup_iframe) iframeTabButton.style.display = "none";
 	if (!i.options.popup_target) targetTabButton.style.display = "none";
@@ -47,14 +47,9 @@ function listElements() {
 
 		var parser = new DOMParser()
 		doc = parser.parseFromString(frame.outerHTML, 'text/html');
-		const attrToRemove = ['style', 'title'];
-		for (const elm of doc.querySelectorAll('*')) {
-			for (const attrib of [...attrToRemove]) {
-				if (elm.hasAttribute(attrib)) {
-					elm.removeAttribute(attrib);
-				}
-			}
-		}
+		doc.body.children[0].classList.remove('dom-tracker-highlight')
+		if (doc.body.children[0].classList == "")
+			doc.body.children[0].removeAttribute("class")
 
 		pre = document.createElement('pre');
 		pre.innerHTML = hljs.highlight(
@@ -82,10 +77,16 @@ function listElements() {
 		el.appendChild(bel);
 		el.appendChild(br);
 		el.appendChild(win);
+		
+		var parser = new DOMParser()
+		doc = parser.parseFromString(target.outerHTML, 'text/html');
+		doc.body.children[0].classList.remove('dom-tracker-highlight')
+		if (doc.body.children[0].classList == "")
+			doc.body.children[0].removeAttribute("class")
 
 		pre = document.createElement('pre');
 		pre.innerHTML = hljs.highlight(
-			target.outerHTML,
+			doc.body.innerHTML,
 			{ language: 'html', ignoreIllegals: true }
 		).value;
 		el.appendChild(pre);
@@ -124,40 +125,40 @@ function listElements() {
 }
 
 function setupElementHighlightCheckbox() {
-	var highlightCb = document.querySelector('.active-content [name=highlight]');
+	var checkbox = document.querySelector('.active-content [name=checkbox]');
 	
-	extensionAPI.storage.sync.get({
+	extensionAPI.storage.local.get({
 		options: {}
 	}, function (i) {	
 		if (document.querySelector('#iframeTab.active-content') != null && i.options.highlight_iframe) {
-			highlightCb.checked = true;
+			checkbox.checked = true;
 		} else if (document.querySelector('#targetTab.active-content') != null && i.options.highlight_target) {
-			highlightCb.checked = true;
-		} else if (document.querySelector('#rpoTab.active-content') != null && i.options.highlight_rpo) {
-			highlightCb.checked = true;
+			checkbox.checked = true;
+		} else if (document.querySelector('#rpoTab.active-content') != null && i.options.detect_quirks_mode) {
+			checkbox.checked = true;
 		}
 	});
 	
-	highlightCb.addEventListener('change', (event) => {
-		extensionAPI.storage.sync.get({
+	checkbox.addEventListener('change', (event) => {
+		extensionAPI.storage.local.get({
 			options: {}
 		}, function (i) {
 			if (document.querySelector('#iframeTab.active-content') != null) {
-				i.options.highlight_iframe = highlightCb.checked;
+				i.options.highlight_iframe = checkbox.checked;
 			} else if (document.querySelector('#targetTab.active-content') != null) {
-				i.options.highlight_target = highlightCb.checked;
+				i.options.highlight_target = checkbox.checked;
 			} else if (document.querySelector('#rpoTab.active-content') != null) {
-				i.options.highlight_rpo = highlightCb.checked;
+				i.options.detect_quirks_mode = checkbox.checked;
 			}
 			
-			extensionAPI.storage.sync.set(i);
+			extensionAPI.storage.local.set(i);
 			
 			extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 				extensionAPI.tabs.sendMessage(tabs[0].id, 
 				{ 
 					highlight_iframe: i.options.highlight_iframe,
 					highlight_target: i.options.highlight_target,
-					highlight_rpo: i.options.highlight_rpo
+					detect_quirks_mode: i.options.detect_quirks_mode
 				});
 			});
 		});
