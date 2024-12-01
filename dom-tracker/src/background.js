@@ -3,23 +3,27 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 var tab_data = {};
 
 function refreshCount(tab) {
-	let badgeCounters = Array();
-	frameCount = tab_data[tab.id]?.frames ? tab_data[tab.id].frames.length : 0;
-	targetCount = tab_data[tab.id]?.targets ? tab_data[tab.id].targets.length : 0;
-	rpoCount = tab_data[tab.id]?.rpo ? tab_data[tab.id].rpo.length : 0;
+	extensionAPI.tabs.query({ active: true }, function (tabs) {
+		if (tab.id != tabs[0].id) return;
+		
+		let badgeCounters = Array();
+		frameCount = tab_data[tab.id]?.frames ? tab_data[tab.id].frames.length : 0;
+		targetCount = tab_data[tab.id]?.targets ? tab_data[tab.id].targets.length : 0;
+		rpoCount = tab_data[tab.id]?.rpo ? tab_data[tab.id].rpo.length : 0;
 
-	extensionAPI.storage.local.get({
-		options: { popup_iframe: true, popup_target: true, popup_rpo: true }
-	}, function (i) {
-		if (i.options.popup_iframe) badgeCounters.push(frameCount);
-		if (i.options.popup_target) badgeCounters.push(targetCount);
-		if (i.options.popup_rpo) badgeCounters.push(rpoCount);
+		extensionAPI.storage.local.get({
+			options: { popup_iframe: true, popup_target: true, popup_rpo: true }
+		}, function (i) {
+			if (i.options.popup_iframe) badgeCounters.push(frameCount);
+			if (i.options.popup_target) badgeCounters.push(targetCount);
+			if (i.options.popup_rpo) badgeCounters.push(rpoCount);
 
-		if (!extensionAPI.runtime.lastError) {
-			extensionAPI.action.setBadgeText({ "text": badgeCounters.join(':'), tabId: tab.id });
-			extensionAPI.action.setBadgeBackgroundColor({ color: [255, 255, 0, 255] });
-		}
-	});
+			if (!extensionAPI.runtime.lastError) {
+				extensionAPI.action.setBadgeText({ "text": badgeCounters.join(':'), tabId: tab.id });
+				extensionAPI.action.setBadgeBackgroundColor({ color: [255, 255, 0, 255] });
+			}
+		});
+	}).then(()=>{});
 }
 
 function logToWebhook(msg) {
