@@ -23,7 +23,7 @@ function refreshCount(tab) {
 				extensionAPI.action.setBadgeBackgroundColor({ color: [255, 255, 0, 255] });
 			}
 		});
-	}).then(()=>{});
+	});
 }
 
 function logToWebhook(msg) {
@@ -83,25 +83,6 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	tab_data[sender.tab.id].cookies = msg.cookies;
 
 	refreshCount(sender.tab);
-});
-
-extensionAPI.tabs.onUpdated.addListener(function (tabId, props) {
-	if (props.status == "complete") {
-		extensionAPI.tabs.get(tabId, function (tab) {
-			refreshCount(tab);
-			
-			extensionAPI.storage.local.get({
-				options: {}
-			}, function (i) {
-				extensionAPI.tabs.sendMessage(tabId, 
-				{ 
-					highlight_iframe: i.options.highlight_iframe,
-					highlight_target: i.options.highlight_target,
-					detect_quirks_mode: i.options.detect_quirks_mode
-				});
-			});
-		});
-	}
 });
 
 extensionAPI.runtime.onConnect.addListener(function (port) {
