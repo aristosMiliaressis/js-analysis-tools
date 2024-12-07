@@ -127,21 +127,22 @@ function fetch_urls() {
 
 # generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
 function logMsg() {
-	interactsh-client -json -o data.json >/dev/null &
-	trap "rm data.json" EXIT
+	tmp=`mktemp`
+	interactsh-client -http-only -json -o $tmp >/dev/null &
+	trap "rm $tmp" EXIT
 
 	while true; do
 		sleep 5
-		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | tee messagelog.txt
-		cat data.json | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
+		cat $tmp | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | anew messagelog.txt
+		cat $tmp | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
 			while read -r msg; do
 				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
 				hops=$(echo $msg | jq -r .hops | sed 's,\%,%%,g')
 				stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
 				listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
 				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
-			done | tee message_listeners.md
-		cat data.json |
+			done | anew message_listeners.md
+		cat $tmp |
 			jq -r '."raw-request"' |
 			grep '{"' |
 			jq -c 'select(.iframes != null) | .frames[]' |
@@ -150,9 +151,9 @@ function logMsg() {
 				domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
 				href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
 				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
-			done | tee iframes.md
+			done | anew iframes.md
 
-		cat data.json |
+		cat $tmp |
 			jq -r '."raw-request"' |
 			grep '{"' |
 			jq -c 'select(.dom != null)' |
@@ -161,14 +162,14 @@ function logMsg() {
 				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
 				domain=$(echo $location | unfurl domains)
 				path=$(echo $location | unfurl path)
-				path="./$domain$path"
+				path="./pages/$domain$path"
 				if [[ -d "$path" ]]; then path=$(echo $path | sed 's,/$,,').html; fi
 				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
 				echo "$dom" > "$path"
 			done
 
-		cat data.json |
+		cat $tmp |
 			jq -r '."raw-request"' |
 			grep '{"' |
 			jq -c 'select(.localStorage != null)' |
@@ -178,7 +179,7 @@ function logMsg() {
 				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew localStorage.tsv
 			done
 
-		cat data.json |
+		cat $tmp |
 			jq -r '."raw-request"' |
 			grep '{"' |
 			jq -c 'select(.sessionStorage != null)' |
@@ -188,7 +189,7 @@ function logMsg() {
 				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew sessionStorage.tsv
 			done
 
-		cat data.json |
+		cat $tmp |
 			jq -r '."raw-request"' |
 			grep '{"' |
 			jq -c 'select(.cookies != null)' |
@@ -197,5 +198,11 @@ function logMsg() {
 				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
 				echo "$location"$(printf "\t")"$storage" | anew cookies.tsv
 			done
+
+		cat $tmp |
+			jq -r '."raw-request"' |
+			grep '^{' |
+			jq -c 'select(.ext == "domlogger++")' |
+			anew domlogger.json
 	done
 }
