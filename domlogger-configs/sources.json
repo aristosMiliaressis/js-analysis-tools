@@ -3,24 +3,34 @@
     "CrossWindow": {
       "attribute": [
         "get:window.name",
-        "get:window.parent",
-        "get:window.opener"
+        "get:MessageEvent.prototype.data"
       ],
-      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
-      "event": ["message"],
-      "function": ["window.postMessage", "window.open"]
-    },
-    "NAVIGATION": {
-      "event": ["hashchange", "beforeunload"],
-      "function": [
-        "history.pushState",
-        "history.replaceState",
-        "navigation.navigate"
+      "class": [
+        "BroadcastChannel",
+        "MessagePort"
       ]
     },
-    "Network": {
-      "class": ["WebSocket", "EventSource"],
-      "function": ["WebSocket.prototype.send"]
+    "NAVIGATION": {
+      "event": [
+        "hashchange",
+        "beforeunload"
+      ]
+    },
+    "NetworkSources": {
+      "attribute": [
+        "get:Response.prototype.body",
+        "get:Response.prototype.headers",
+        "get:XMLHttpRequest.prototype.response",
+        "get:XMLHttpRequest.prototype.responseText",
+        "get:XMLHttpRequest.prototype.responseXML"
+      ],
+      "function": [
+        "Response.prototype.text",
+        "Response.prototype.json",
+        "Response.prototype.blob",
+        "XMLHttpRequest.prototype.getAllResponseHeaders",
+        "XMLHttpRequest.prototype.getResponseHeaders"
+      ]
     },
     "Parameters": {
       "attribute": [
@@ -47,24 +57,6 @@
         "String.prototype.split"
       ]
     },
-    "REGEX": {
-      "class": [
-        "RegExp"
-      ]
-    },
-    "WebWorker": {
-      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
-      "function": [
-        "Worker.prototype.postMessage",
-        "ServiceWorker.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
-        "Worker.prototype.addEventListener",
-        "ServiceWorker.prototype.addEventListener",
-        "navigator.serviceWorker.register",
-        "ServiceWorkerContainer.prototype.register",
-        "ServiceWorkerContainer.prototype.getRegistrations"
-      ]
-    },
     "clipboard": {
       "attribute": [
         "HTMLElement.prototype.oncopy",
@@ -72,25 +64,25 @@
         "HTMLElement.prototype.onpaste",
         "HTMLElement.prototype.onbeforepaste"
       ],
-      "event": ["drag", "drop"]
-    },
-    "misc": {
-      "class": ["Blob"],
-      "function": ["URL.createObjectURL"]
+      "event": [
+        "drag",
+        "drop"
+      ]
     },
     "storage": {
-      "attribute": ["set:document.cookie"],
+      "attribute": [
+        "//get:document.cookie"
+      ],
       "function": [
         "localStorage.getItem",
-        "localStorage.setItem",
-        "sessionStorage.getItem",
-        "sessionStorage.setItem"
+        "sessionStorage.getItem"
       ]
     }
   },
   "config": {
     "*": {
       "!match": [
+        "domlogger",
         "facebook",
         "metamask",
         "wappalyzer",
@@ -102,6 +94,7 @@
         "hcaptcha"
       ],
       "!matchTrace": [
+        "domlogger",
         "facebook",
         "metamask",
         "wappalyzer",
@@ -114,22 +107,20 @@
       ]
     },
     "String.prototype.split": {
-      "match": ["\\[&\\]"]
+      "match": [
+        "\\[&\\]"
+      ]
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
       ]
     },
-    "history.pushState|history.replaceState": {
-      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
-    },
     "storage": {
       "hideThis": true
-    },
-    "window.open": {
-      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
     }
   },
-  "removeHeaders": ["content-security-policy"]
+  "removeHeaders": [
+    "content-security-policy"
+  ]
 }

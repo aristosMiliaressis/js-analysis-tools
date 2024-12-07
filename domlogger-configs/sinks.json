@@ -78,8 +78,6 @@
       "attribute": ["set:document.domain"],
       "class": [
         "FileReader",
-        "WebSocket",
-        "EventSource",
         "BroadcastChannel",
         "MessageEvent",
         "MessagePort",
@@ -88,11 +86,6 @@
       "function": [
         "document.evaluate",
         "Element.prototype.evaluate",
-        "fetch",
-        "XMLHttpRequest.prototype.open",
-        "XMLHttpRequest.prototype.send",
-        "XMLHttpRequest.prototype.setRequestHeader",
-        "WebSocket.prototype.send",
         "URL.createObjectURL",
         "window.postMessage",
         "Worker.prototype.postMessage",
@@ -101,14 +94,29 @@
         "window.open"
       ]
     },
-    "REGEX": {
-      "class": ["RegExp"]
+    "NETWORK": {
+      "attribute": [
+        "//set:Request.prototype.body",
+        "//set:Request.prototype.headers"
+      ],
+      "class": [
+        "WebSocket",
+        "EventSource",
+        "Request"
+      ],
+      "function": [
+        "fetch",
+        "navigator.sendBeacon",
+        "XMLHttpRequest.prototype.open",
+        "//XMLHttpRequest.prototype.send",
+        "//WebSocket.prototype.send",
+        "//XMLHttpRequest.prototype.setRequestHeader",
+        "//WebSocket.prototype.send"
+      ]
     },
     "STORAGE": {
       "attribute": [
-        "set:document.cookie",
-        "get:document.cookie",
-        "get:window.name"
+        "set:document.cookie"
       ],
       "function": ["localStorage.setItem", "sessionStorage.setItem"]
     },
@@ -159,12 +167,6 @@
         "exec:return args[0] == 'srcdoc' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
         "exec:return args[0] == 'style' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/"
       ]
-    },
-    "get:document.cookie": {
-      "hookFunction": "thisArg = thisArg.replace(/=[^;]*(;|$)/g, '=3313377;')"
-    },
-    "get:window.name": {
-      "hookFunction": "thisArg = domlogger.globals.canary;"
     },
     "STORAGE": {
       "hideThis": true
