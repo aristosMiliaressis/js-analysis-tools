@@ -25,6 +25,7 @@ onbeforeunload = (e) => {
 // detect History API based navigations
 var origPushState = History.prototype.pushState;
 History.prototype.pushState = function (state, title, url) {
+	clearInterval(interval);
 	extensionAPI.runtime.sendMessage({ reset: true });
 
 	return origPushState.apply(this, arguments);
@@ -32,7 +33,7 @@ History.prototype.pushState = function (state, title, url) {
 
 applyTabOptions();
 
-// respond to commands to highlight elements
+// respond to messages about changes to popup checkboxes
 extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	applyTabOptions(true);
 });

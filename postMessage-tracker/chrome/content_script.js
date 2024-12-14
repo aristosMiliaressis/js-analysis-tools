@@ -144,19 +144,28 @@ var injectedJS = function (pushstate, msgeventlistener, msgporteventlistener) {
 		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
 		document.dispatchEvent(storeEvent);
 	};
+	const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
+	function whois(origin) {
+        if (origin === 'null') return 'OPAQUE ' + origin;
+        if (origin === '*') return 'UNSAFE ' + origin;
+        if (origin.startsWith('http://')) return 'UNSAFE ' + origin;
+        if (anarchyDomains.has(origin)) return 'UNSAFE ' + origin;
+        return origin;
+    }
 	var onmsg = function (e) {
 		if (e.data.wappalyzer !== undefined || e.data.ext == "domlogger" || e.data.ext == "domlogger++" || e.data.untrustedTypes !== undefined) {
 			return
 		}
 		var p = (e.ports.length ? '%cport' + e.ports.length + '%c ' : '');
-		var msg = '%c' + h(e.source) + '%c→%c' + h() + '%c ' + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		var logMsg = h(e.source) + " <" + e.origin + "> → " + h() + " <" + location.href + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		const me = whois(window.origin);
+        const source = whois(e.origin);
+		var msg = '%c' + h(e.source) + `%c <${source}> → %c` + h() + `%c <${me}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		var logMsg = h(e.source) + " <" + source + "> → " + h() + " <" + me + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: red", '', "color: green", '', "color: blue", '');
 		} else {
 			console.log(msg, "color: red", '', "color: green", '');
 		}
-
 		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
 		document.dispatchEvent(storeEvent);
 	};

@@ -75,8 +75,16 @@
       "event": ["drag", "drop"]
     },
     "misc": {
-      "class": ["Blob"],
-      "function": ["URL.createObjectURL"]
+      "class": [
+        "Blob",
+        "DOMParser",
+        "Document"
+      ],
+      "function": [
+        "URL.createObjectURL",
+        "DOMParser.prototype.parseFromString",
+        "Document.prototype.parseHTMLUnsafe"
+      ]
     },
     "storage": {
       "attribute": ["set:document.cookie"],

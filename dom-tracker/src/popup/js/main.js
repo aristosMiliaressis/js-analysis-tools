@@ -24,7 +24,7 @@ extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 	port.postMessage({ tabId: tabs[0].id });
 });
 
-function listElements() {
+function populatePopupData() {
 	var x = document.createElement('ol');
 	x.id = 'x';
 
@@ -124,7 +124,7 @@ function listElements() {
 	document.querySelector('.active-content').appendChild(x);
 }
 
-function setupElementHighlightCheckbox() {
+function setupCheckboxes() {
 	var checkbox = document.querySelector('.active-content [name=checkbox]');
 	
 	extensionAPI.storage.local.get({
@@ -180,6 +180,6 @@ function openTab(tabName) {
 	document.getElementById(tabName + 'Tab').className += " active-content";
 	document.getElementById(tabName + 'TabButton').className += " active";
 
-	setupElementHighlightCheckbox();
-	listElements();
+	setupCheckboxes();
+	populatePopupData();
 }

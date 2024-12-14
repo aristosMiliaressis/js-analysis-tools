@@ -17,7 +17,6 @@ function refreshCount() {
 }
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
-	console.log('message from cs', msg);
 	tabId = sender.tab.id;
 	if(msg.listener) {
 		if(msg.listener == 'function () { [native code] }') return;
@@ -40,7 +39,6 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, props) {
-	console.log(props);
 	if (props.status == "complete") {
 		if(tabId == selectedId) refreshCount();
 	} else if(props.status) {
