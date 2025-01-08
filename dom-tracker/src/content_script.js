@@ -1,42 +1,49 @@
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
-// query data out of the dom on interval
-var interval = setInterval(() => {
-	var details = {}
-	details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
-	details.targets = getCrossWindowTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
-	details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
-	details.dom = document.documentElement.outerHTML;
-	details.location = document.location.href;
-	details.localStorage = localStorage;
-	details.sessionStorage = sessionStorage;
-	details.cookies = document.cookie;
-	extensionAPI.runtime.sendMessage(details);
+(function () {
+	switch (document.contentType) {
+		case 'application/xml':
+			return;
+	}
 	
-	applyTabOptions(true);
-}, 500);
+	// query data out of the dom on interval
+	var interval = setInterval(() => {
+		var details = {}
+		details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+		details.targets = getCrossWindowTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+		details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+		details.dom = document.documentElement.outerHTML;
+		details.location = document.location.href;
+		details.localStorage = localStorage;
+		details.sessionStorage = sessionStorage;
+		details.cookies = document.cookie;
+		extensionAPI.runtime.sendMessage(details);
 
-// sends data to webhook & reset tab data
-onbeforeunload = (e) => {
-	clearInterval(interval);
-	extensionAPI.runtime.sendMessage({ reset: true });
-};
+		applyTabOptions(true);
+	}, 500);
 
-// detect History API based navigations
-var origPushState = History.prototype.pushState;
-History.prototype.pushState = function (state, title, url) {
-	clearInterval(interval);
-	extensionAPI.runtime.sendMessage({ reset: true });
+	// sends data to webhook & reset tab data
+	onbeforeunload = (e) => {
+		clearInterval(interval);
+		extensionAPI.runtime.sendMessage({ reset: true });
+	};
 
-	return origPushState.apply(this, arguments);
-};
+	// detect History API based navigations
+	var origPushState = History.prototype.pushState;
+	History.prototype.pushState = function (state, title, url) {
+		clearInterval(interval);
+		extensionAPI.runtime.sendMessage({ reset: true });
 
-applyTabOptions();
+		return origPushState.apply(this, arguments);
+	};
 
-// respond to messages about changes to popup checkboxes
-extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-	applyTabOptions(true);
-});
+	applyTabOptions();
+
+	// respond to messages about changes to popup checkboxes
+	extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+		applyTabOptions(true);
+	});
+})();
 
 function applyTabOptions(skipMsg) {
 	extensionAPI.storage.local.get({
