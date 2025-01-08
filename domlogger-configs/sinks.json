@@ -1,5 +1,10 @@
 {
   "hooks": {
+    "JSNAVIGATION": {
+      "custom": [
+        "attribute:jsinitiatednav"
+      ]
+    },
     "CSS": {
       "attribute": [
         "set:Element.prototype.cssText",
@@ -75,18 +80,21 @@
       ]
     },
     "MISC": {
-      "attribute": ["set:document.domain"],
+      "attribute": ["set:document.domain","set:window.name"],
       "class": [
         "FileReader",
         "BroadcastChannel",
-        "MessageEvent",
-        "MessagePort",
+        "MessageChannel",
         "Blob"
       ],
       "function": [
         "document.evaluate",
         "Element.prototype.evaluate",
         "URL.createObjectURL",
+        "MessagePort.prototype.start",
+        "MessagePort.prototype.postMessage",
+        "MessagePort.prototype.addEventListener",
+        "BroadcastChannel.prototype.postMessage",
         "window.postMessage",
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
@@ -172,6 +180,7 @@
       "hideThis": true
     }
   },
+  "onload": "origBeforeUnload=onbeforeunload;onbeforeunload=(ne)=>{try{throw Error()}catch(e){if(e.stack.split('\\n').length>2){jsinitiatednav=`js initiated nav \\n${e.stack.split('\\n').slice(1).join('\\n')}`}}origBeforeUnload&&origBeforeUnload(ne)}",
   "globals": { "canary": "3313377" },
   "removeHeaders": ["content-security-policy"]
 }

@@ -7,7 +7,15 @@
       ],
       "class": [
         "BroadcastChannel",
-        "MessagePort"
+        "MessageChannel"
+      ],
+      "function": [
+        "window.postMessage",
+        "MessagePort.prototype.start",
+        "MessagePort.prototype.postMessage",
+        "MessagePort.prototype.addEventListener",
+        "BroadcastChannel.prototype.postMessage",
+        "window.open"
       ]
     },
     "NAVIGATION": {

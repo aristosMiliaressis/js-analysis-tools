@@ -2,13 +2,16 @@
   "hooks": {
     "CrossWindow": {
       "attribute": [
-        "get:window.name",
-        "get:window.parent",
-        "get:window.opener"
+        "set:window.name"
       ],
-      "class": ["BroadcastChannel", "MessageEvent", "MessagePort"],
-      "event": ["message"],
-      "function": ["window.postMessage", "window.open"]
+      "function": [
+        "window.postMessage",
+        "MessagePort.prototype.start",
+        "MessagePort.prototype.postMessage",
+        "MessagePort.prototype.addEventListener",
+        "BroadcastChannel.prototype.postMessage",
+        "window.open"
+      ]
     },
     "NAVIGATION": {
       "event": ["hashchange", "beforeunload"],
@@ -57,7 +60,6 @@
       "function": [
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
         "Worker.prototype.addEventListener",
         "ServiceWorker.prototype.addEventListener",
         "navigator.serviceWorker.register",

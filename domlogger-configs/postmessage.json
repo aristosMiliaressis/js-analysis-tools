@@ -1,11 +1,13 @@
 {
-  "hooks": {
-    "PSTMSG": {
-      "function": ["window.postMessage"],
-      "event": ["message"]
-    }
-  },
   "config": {
+    "*": {
+      "!match": [
+        "wappalyzer"
+      ],
+      "!matchTrace": [
+        "wappalyzer"
+      ]
+    },
     "message": {
       "alert": {
         "match": [
@@ -25,7 +27,47 @@
         ],
         "notification": true
       }
+    },
+    "window.open": {
+      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
     }
   },
-  "removeHeaders": ["content-security-policy", "x-frame-options"]
+  "hooks": {
+    "CrossWindow": {
+      "attribute":["set:window.name"],
+      "event": [
+        "message"
+      ],
+      "function": [
+        "window.postMessage",
+        "window.open",
+        "window.close",
+        "MessagePort.prototype.start",
+        "MessagePort.prototype.close",
+        "MessagePort.prototype.postMessage",
+        "MessagePort.prototype.addEventListener",
+        "BroadcastChannel.prototype.postMessage",
+        "BroadcastChannel.prototype.close"
+      ]
+    },
+    "WebWorker": {
+      "class": [
+        "Worker",
+        "ServiceWorker",
+        "ServiceWorkerContainer"
+      ],
+      "function": [
+        "Worker.prototype.postMessage",
+        "ServiceWorker.prototype.postMessage",
+        "Worker.prototype.addEventListener",
+        "ServiceWorker.prototype.addEventListener",
+        "navigator.serviceWorker.register",
+        "ServiceWorkerContainer.prototype.register",
+        "ServiceWorkerContainer.prototype.getRegistrations"
+      ]
+    }
+  },
+  "removeHeaders": [
+    "content-security-policy"
+  ]
 }
