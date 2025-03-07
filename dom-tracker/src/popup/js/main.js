@@ -126,6 +126,8 @@ function populatePopupData() {
 
 function setupCheckboxes() {
 	var checkbox = document.querySelector('.active-content [name=checkbox]');
+	if (checkbox == undefined)
+		return
 	
 	extensionAPI.storage.local.get({
 		options: {}
@@ -133,8 +135,6 @@ function setupCheckboxes() {
 		if (document.querySelector('#iframeTab.active-content') != null && i.options.highlight_iframe) {
 			checkbox.checked = true;
 		} else if (document.querySelector('#targetTab.active-content') != null && i.options.highlight_target) {
-			checkbox.checked = true;
-		} else if (document.querySelector('#rpoTab.active-content') != null && i.options.detect_quirks_mode) {
 			checkbox.checked = true;
 		}
 	});
@@ -147,8 +147,6 @@ function setupCheckboxes() {
 				i.options.highlight_iframe = checkbox.checked;
 			} else if (document.querySelector('#targetTab.active-content') != null) {
 				i.options.highlight_target = checkbox.checked;
-			} else if (document.querySelector('#rpoTab.active-content') != null) {
-				i.options.detect_quirks_mode = checkbox.checked;
 			}
 			
 			extensionAPI.storage.local.set(i);
@@ -157,8 +155,7 @@ function setupCheckboxes() {
 				extensionAPI.tabs.sendMessage(tabs[0].id, 
 				{ 
 					highlight_iframe: i.options.highlight_iframe,
-					highlight_target: i.options.highlight_target,
-					detect_quirks_mode: i.options.detect_quirks_mode
+					highlight_target: i.options.highlight_target
 				});
 			});
 		});

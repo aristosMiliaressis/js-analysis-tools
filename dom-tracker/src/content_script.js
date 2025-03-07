@@ -78,9 +78,10 @@ function applyTabOptions(skipMsg) {
 			}
 		}
 		
-		if (!skipMsg && i.options.detect_quirks_mode) {
-			// detects quirks mode for PRSSI exploitation
-			document.compatMode != 'CSS1Compat' && alert(`${location.href} page is in quirks mode!`);
+		if (!skipMsg) {
+			// quirks mode + path relative stylesheet == PRSSI
+			if (document.compatMode != 'CSS1Compat' && getPathRelativeUriTargetingElements().some(e => e.nodeName == "STYLE" || e.nodeName == "LINK"))
+				alert(`${location.href} page is in quirks mode!`);
 		}
 	});
 }
