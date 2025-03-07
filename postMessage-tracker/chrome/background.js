@@ -6,11 +6,11 @@ function refreshCount() {
 	txt = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
 	chrome.tabs.get(selectedId, function() {
 		if (!chrome.runtime.lastError) {
-			chrome.browserAction.setBadgeText({"text": ''+txt, tabId: selectedId});
+			chrome.action.setBadgeText({"text": ''+txt, tabId: selectedId});
 			if(txt > 0) {
-				chrome.browserAction.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
+				chrome.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
 			} else {
-				chrome.browserAction.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
+				chrome.action.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
 			}
 		}
 	});
@@ -92,7 +92,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	refreshCount();
 });
 
-chrome.extension.onConnect.addListener(function(port) {
+chrome.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function(msg) {
 		port.postMessage({listeners:tab_listeners});
 	});
