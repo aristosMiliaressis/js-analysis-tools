@@ -127,14 +127,14 @@ function fetch_urls() {
 
 # generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
 function logMsg() {
+	set -m
 	tmp=`mktemp`
-	interactsh-client -http-only -json -o $tmp >/dev/null &
-	trap "rm $tmp" EXIT
 
-	while true; do
-		sleep 5
-		cat $tmp | jq -r '."raw-request"' | grep '{"' | jq -r 'select(.message != null) | .message' | anew messagelog.txt
-		cat $tmp | jq -r '."raw-request"' | grep '{"' | jq -c 'select(.listener != null)' |
+	( while true; do
+		sleep 1
+		mv .webhook.log $tmp 2>/dev/null
+		cat $tmp | jq -r 'select(.message != null) | .message' | anew messagelog.txt
+		cat $tmp | jq -c 'select(.listener != null)' |
 			while read -r msg; do
 				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
 				hops=$(echo $msg | jq -r .hops | sed 's,\%,%%,g')
@@ -143,8 +143,6 @@ function logMsg() {
 				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
 			done | anew message_listeners.md
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '{"' |
 			jq -c 'select(.iframes != null) | .frames[]' |
 			while read -r msg; do
 				html=$(echo $msg | jq -r .frame | sed 's,\%,%%,g')
@@ -154,8 +152,6 @@ function logMsg() {
 			done | anew iframes.md
 
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '{"' |
 			jq -c 'select(.dom != null)' |
 			while read -r msg; do
 				dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
@@ -170,8 +166,6 @@ function logMsg() {
 			done
 
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '{"' |
 			jq -c 'select(.localStorage != null)' |
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .localStorage | sed 's,\%,%%,g')
@@ -180,8 +174,6 @@ function logMsg() {
 			done
 
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '{"' |
 			jq -c 'select(.sessionStorage != null)' |
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .sessionStorage | sed 's,\%,%%,g')
@@ -190,8 +182,6 @@ function logMsg() {
 			done
 
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '{"' |
 			jq -c 'select(.cookies != null)' |
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .cookies | sed 's,\%,%%,g')
@@ -200,9 +190,12 @@ function logMsg() {
 			done
 
 		cat $tmp |
-			jq -r '."raw-request"' |
-			grep '^{' |
 			jq -c 'select(.ext == "domlogger++")' |
 			anew domlogger.json
-	done
+	done ) &
+
+	webhook_listener.py &
+
+	trap "rm $tmp ; fg ; exit" INT EXIT
+	wait
 }

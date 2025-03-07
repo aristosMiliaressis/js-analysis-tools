@@ -31,13 +31,15 @@ function logToWebhook(msg) {
 		options: {}
 	}, function (i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
-		if (!i.options.webhook_iframe) msg.iframes = undefined;
+		if (!i.options.webhook_iframe) msg.frames = undefined;
 		if (!i.options.webhook_target) msg.targets = undefined;
 		if (!i.options.webhook_rpo) msg.rpo = undefined;
 		if (!i.options.webhook_dom) msg.dom = undefined;
 		if (!i.options.webhook_local_storage) msg.localStorage = undefined;
 		if (!i.options.webhook_session_storage) msg.sessionStorage = undefined;
 		if (!i.options.webhook_cookies) msg.cookies = undefined;
+		if (!msg.cookies && !msg.localStorage && !msg.sessionStorage && !msg.dom && !msg.rpo && !msg.targets && !msg.frames)
+			return
 
 		var data = JSON.stringify(msg);
 		try {
