@@ -4,6 +4,7 @@ function save_options() {
     extensionAPI.storage.local.set({
         options: {
             webhook_url: webhook_url.value.length > 0 ? webhook_url.value : '',
+            webhook_scope: webhook_scope.value.length > 0 ? webhook_scope.value : '',
             popup_iframe: popup_iframe.checked,
             popup_target: popup_target.checked,
             popup_rpo: popup_rpo.checked,
@@ -28,6 +29,7 @@ function restore_options() {
         options: { }
     }, function (i) {
         webhook_url.value = i.options.webhook_url || '';
+        webhook_scope.value = i.options.webhook_scope || '';
         popup_iframe.checked = i.options.popup_iframe === undefined ? true : i.options.popup_iframe;
         popup_target.checked = i.options.popup_target === undefined ? true : i.options.popup_target;
         popup_rpo.checked = i.options.popup_rpo === undefined ? true : i.options.popup_rpo;

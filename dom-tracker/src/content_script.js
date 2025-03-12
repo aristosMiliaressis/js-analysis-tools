@@ -23,7 +23,7 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 	}, 500);
 
 	// sends data to webhook & reset tab data
-	onbeforeunload = (e) => {
+	onhashchange = onbeforeunload = (e) => {
 		clearInterval(interval);
 		extensionAPI.runtime.sendMessage({ reset: true });
 	};
@@ -33,9 +33,15 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 	History.prototype.pushState = function (state, title, url) {
 		clearInterval(interval);
 		extensionAPI.runtime.sendMessage({ reset: true });
-
 		return origPushState.apply(this, arguments);
 	};
+
+	var origReplaceState = History.prototype.replaceState;
+	History.prototype.replaceState = function (state, title, url) {
+		clearInterval(interval);
+		extensionAPI.runtime.sendMessage({ reset: true });
+		return origReplaceState.apply(this, arguments);
+	};	
 
 	applyTabOptions();
 

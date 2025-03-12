@@ -31,6 +31,8 @@ function logToWebhook(msg) {
 		options: {}
 	}, function (i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
+		if (new URL(msg.location).origin.match(i.options.webhook_scope) == null) return;
+
 		if (!i.options.webhook_iframe) msg.frames = undefined;
 		if (!i.options.webhook_target) msg.targets = undefined;
 		if (!i.options.webhook_rpo) msg.rpo = undefined;
