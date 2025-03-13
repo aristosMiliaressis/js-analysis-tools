@@ -59,7 +59,7 @@ function applyTabOptions(skipMsg) {
 			var style = document.createElement('style');
 			style.id = 'dom-tracker-stylesheet';
 			css = `iframe.dom-tracker-highlight {display: block !important; visibility: visible !important; border: 3px dashed green !important; margin: 5px !important; padding: 5px !important;}	
-		a.dom-tracker-highlight, form.dom-tracker-highlight, area.dom-tracker-highlight {display: block !important; visibility: visible !important; border: 3px dashed yellow !important; margin: 5px !important; padding: 5px !important;}`;
+			a.dom-tracker-highlight, form.dom-tracker-highlight, area.dom-tracker-highlight {display: block !important; visibility: visible !important; border: 3px dashed yellow !important; margin: 5px !important; padding: 5px !important;}`;
 			style.appendChild(document.createTextNode(css));
 			document.body.appendChild(style);
 		}
@@ -87,7 +87,7 @@ function applyTabOptions(skipMsg) {
 		if (!skipMsg) {
 			// quirks mode + path relative stylesheet == PRSSI
 			if (document.compatMode != 'CSS1Compat' && getPathRelativeUriTargetingElements().some(e => e.nodeName == "STYLE" || e.nodeName == "LINK"))
-				alert(`${location.href} page is in quirks mode!`);
+				alert(`possible PRSSI detected on ${location.href}`);
 		}
 	});
 }
