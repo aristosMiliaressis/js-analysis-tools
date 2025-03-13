@@ -4,8 +4,16 @@
 <body>
 	<div id='response'></div>
 	<div id="options">
+		<input type="checkbox" id="webhook_listeners" />
+		<label for="scales">listeners</label>
+		<input type="checkbox" id="webhook_messages" />
+		<label for="scales">messages</label>
+		<br>
+		Scope:
+		<input type="text" id="webhook_scope" placeholder=".*" value=".*" size="40" />
+		<br>
 		Log-URL:
-		<input type="text" id="log-url" size="40" />
+		<input type="text" id="webhook_url" placeholder="http://127.0.0.1:31337" size="40" />
 		<button id="save">Save</button>
 		<div id="status"></div>
 	</div>

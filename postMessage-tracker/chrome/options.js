@@ -1,7 +1,11 @@
 function save_options() {
-	var log_url = document.getElementById('log-url').value;
 	chrome.storage.sync.set({
-		log_url: log_url.length > 0?log_url:''
+		options: {
+			webhook_url: webhook_url.value.length > 0 ? webhook_url.value : '',
+			webhook_scope: webhook_scope.value.length > 0 ? webhook_scope.value : '',
+			webhook_listeners: webhook_listeners.checked,
+			webhook_messages: webhook_messages.checked
+		}
 	}, function() {
 		var status = document.getElementById('status');
 		status.textContent = 'Options saved.';
@@ -14,9 +18,12 @@ function save_options() {
 
 function restore_options() {
 	chrome.storage.sync.get({
-		log_url: ''
-	}, function(items) {
-		document.getElementById('log-url').value = items.log_url;
+		options: { }
+	}, function(i) {
+		webhook_url.value = i.options.webhook_url || '';
+		webhook_scope.value = i.options.webhook_scope || '';
+		webhook_listeners.checked = i.options.webhook_listeners === undefined ? false : i.options.webhook_listeners;
+		webhook_messages.checked = i.options.webhook_messages === undefined ? true : i.options.webhook_messages;
 	});
 }
 

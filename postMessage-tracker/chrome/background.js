@@ -16,15 +16,19 @@ function refreshCount() {
 	});
 }
 
-function logListener(data) {
+function logToWebhook(data) {
 	chrome.storage.sync.get({
-		log_url: ''
-	}, function(items) {
-		log_url = items.log_url;
-		if(!log_url.length) return;
+		options: { }
+	}, function(i) {
+		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
+		if (new URL(data.parent_url).origin.match(i.options.webhook_scope) == null) return;
+
+		if (!i.options.webhook_listeners && data.listener != undefined) return;
+		if (!i.options.webhook_messages && data.message != undefined) return;
+
 		data = JSON.stringify(data);
 		try {
-			fetch(log_url, {
+			fetch(i.options.webhook_url, {
 				method: 'post',
 				headers: {
 					"Content-type": "application/json; charset=UTF-8"
@@ -43,10 +47,11 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		if(!tab_listeners[tabId]) tab_listeners[tabId] = [];
 		if (tab_listeners[tabId].some(l => l.hops == msg.hops && l.stack == msg.stack)) return;
 		tab_listeners[tabId][tab_listeners[tabId].length] = msg;
-		logListener(msg);
+		logToWebhook(msg);
 	}
 	if (msg.message) {
-		logListener(msg);
+		msg.parent_url = sender.tab.url;
+		logToWebhook(msg);
 	}
 	if (msg.pushState) {
 		tab_push[tabId] = true;
