@@ -124,19 +124,19 @@
       ]
     },
     "String.prototype.split": {
-      "match": ["\\[&\\]"]
+      "match": ["\\[&\\]"],
+      "showThis": true
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
-      ]
+      ],
+      "showThis": true
     },
     "history.pushState|history.replaceState": {
       "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
     },
-    "storage": {
-      "hideThis": true
-    },
+
     "window.open": {
       "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
     }

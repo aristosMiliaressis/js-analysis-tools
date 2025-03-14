@@ -117,15 +117,14 @@
     "String.prototype.split": {
       "match": [
         "\\[&\\]"
-      ]
+      ],
+      "showThis": true
     },
     "String.prototype.substring|String.prototype.slice": {
       "match": [
         "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
-      ]
-    },
-    "storage": {
-      "hideThis": true
+      ],
+      "showThis": true
     }
   },
   "removeHeaders": [

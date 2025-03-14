@@ -1,8 +1,8 @@
 {
   "hooks": {
     "JSNAVIGATION": {
-      "custom": [
-        "attribute:jsinitiatednav"
+      "attribute": [
+        "jsinitiatednav"
       ]
     },
     "CSS": {
@@ -50,33 +50,33 @@
       ]
     },
     "JQUERY": {
-      "custom": [
-        "function:$",
-        "function:$.globalEval",
-        "function:jQuery",
-        "function:jQuery.globalEval",
-        "function:jQuery.parseHTML",
-        "function:jQuery.prototype.add",
-        "function:jQuery.prototype.after",
-        "function:jQuery.prototype.attr",
-        "function:jQuery.prototype.append",
-        "function:jQuery.prototype.appendTo",
-        "function:jQuery.prototype.before",
-        "function:jQuery.prototype.constructor",
-        "function:jQuery.prototype.has",
-        "function:jQuery.prototype.html",
-        "function:jQuery.prototype.index",
-        "function:jQuery.prototype.init",
-        "function:jQuery.prototype.insertAfter",
-        "function:jQuery.prototype.insertBefore",
-        "function:jQuery.prototype.prepend",
-        "function:jQuery.prototype.prependTo",
-        "function:jQuery.prototype.prop",
-        "function:jQuery.prototype.replaceAll",
-        "function:jQuery.prototype.replaceWith",
-        "function:jQuery.prototype.wrap",
-        "function:jQuery.prototype.wrapAll",
-        "function:jQuery.prototype.wrapInner"
+      "function": [
+        "$",
+        "$.globalEval",
+        "jQuery",
+        "jQuery.globalEval",
+        "jQuery.parseHTML",
+        "jQuery.prototype.add",
+        "jQuery.prototype.after",
+        "jQuery.prototype.attr",
+        "jQuery.prototype.append",
+        "jQuery.prototype.appendTo",
+        "jQuery.prototype.before",
+        "jQuery.prototype.constructor",
+        "jQuery.prototype.has",
+        "jQuery.prototype.html",
+        "jQuery.prototype.index",
+        "jQuery.prototype.init",
+        "jQuery.prototype.insertAfter",
+        "jQuery.prototype.insertBefore",
+        "jQuery.prototype.prepend",
+        "jQuery.prototype.prependTo",
+        "jQuery.prototype.prop",
+        "jQuery.prototype.replaceAll",
+        "jQuery.prototype.replaceWith",
+        "jQuery.prototype.wrap",
+        "jQuery.prototype.wrapAll",
+        "jQuery.prototype.wrapInner"
       ]
     },
     "MISC": {
@@ -175,9 +175,6 @@
         "exec:return args[0] == 'srcdoc' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/",
         "exec:return args[0] == 'style' && args[1].includes(domlogger.globals.canary) ? /3313377/ : /^$/"
       ]
-    },
-    "STORAGE": {
-      "hideThis": true
     }
   },
   "onload": "origBeforeUnload=onbeforeunload;onbeforeunload=(ne)=>{try{throw Error()}catch(e){if(e.stack.split('\\n').length>2){jsinitiatednav=`js initiated nav \\n${e.stack.split('\\n').slice(1).join('\\n')}`}}origBeforeUnload&&origBeforeUnload(ne)}",
