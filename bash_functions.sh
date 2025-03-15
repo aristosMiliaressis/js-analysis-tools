@@ -82,47 +82,29 @@ function capture_har() {
     fi
 }
 
-function fetch_urls() {
-    tmp=$(mktemp)
-    trap "rm $tmp" EXIT
+function fetch_js() {
+    tmp="$(mktemp).html"
+    tmp2="$(mktemp).har"
+    trap "rm $tmp $tmp2" EXIT
 
+    echo "<!DOCTYPE html><html><head>" >$tmp
     while read url; do
         echo $url
-    done | tr -d '\r' | unfurl format %s://%a%p >$tmp
+    done | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >>$tmp
+    echo "</head></html>" >>$tmp
 
-    while read url; do
-        url=$(echo $url | tr -d '\r')
-        query=$(echo "$url" | unfurl format %q)
-        domain=$(echo "$url" | unfurl format %d)
-        path=$(echo "$url" | unfurl format %p | rev | cut -d / -f 2- | rev | head -c 3800)
-        file=$(echo "$url" | unfurl format %p | rev | cut -d / -f 1 | rev)
-        filename="${file}"
-        [[ ! -z "$query" ]] && filename="$filename%3F$query"
-        filename="${domain}${path}/$(echo $filename | head -c 253)"
-        mkdir -p "${domain}${path}" 2>/dev/null
-        if [[ -d "$filename" ]]; then
-            file=$(echo "$path" | rev | cut -d / -f 1 | rev | tail -c 249).html
-            path=$(echo "$path" | rev | cut -d / -f 2- | rev)
-        fi
+    origin=$(cat $tmp | htmlq -a src 'script' | head -n1 | unfurl format %s://%d)
 
-        echo "Curling $url"
-        curl -s --compressed -H 'User-Agent: Mozilla/5.1' "$url" >"$filename"
+    stealthy-har-capturer -H "Origin: $origin" -H "Referer: $origin" -t 60000 -g 6000 -o $tmp2 file://$tmp
 
-        if [[ $(file -- "$filename") == *"HTML document"* || "$file" == *".html" ]]; then
-            cat "$filename" | htmlq -t script >"$filename.js"
-            rm "$filename"
-            filename="$filename.js"
-        fi
+    unhar $tmp2
+}
 
-        if [[ $(file -- "$filename") == *"JavaScript source"* || "$file" == *".js" ]]; then
-            (
-                deobfuscator.js "$filename"
-                if [[ $? -ne 0 ]]; then
-                    js-beautify --outfile="$filename" "$filename"
-                fi
-            ) &
-        fi
-    done <<<$(cat $tmp | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
+function webcrap() {
+	dir="$1"
+	for file in $(find "$dir" -type f -name '*.js'); do
+		webcrack "$file" | sponge "$file"
+	done
 }
 
 # generates wbhook url for use with postMessage-tracker/dom-tracker and extracts messages with appropriate file structure
