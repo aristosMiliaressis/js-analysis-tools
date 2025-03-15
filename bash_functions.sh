@@ -115,7 +115,7 @@ function logMsg() {
 	( while true; do
 		sleep 1
 		mv .webhook.log $tmp 2>/dev/null
-		cat $tmp | jq -r 'select(.message != null) | .message' | anew messagelog.txt
+		cat $tmp | jq -r 'select(.message != null) | .message' | anew -q messagelog.txt
 		cat $tmp | jq -c 'select(.listener != null)' |
 			while read -r msg; do
 				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
@@ -123,7 +123,7 @@ function logMsg() {
 				stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
 				listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
 				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
-			done | anew message_listeners.md
+			done | anew -q message_listeners.md
 		cat $tmp |
 			jq -c 'select(.iframes != null) | .frames[]' |
 			while read -r msg; do
@@ -131,7 +131,7 @@ function logMsg() {
 				domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
 				href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
 				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
-			done | anew iframes.md
+			done | anew -q iframes.md
 
 		cat $tmp |
 			jq -c 'select(.dom != null)' |
@@ -141,9 +141,9 @@ function logMsg() {
 				domain=$(echo $location | unfurl domains)
 				path=$(echo $location | unfurl path)
 				path="./pages/$domain$path"
-				if [[ -d "$path" ]]; then path=$(echo $path | sed 's,/$,,').html; fi
 				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
+				if [[ -d "$path" ]]; then path=$(echo $path | sed 's,/$,,').html; fi
 				echo "$dom" > "$path"
 			done
 
@@ -152,7 +152,7 @@ function logMsg() {
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .localStorage | sed 's,\%,%%,g')
 				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew localStorage.tsv
+				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q localStorage.tsv
 			done
 
 		cat $tmp |
@@ -160,7 +160,7 @@ function logMsg() {
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .sessionStorage | sed 's,\%,%%,g')
 				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew sessionStorage.tsv
+				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q sessionStorage.tsv
 			done
 
 		cat $tmp |
@@ -168,12 +168,12 @@ function logMsg() {
 			while read -r msg; do
 				storage=$(echo $msg | jq -r .cookies | sed 's,\%,%%,g')
 				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$storage" | anew cookies.tsv
+				echo "$location"$(printf "\t")"$storage" | anew -q cookies.tsv
 			done
 
 		cat $tmp |
 			jq -c 'select(.ext == "domlogger++")' |
-			anew domlogger.json
+			anew -q domlogger.json
 	done ) &
 
 	webhook_listener.py &
