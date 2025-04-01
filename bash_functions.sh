@@ -113,26 +113,26 @@ function logMsg() {
 		cat $tmp | jq -r 'select(.message != null) | .message' | anew -q messagelog.txt
 		cat $tmp | jq -c 'select(.listener != null)' |
 			while read -r msg; do
-				href=$(echo $msg | jq -r .parent_url | sed 's,\%,%%,g')
-				hops=$(echo $msg | jq -r .hops | sed 's,\%,%%,g')
-				stack=$(echo $msg | jq -r .stack | sed 's,\%,%%,g')
-				listener=$(echo $msg | jq -r .listener | sed 's,\%,%%,g')
+				href=$(echo "$msg" | jq -r .parent_url | sed 's,\%,%%,g')
+				hops=$(echo "$msg" | jq -r .hops | sed 's,\%,%%,g')
+				stack=$(echo "$msg" | jq -r .stack | sed 's,\%,%%,g')
+				listener=$(echo "$msg" | jq -r .listener | sed 's,\%,%%,g')
 				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
 			done | anew -q message_listeners.md
 		cat $tmp |
 			jq -c 'select(.iframes != null) | .frames[]' |
 			while read -r msg; do
-				html=$(echo $msg | jq -r .frame | sed 's,\%,%%,g')
-				domPath=$(echo $msg | jq -r .path | sed 's,\%,%%,g')
-				href=$(echo $msg | jq -r .url.href | sed 's,\%,%%,g')
+				html=$(echo "$msg" | jq -r .frame | sed 's,\%,%%,g')
+				domPath=$(echo "$msg" | jq -r .path | sed 's,\%,%%,g')
+				href=$(echo "$msg" | jq -r .url.href | sed 's,\%,%%,g')
 				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
 			done | anew -q iframes.md
 
 		cat $tmp |
 			jq -c 'select(.dom != null)' |
 			while read -r msg; do
-				dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
-				location=$(echo $msg | jq -r .location)
+				dom=$(echo "$msg" | jq -r .dom | sed 's,\%,%%,g')
+				location=$(echo "$msg" | jq -r .location)
 				domain=$(echo "$location" | unfurl domains)
 				path=$(echo "$location" | unfurl path | sed 's,/$,,')
 				path="./pages/$domain$path"
@@ -145,24 +145,24 @@ function logMsg() {
 		cat $tmp |
 			jq -c 'select(.localStorage != null)' |
 			while read -r msg; do
-				storage=$(echo $msg | jq -r .localStorage | sed 's,\%,%%,g')
-				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				storage=$(echo "$msg" | jq -r .localStorage | sed 's,\%,%%,g')
+				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
 				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q localStorage.tsv
 			done
 
 		cat $tmp |
 			jq -c 'select(.sessionStorage != null)' |
 			while read -r msg; do
-				storage=$(echo $msg | jq -r .sessionStorage | sed 's,\%,%%,g')
-				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				storage=$(echo "$msg" | jq -r .sessionStorage | sed 's,\%,%%,g')
+				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
 				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q sessionStorage.tsv
 			done
 
 		cat $tmp |
 			jq -c 'select(.cookies != null)' |
 			while read -r msg; do
-				storage=$(echo $msg | jq -r .cookies | sed 's,\%,%%,g')
-				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
+				storage=$(echo "$msg" | jq -r .cookies | sed 's,\%,%%,g')
+				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
 				echo "$location"$(printf "\t")"$storage" | anew -q cookies.tsv
 			done
 
@@ -172,7 +172,7 @@ function logMsg() {
 	done ) &
 
 	webhook_listener.py &
-
 	trap "rm $tmp ; pkill -P $$; fg ; exit" INT EXIT
+
 	wait
 }
