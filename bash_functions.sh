@@ -131,11 +131,11 @@ function logMsg() {
 		cat $tmp |
 			jq -c 'select(.dom != null)' |
 			while read -r msg; do
-				dom=$(echo "$msg" | jq -r .dom | sed 's,\%,%%,g')
+				dom=$(echo "$msg" | jq -r .dom)
 				location=$(echo "$msg" | jq -r .location)
 				domain=$(echo "$location" | unfurl domains)
 				path=$(echo "$location" | unfurl path | sed 's,/$,,')
-				path="./pages/$domain$path"
+				path="./$domain$path"
 				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
 				if [[ -d "$path" ]]; then path="$path/index.html"; fi
@@ -173,7 +173,7 @@ function logMsg() {
 	done ) &
 
 	webhook_listener.py &
-	trap "rm $tmp ; pkill -P $$; fg ; exit" INT EXIT
+	trap "rm $tmp ; pkill -P $$" INT EXIT
 
 	wait
 }
