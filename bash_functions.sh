@@ -140,6 +140,7 @@ function logMsg() {
 				mkdir -p "$basePath" 2>/dev/null
 				if [[ -d "$path" ]]; then path="$path/index.html"; fi
 				echo "$dom" > "$path"
+				cat "$path" | htmlq -t 'script:not([src])' > "${path}.inline.js"
 			done
 
 		cat $tmp |
