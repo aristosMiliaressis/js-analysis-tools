@@ -87,17 +87,11 @@ function fetch_js() {
     tmp2="$(mktemp).har"
     trap "rm $tmp $tmp2" EXIT
 
-    echo "<!DOCTYPE html><html><head>" >$tmp
     while read url; do
-        echo $url
-    done | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >>$tmp
-    echo "</head></html>" >>$tmp
-
-    origin=$(cat $tmp | htmlq -a src 'script' | head -n1 | unfurl format %s://%d)
-
-    stealthy-har-capturer -H "Origin: $origin" -H "Referer: $origin" -t 60000 -g 6000 -o $tmp2 file://$tmp
-
-    unhar $tmp2
+	echo $url | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >$tmp
+	stealthy-har-capturer -A '--headless' -t 10000 -o $tmp2 file://$tmp
+	unhar $tmp2
+    done
 }
 
 function webcrap() {
@@ -114,6 +108,7 @@ function logMsg() {
 
 	( while true; do
 		sleep 1
+		echo > $tmp
 		mv .webhook.log $tmp 2>/dev/null
 		cat $tmp | jq -r 'select(.message != null) | .message' | anew -q messagelog.txt
 		cat $tmp | jq -c 'select(.listener != null)' |
@@ -137,13 +132,13 @@ function logMsg() {
 			jq -c 'select(.dom != null)' |
 			while read -r msg; do
 				dom=$(echo $msg | jq -r .dom | sed 's,\%,%%,g')
-				location=$(echo $msg | jq -r .location | sed 's,\%,%%,g')
-				domain=$(echo $location | unfurl domains)
-				path=$(echo $location | unfurl path)
+				location=$(echo $msg | jq -r .location)
+				domain=$(echo "$location" | unfurl domains)
+				path=$(echo "$location" | unfurl path | sed 's,/$,,')
 				path="./pages/$domain$path"
 				basePath=$(echo "$path" | rev | cut -d / -f 2- | rev)
 				mkdir -p "$basePath" 2>/dev/null
-				if [[ -d "$path" ]]; then path=$(echo $path | sed 's,/$,,').html; fi
+				if [[ -d "$path" ]]; then path="$path/index.html"; fi
 				echo "$dom" > "$path"
 			done
 
@@ -178,6 +173,6 @@ function logMsg() {
 
 	webhook_listener.py &
 
-	trap "rm $tmp ; fg ; exit" INT EXIT
+	trap "rm $tmp ; pkill -P $$; fg ; exit" INT EXIT
 	wait
 }

@@ -1,18 +1,21 @@
 #!/bin/env python3
 from http.server import HTTPServer, BaseHTTPRequestHandler
-import os
 
 class WebhookHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
-        content_len = int(self.headers.get('content-length'))
-        msg = self.rfile.read(content_len).decode()
-        self.send_response(200)
-        self.end_headers()
+        try:
+            content_len = int(self.headers.get('content-length'))
+            msg = self.rfile.read(content_len).decode()
+            self.send_response(200)
+            self.end_headers()
 
-        log = open("./.webhook.log", "a")
-        log.write(f"{msg}\n")
-        log.close()
+            log = open("./.webhook.log", "a")
+            log.write(f"{msg}\n")
+            log.close()
+            print(f'length: {content_len}, content: {msg[:40]}')
+        except Exception as ex:
+            print(f'Exception: {ex}')
         return
 
 if __name__ == '__main__':
