@@ -2,7 +2,7 @@ body { margin: 0px; }
 h3 {  font-weight: normal; width: 250px; overflow: hidden; white-space: normal; word-wrap: break-word; max-height: 96px; display:inline-block;margin-right:30px; }
 h3 code { font-size: 15px; }
 #content { height: 600px; width: 400px; overflow-y: scroll; }
-ol { padding: 0 0 0 10px; max-width: 500px; width: 350px; margin: 0; }
+ul { list-style-type: none; padding: 0px; max-width: 500px; }
 li i { font-size: 10px; }
 li pre { white-space: pre-wrap; word-wrap: break-word; background: #f2f2f2; padding: 2px 5px 5px; margin: 0; }
 li { margin: 0 0 5px; padding: 0; white-space: pre-wrap; word-wrap: break-word; }

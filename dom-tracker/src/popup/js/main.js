@@ -25,25 +25,29 @@ extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 function populatePopupData() {
-	var x = document.createElement('ol');
-	x.id = 'x';
+	var elementList = document.createElement('ul');
+	elementList.id = 'x';
+
+	iframeTabButton.innerText = `IFRAMES (${data.frames.length})`;
+	targetTabButton.innerText = `TARGET (${data.targets.length})`;
+	rpoTabButton.innerText = `RPO (${data.rpo.length})`;
 
 	for (let frame of data.frames) {
 		if (!iframeTab.classList.contains('active-content'))
 			continue;
 
-		iframeTab.querySelectorAll('ol').forEach(e => e.remove());
+		iframeTab.querySelectorAll('ul').forEach(e => e.remove());
 
-		el = document.createElement('li');
+		element = document.createElement('li');
 
-		bel = document.createElement('b');
+		bel = document.createElement('code');
 		br = document.createElement('br');
 		bel.innerText = frame.url.href;
 		win = document.createElement('code');
 		win.innerText = frame.path;
-		el.appendChild(bel);
-		el.appendChild(br);
-		el.appendChild(win);
+		element.appendChild(bel);
+		element.appendChild(br);
+		element.appendChild(win);
 
 		var parser = new DOMParser()
 		doc = parser.parseFromString(frame.outerHTML, 'text/html');
@@ -56,27 +60,27 @@ function populatePopupData() {
 			doc.body.innerHTML,
 			{ language: 'html', ignoreIllegals: true }
 		).value;
-		el.appendChild(pre);
+		element.appendChild(pre);
 
-		x.appendChild(el);
+		elementList.appendChild(element);
 	}
 
 	for (let target of data.targets) {
 		if (!targetTab.classList.contains('active-content'))
 			continue;
 
-		targetTab.querySelectorAll('ol').forEach(e => e.remove());
+		targetTab.querySelectorAll('ul').forEach(e => e.remove());
 
-		el = document.createElement('li');
+		element = document.createElement('li');
 
-		bel = document.createElement('b');
+		bel = document.createElement('code');
 		br = document.createElement('br');
 		bel.innerText = target.url.href;
 		win = document.createElement('code');
 		win.innerText = target.path;
-		el.appendChild(bel);
-		el.appendChild(br);
-		el.appendChild(win);
+		element.appendChild(bel);
+		element.appendChild(br);
+		element.appendChild(win);
 		
 		var parser = new DOMParser()
 		doc = parser.parseFromString(target.outerHTML, 'text/html');
@@ -89,39 +93,39 @@ function populatePopupData() {
 			doc.body.innerHTML,
 			{ language: 'html', ignoreIllegals: true }
 		).value;
-		el.appendChild(pre);
+		element.appendChild(pre);
 
-		x.appendChild(el);
+		elementList.appendChild(element);
 	}
 
 	for (let rpo of data.rpo) {
 		if (!rpoTab.classList.contains('active-content'))
 			continue;
 
-		rpoTab.querySelectorAll('ol').forEach(e => e.remove());
+		rpoTab.querySelectorAll('ul').forEach(e => e.remove());
 
-		el = document.createElement('li');
+		element = document.createElement('li');
 
-		bel = document.createElement('b');
+		bel = document.createElement('code');
 		br = document.createElement('br');
 		bel.innerText = rpo.url.href;
 		win = document.createElement('code');
 		win.innerText = rpo.path;
-		el.appendChild(bel);
-		el.appendChild(br);
-		el.appendChild(win);
+		element.appendChild(bel);
+		element.appendChild(br);
+		element.appendChild(win);
 
 		pre = document.createElement('pre');
 		pre.innerHTML = hljs.highlight(
 			rpo.outerHTML,
 			{ language: 'html', ignoreIllegals: true }
 		).value;
-		el.appendChild(pre);
+		element.appendChild(pre);
 
-		x.appendChild(el);
+		elementList.appendChild(element);
 	}
 
-	document.querySelector('.active-content').appendChild(x);
+	document.querySelector('.active-content').appendChild(elementList);
 }
 
 function setupCheckboxes() {
