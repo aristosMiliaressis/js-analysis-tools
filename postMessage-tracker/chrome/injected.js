@@ -10,6 +10,15 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 (function (pushstate, msgeventlistener, msgporteventlistener) {
 	var loaded = false;
 	var originalFunctionToString = Function.prototype.toString;
+
+	var originalBind = Function.prototype.bind; 
+	window.BindedFunctionLookupTable = new Map();
+	Function.prototype.bind = function () {
+		var bindedFunction = originalBind.call(this, ...arguments) 
+		window.BindedFunctionLookupTable[bindedFunction.name] = this.toString();
+		return bindedFunction;
+	}
+
 	var m = function (detail) {
 		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': detail });
 		document.dispatchEvent(storeEvent);
@@ -237,7 +246,7 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 					} else if (clr) { offset++; }
 				}
 				if (listener.name.indexOf('bound ') === 0) {
-					listener.__postmessagetrackername__ = listener.name;
+					listener.__postmessagetrackername__ = window.BindedFunctionLookupTable[listener.name];
 				}
 				return listener;
 			};
