@@ -1,8 +1,24 @@
 {
+  "config": {
+    "String.prototype.*": {
+      "match": [
+        "exec:return location.search != '' && (thisArg == location.search || '?'+thisArg == location.search) ? /./ : /^$/",
+        "exec:return location.hash != '' && (thisArg == location.hash || '#'+thisArg == location.hash) ? /./ : /^$/",
+        "exec:return thisArg == location.href ? /./ : /^$/"
+      ]
+    },
+    "history.pushState|history.replaceState": {
+      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
+    },
+    "window.open": {
+      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
+    }
+  },
   "hooks": {
     "CrossWindow": {
       "attribute": [
-        "set:window.name"
+        "set:window.name",
+        "get:window.name"
       ],
       "function": [
         "window.postMessage",
@@ -14,7 +30,10 @@
       ]
     },
     "NAVIGATION": {
-      "event": ["hashchange", "beforeunload"],
+      "event": [
+        "hashchange",
+        "beforeunload"
+      ],
       "function": [
         "history.pushState",
         "history.replaceState",
@@ -22,8 +41,13 @@
       ]
     },
     "Network": {
-      "class": ["WebSocket", "EventSource"],
-      "function": ["WebSocket.prototype.send"]
+      "class": [
+        "WebSocket",
+        "EventSource"
+      ],
+      "function": [
+        "WebSocket.prototype.send"
+      ]
     },
     "Parameters": {
       "attribute": [
@@ -47,7 +71,8 @@
         "URLSearchParams.prototype.values",
         "String.prototype.slice",
         "String.prototype.substring",
-        "String.prototype.split"
+        "String.prototype.split",
+        "String.prototype.indexOf"
       ]
     },
     "REGEX": {
@@ -56,7 +81,11 @@
       ]
     },
     "WebWorker": {
-      "class": ["Worker", "ServiceWorker", "ServiceWorkerContainer"],
+      "class": [
+        "Worker",
+        "ServiceWorker",
+        "ServiceWorkerContainer"
+      ],
       "function": [
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
@@ -74,7 +103,10 @@
         "HTMLElement.prototype.onpaste",
         "HTMLElement.prototype.onbeforepaste"
       ],
-      "event": ["drag", "drop"]
+      "event": [
+        "drag",
+        "drop"
+      ]
     },
     "misc": {
       "class": [
@@ -89,7 +121,9 @@
       ]
     },
     "storage": {
-      "attribute": ["set:document.cookie"],
+      "attribute": [
+        "set:document.cookie"
+      ],
       "function": [
         "localStorage.getItem",
         "localStorage.setItem",
@@ -97,49 +131,5 @@
         "sessionStorage.setItem"
       ]
     }
-  },
-  "config": {
-    "*": {
-      "!match": [
-        "facebook",
-        "metamask",
-        "wappalyzer",
-        "google_tag_manager",
-        "googletagmanager",
-        "bitwarden",
-        "messenger_awaiter",
-        "grecaptcha",
-        "hcaptcha"
-      ],
-      "!matchTrace": [
-        "facebook",
-        "metamask",
-        "wappalyzer",
-        "google_tag_manager",
-        "googletagmanager",
-        "bitwarden",
-        "messenger_awaiter",
-        "grecaptcha",
-        "hcaptcha"
-      ]
-    },
-    "String.prototype.split": {
-      "match": ["\\[&\\]"],
-      "showThis": true
-    },
-    "String.prototype.substring|String.prototype.slice": {
-      "match": [
-        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
-      ],
-      "showThis": true
-    },
-    "history.pushState|history.replaceState": {
-      "hookFunction": "if (args.length > 2 && !location.toString().includes(args[2])) { location = args[2];} return args;"
-    },
-
-    "window.open": {
-      "hookFunction": "if (args.length > 2) { return args.slice(0, 2); } return args;"
-    }
-  },
-  "removeHeaders": ["content-security-policy"]
+  }
 }

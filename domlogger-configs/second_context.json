@@ -1,15 +1,18 @@
 {
   "config": {
-    "Element.prototype.setAttribute": {
+    "*": {
       "match": [
-        "\\[\"href",
-        "\\[\"src",
-        "\\[\"action",
-        "\\[\"formaction",
-        "\\[\"srcdoc",
-        "\\[\"style"
+        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[0]) ? /./ : /^$/",
+        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[1]) ? /./ : /^$/",
+        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[2]) ? /./ : /^$/",
+        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args) ? /./ : /^$/"
       ]
     }
+  },
+  "globals": {
+    "isPresentInCookies": "return c.length>4 && unescape(unescape(unescape(document.cookie))).includes(c)",
+    "isPresentInLocalStorage": "for(var k in localStorage){if(typeof localStorage[k]==='string'){var v=localStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false",
+    "isPresentInSessionStorage": "for(var k in sessionStorage){if(typeof sessionStorage[k]==='string'){var v=sessionStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false"
   },
   "hooks": {
     "CSS": {
@@ -51,74 +54,73 @@
       ],
       "function": [
         "Element.prototype.insertAdjacentHTML",
-        "Element.prototype.setAttribute",
+        "HTMLIFrameElement.prototype.setAttribute",
         "HTMLScriptElement.prototype.append",
         "HTMLScriptElement.prototype.appendChild"
       ]
     },
     "JQUERY": {
-      "function": [
-        "$",
-        "$.globalEval",
-        "jQuery",
-        "jQuery.globalEval",
-        "jQuery.parseHTML",
-        "jQuery.prototype.add",
-        "jQuery.prototype.after",
-        "jQuery.prototype.attr",
-        "jQuery.prototype.append",
-        "jQuery.prototype.appendTo",
-        "jQuery.prototype.before",
-        "jQuery.prototype.constructor",
-        "jQuery.prototype.has",
-        "jQuery.prototype.html",
-        "jQuery.prototype.index",
-        "jQuery.prototype.init",
-        "jQuery.prototype.insertAfter",
-        "jQuery.prototype.insertBefore",
-        "jQuery.prototype.prepend",
-        "jQuery.prototype.prependTo",
-        "jQuery.prototype.prop",
-        "jQuery.prototype.replaceAll",
-        "jQuery.prototype.replaceWith",
-        "jQuery.prototype.wrap",
-        "jQuery.prototype.wrapAll",
-        "jQuery.prototype.wrapInner"
+      "custom": [
+        "function:$",
+        "function:$.globalEval",
+        "function:jQuery",
+        "function:jQuery.globalEval",
+        "function:jQuery.parseHTML",
+        "function:jQuery.prototype.add",
+        "function:jQuery.prototype.after",
+        "function:jQuery.prototype.attr",
+        "function:jQuery.prototype.append",
+        "function:jQuery.prototype.appendTo",
+        "function:jQuery.prototype.before",
+        "function:jQuery.prototype.constructor",
+        "function:jQuery.prototype.has",
+        "function:jQuery.prototype.html",
+        "function:jQuery.prototype.index",
+        "function:jQuery.prototype.init",
+        "function:jQuery.prototype.insertAfter",
+        "function:jQuery.prototype.insertBefore",
+        "function:jQuery.prototype.prepend",
+        "function:jQuery.prototype.prependTo",
+        "function:jQuery.prototype.prop",
+        "function:jQuery.prototype.replaceAll",
+        "function:jQuery.prototype.replaceWith",
+        "function:jQuery.prototype.wrap",
+        "function:jQuery.prototype.wrapAll",
+        "function:jQuery.prototype.wrapInner"
       ]
     },
     "JSNAVIGATION": {
-      "attribute": [
-        "jsinitiatednav"
+      "custom": [
+        "attribute:jsinitiatednav"
       ]
     },
     "MISC": {
-      "attribute": ["set:document.domain","set:window.name"],
+      "attribute": [
+        "set:document.domain",
+        "window.name"
+      ],
       "class": [
         "FileReader",
         "BroadcastChannel",
-        "MessageChannel",
+        "MessageEvent",
+        "MessagePort",
         "Blob"
       ],
       "function": [
         "document.evaluate",
         "Element.prototype.evaluate",
         "URL.createObjectURL",
-        "MessagePort.prototype.start",
-        "MessagePort.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
-        "BroadcastChannel.prototype.postMessage",
         "window.postMessage",
         "Worker.prototype.postMessage",
         "ServiceWorker.prototype.postMessage",
         "navigator.serviceWorker.register",
-        "window.open",
-        "Object.assign"
+        "window.open"
       ]
     },
     "NETWORK": {
       "attribute": [
-        "//set:Request.prototype.body",
-        "//set:Request.prototype.headers"
+        "set:Request.prototype.body",
+        "set:Request.prototype.headers"
       ],
       "class": [
         "WebSocket",
@@ -128,31 +130,30 @@
       "function": [
         "fetch",
         "navigator.sendBeacon",
-        "XMLHttpRequest.prototype.open",
-        "//XMLHttpRequest.prototype.send",
-        "//WebSocket.prototype.send",
-        "//XMLHttpRequest.prototype.setRequestHeader",
-        "//WebSocket.prototype.send"
+        "XMLHttpRequest.prototype.open"
       ]
     },
     "STORAGE": {
       "attribute": [
         "set:document.cookie"
       ],
-      "function": ["localStorage.setItem", "sessionStorage.setItem"]
+      "function": [
+        "//localStorage.setItem",
+        "//sessionStorage.setItem"
+      ]
     },
     "XSS": {
-      "class": ["Location"],
+      "class": [
+        "Location"
+      ],
       "function": [
         "location.assign",
         "location.replace",
         "eval",
-        "//Function",
         "document.write",
         "document.writeln",
         "Range.prototype.createContextualFragment"
       ]
     }
-  },
-  "onload": "origBeforeUnload=onbeforeunload;onbeforeunload=(ne)=>{try{throw Error()}catch(e){if(e.stack.split('\\n').length>2){jsinitiatednav=`js initiated nav \\n${e.stack.split('\\n').slice(1).join('\\n')}`}}origBeforeUnload&&origBeforeUnload(ne)}"
+  }
 }

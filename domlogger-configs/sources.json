@@ -1,9 +1,18 @@
 {
+  "config": {
+    "String.prototype.indexOf|String.prototype.includes|String.prototype.match|String.prototype.slice|String.prototype.substring|String.prototype.split": {
+      "match": [
+        "exec:return location.search != '' && (thisArg == location.search || '?'+thisArg == location.search) ? /./ : /^$/",
+        "exec:return location.hash != '' && (thisArg == location.hash || '#'+thisArg == location.hash) ? /./ : /^$/",
+        "exec:return thisArg == location.href ? /./ : /^$/"
+      ],
+      "showThis": true
+    }
+  },
   "hooks": {
     "CrossWindow": {
       "attribute": [
-        "get:window.name",
-        "get:MessageEvent.prototype.data"
+        "get:window.name"
       ],
       "class": [
         "BroadcastChannel",
@@ -16,12 +25,6 @@
         "MessagePort.prototype.addEventListener",
         "BroadcastChannel.prototype.postMessage",
         "window.open"
-      ]
-    },
-    "NAVIGATION": {
-      "event": [
-        "hashchange",
-        "beforeunload"
       ]
     },
     "NetworkSources": {
@@ -41,6 +44,16 @@
       ]
     },
     "Parameters": {
+      "function": [
+        "URLSearchParams.prototype.get",
+        "URLSearchParams.prototype.has",
+        "URLSearchParams.prototype.delete",
+        "String.prototype.indexOf",
+        "String.prototype.includes",
+        "String.prototype.match"
+      ]
+    },
+    "URLParsing": {
       "attribute": [
         "get:URL.prototype.hash",
         "get:URL.prototype.search",
@@ -50,15 +63,10 @@
         "get:document.URL"
       ],
       "function": [
-        "URLSearchParams.prototype.get",
-        "URLSearchParams.prototype.has",
-        "URLSearchParams.prototype.append",
-        "URLSearchParams.prototype.delete",
         "URLSearchParams.prototype.entries",
         "URLSearchParams.prototype.forEach",
         "URLSearchParams.prototype.getAll",
         "URLSearchParams.prototype.keys",
-        "URLSearchParams.prototype.set",
         "URLSearchParams.prototype.values",
         "String.prototype.slice",
         "String.prototype.substring",
@@ -86,48 +94,5 @@
         "sessionStorage.getItem"
       ]
     }
-  },
-  "config": {
-    "*": {
-      "!match": [
-        "domlogger",
-        "facebook",
-        "metamask",
-        "wappalyzer",
-        "google_tag_manager",
-        "googletagmanager",
-        "bitwarden",
-        "messenger_awaiter",
-        "grecaptcha",
-        "hcaptcha"
-      ],
-      "!matchTrace": [
-        "domlogger",
-        "facebook",
-        "metamask",
-        "wappalyzer",
-        "google_tag_manager",
-        "googletagmanager",
-        "bitwarden",
-        "messenger_awaiter",
-        "grecaptcha",
-        "hcaptcha"
-      ]
-    },
-    "String.prototype.split": {
-      "match": [
-        "\\[&\\]"
-      ],
-      "showThis": true
-    },
-    "String.prototype.substring|String.prototype.slice": {
-      "match": [
-        "exec:return thisArg.startsWith('?') || thisArg.startsWith('#') || thisArg == '' ? /\\[1\\]/ : /^$/"
-      ],
-      "showThis": true
-    }
-  },
-  "removeHeaders": [
-    "content-security-policy"
-  ]
+  }
 }
