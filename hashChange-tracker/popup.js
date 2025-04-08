@@ -17,10 +17,8 @@ window.onload = loaded
 function listListeners(listeners) {
 	var x = document.getElementById('x');
 	x.parentElement.removeChild(x);
-	x = document.createElement('ol');
+	x = document.createElement('ul');
 	x.id = 'x';
-
-	document.getElementById('h').innerText = listeners.length ? listeners[0].parent_url : '';
 
 	for(var i = 0; i < listeners.length; i++) {
 		listener = listeners[i]
