@@ -1,4 +1,4 @@
-var port = chrome.extension.connect({
+var port = chrome.runtime.connect({
 	name: "Sample Communication"
 });
 
