@@ -8,7 +8,7 @@ function unhar() {
     echo $tmp_file
     cat $har_file | jq '.log.entries[] | select(._resourceType == "script" or ._resourceType == "document") | select(.response.content.text != null)' >$tmp_file
 
-    while read url; do
+    while read url || [ -n "$url" ]; do
         domain=$(echo "$url" | unfurl format %d)
         apex=$(echo $domain | unfurl apexes)
         if [[ $apex != $apex_domain ]]; then continue; fi
@@ -49,8 +49,12 @@ function unhar() {
 function srcmap() {
     mkdir src 2>/dev/null
 
-    while read url; do
-        sourcemapper --output src -jsurl $url
+    while read url || [ -n "$url" ]; do
+        sourcemapper --output src -jsurl "$url";
+        if [[ $? -eq 1 ]]; then
+            sourcemapper --output src -url "${url}.map";
+            [[ $? -eq 1 ]] && sourcemapper --output src -url "${url%.js}.map.js";
+        fi;
     done <"${1:-/dev/stdin}"
 
     /opt/codeql/codeql database create codeql -s source_code --language=javascript
@@ -87,10 +91,10 @@ function fetch_js() {
     tmp2="$(mktemp).har"
     trap "rm $tmp $tmp2" EXIT
 
-    while read url; do
-	echo $url | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >$tmp
-	stealthy-har-capturer -A '--headless' -t 10000 -o $tmp2 file://$tmp
-	unhar $tmp2
+    while read url || [ -n "$url" ]; do
+        echo $url | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >$tmp
+        stealthy-har-capturer -A '--headless' -t 10000 -o $tmp2 file://$tmp
+        unhar $tmp2
     done
 }
 
