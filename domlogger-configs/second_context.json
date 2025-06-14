@@ -1,16 +1,23 @@
 {
   "config": {
     "*": {
-      "match": [
-        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[0]) ? /./ : /^$/",
-        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[1]) ? /./ : /^$/",
-        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args[2]) ? /./ : /^$/",
-        "exec:return new Function('c',domlogger.globals.isPresentInLocalStorage)(args) ? /./ : /^$/"
-      ]
+      "alert": {
+        "match": [
+          "exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[0]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[1]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[2]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInCookies)(args) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[0]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[1]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[2]) ? /./ : /^$/",
+          "exec:return new Function('c',domlogger.globals.isPresentInQuery)(args) ? /./ : /^$/"
+        ]
+      }
     }
   },
   "globals": {
-    "isPresentInCookies": "return c.length>4 && unescape(unescape(unescape(document.cookie))).includes(c)",
+    "isPresentInQuery": "return c.length>4 && unescape(unescape(unescape(location.search))).includes(`=${c}`)",
+    "isPresentInCookies": "return c.length>4 && unescape(unescape(unescape(document.cookie))).includes(`=${c};`)",
     "isPresentInLocalStorage": "for(var k in localStorage){if(typeof localStorage[k]==='string'){var v=localStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false",
     "isPresentInSessionStorage": "for(var k in sessionStorage){if(typeof sessionStorage[k]==='string'){var v=sessionStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false"
   },
@@ -147,8 +154,6 @@
         "Location"
       ],
       "function": [
-        "location.assign",
-        "location.replace",
         "eval",
         "document.write",
         "document.writeln",

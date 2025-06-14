@@ -1,0 +1,34 @@
+{
+    "config": {
+      "String.prototype.indexOf|String.prototype.includes|String.prototype.match": {
+        "match": [
+          "exec:return thisArg == document.cookie ? /./ : /^$/"
+        ],
+        "showThis": true
+      }
+    },
+    "hooks": {
+      "cookies": {
+        "attribute": [
+          "set:document.cookie"
+        ],
+        "function": [
+          "String.prototype.indexOf",
+          "String.prototype.includes",
+          "String.prototype.match"
+        ]
+      },
+      "localStorage": {
+        "function": [
+          "localStorage.getItem",
+          "localStorage.setItem"
+        ]
+      },
+      "sessionStorage": {
+        "function": [
+          "sessionStorage.getItem",
+          "sessionStorage.setItem"
+        ]
+      }
+    }
+  }

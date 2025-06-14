@@ -103,9 +103,7 @@
         "document.evaluate",
         "Element.prototype.evaluate",
         "URL.createObjectURL",
-        "MessagePort.prototype.start",
         "MessagePort.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
         "BroadcastChannel.prototype.postMessage",
         "window.postMessage",
         "Worker.prototype.postMessage",
@@ -128,11 +126,7 @@
       "function": [
         "fetch",
         "navigator.sendBeacon",
-        "XMLHttpRequest.prototype.open",
-        "//XMLHttpRequest.prototype.send",
-        "//WebSocket.prototype.send",
-        "//XMLHttpRequest.prototype.setRequestHeader",
-        "//WebSocket.prototype.send"
+        "XMLHttpRequest.prototype.open"
       ]
     },
     "STORAGE": {
@@ -144,10 +138,7 @@
     "XSS": {
       "class": ["Location"],
       "function": [
-        "location.assign",
-        "location.replace",
         "eval",
-        "//Function",
         "document.write",
         "document.writeln",
         "Range.prototype.createContextualFragment"

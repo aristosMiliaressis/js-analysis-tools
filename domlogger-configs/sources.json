@@ -1,6 +1,6 @@
 {
   "config": {
-    "String.prototype.indexOf|String.prototype.includes|String.prototype.match|String.prototype.slice|String.prototype.substring|String.prototype.split": {
+    "String.prototype.indexOf|String.prototype.includes|String.prototype.match": {
       "match": [
         "exec:return location.search != '' && (thisArg == location.search || '?'+thisArg == location.search) ? /./ : /^$/",
         "exec:return location.hash != '' && (thisArg == location.hash || '#'+thisArg == location.hash) ? /./ : /^$/",
@@ -24,23 +24,10 @@
         "MessagePort.prototype.postMessage",
         "MessagePort.prototype.addEventListener",
         "BroadcastChannel.prototype.postMessage",
+        "Worker.prototype.postMessage",
+        "ServiceWorker.prototype.postMessage",
+        "navigator.serviceWorker.register",
         "window.open"
-      ]
-    },
-    "NetworkSources": {
-      "attribute": [
-        "get:Response.prototype.body",
-        "get:Response.prototype.headers",
-        "get:XMLHttpRequest.prototype.response",
-        "get:XMLHttpRequest.prototype.responseText",
-        "get:XMLHttpRequest.prototype.responseXML"
-      ],
-      "function": [
-        "Response.prototype.text",
-        "Response.prototype.json",
-        "Response.prototype.blob",
-        "XMLHttpRequest.prototype.getAllResponseHeaders",
-        "XMLHttpRequest.prototype.getResponseHeaders"
       ]
     },
     "Parameters": {
@@ -67,10 +54,7 @@
         "URLSearchParams.prototype.forEach",
         "URLSearchParams.prototype.getAll",
         "URLSearchParams.prototype.keys",
-        "URLSearchParams.prototype.values",
-        "String.prototype.slice",
-        "String.prototype.substring",
-        "String.prototype.split"
+        "URLSearchParams.prototype.values"
       ]
     },
     "clipboard": {
@@ -83,15 +67,6 @@
       "event": [
         "drag",
         "drop"
-      ]
-    },
-    "storage": {
-      "attribute": [
-        "//get:document.cookie"
-      ],
-      "function": [
-        "localStorage.getItem",
-        "sessionStorage.getItem"
       ]
     }
   }
