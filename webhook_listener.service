@@ -1,0 +1,13 @@
+[Unit]
+Description=webhook_listener
+After=systemd-journald.service
+
+[Service]
+WorkingDirectory=/opt/webdata
+ExecStart=/bin/bash -c 'source /opt/webdata/bash_functions.sh; logMsg'
+SyslogIdentifier=webhook_listener
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

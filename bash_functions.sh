@@ -1,47 +1,44 @@
+export GOPATH=/usr/local/go
+export PATH="$PATH:$GOPATH/bin:/usr/local/go_bin/bin"
+
 function unhar() {
     har_file=$1
-    origin_domain="${1%.har}"
-    apex_domain=$(echo $origin_domain | unfurl apexes)
     tmp_file=$(mktemp)
-    mkdir $origin_domain 2>/dev/null
 
-    echo $tmp_file
     cat $har_file | jq '.log.entries[] | select(._resourceType == "script" or ._resourceType == "document") | select(.response.content.text != null)' >$tmp_file
 
     while read url || [ -n "$url" ]; do
+        if [[ -z $url ]]; then continue; fi
         domain=$(echo "$url" | unfurl format %d)
-        apex=$(echo $domain | unfurl apexes)
-        if [[ $apex != $apex_domain ]]; then continue; fi
-
         query=$(echo "$url" | unfurl format %q)
         path=$(echo "$url" | unfurl format %p | rev | cut -d / -f 2- | rev | head -c 3800)
         file=$(echo "$url" | unfurl format %p | rev | cut -d / -f 1 | rev)
         filename="${file}"
-        [[ ! -z "$query" ]] && filename="$filename%3F$query"
-        filename="$origin_domain/${domain}${path}/$(echo $filename | head -c 253)"
-        mkdir -p "$origin_domain/${domain}${path}" 2>/dev/null
+        [[ ! -z "$query" ]] && filename="$filename%3F$query" # TODO Separate query with slash?
+        filename="${domain}${path}/$(echo $filename | head -c 253)"
+        echo "domain: $domain path: $path file: $filename"
+
+        mkdir -p "${domain}${path}" 2>/dev/null
         if [[ -d "$filename" ]]; then
             file=$(echo "$path" | rev | cut -d / -f 1 | rev | tail -c 249).html
             path=$(echo "$path" | rev | cut -d / -f 2- | rev)
         fi
+        
         cat $tmp_file | jq -c 'select( .request.url == "'$url'")' |
             head -n 1 |
             jq -r '.response.content.text' >"$filename"
-        echo "domain: $domain path: $path file: $filename"
-
+        
         if [[ $(file -- "$filename") == *"HTML document"* || "$file" == *".html" ]]; then
-            cat "$filename" | htmlq -t script >"$filename.js"
+            cat "$filename" | htmlq -t script >"$filename.js" # TODO handle query string correctly
             rm "$filename"
             filename="$filename.js"
         fi
 
         if [[ $(file -- "$filename") == *"JavaScript source"* || "$file" == *".js" ]]; then
-            (
-                deobfuscator.js "$filename"
-                if [[ $? -ne 0 ]]; then
-                    js-beautify --outfile="$filename" "$filename"
-                fi
-            ) &
+            deobfuscator.js "$filename"
+            if [[ $? -ne 0 ]]; then
+                js-beautify --outfile="$filename" "$filename"
+            fi
         fi
     done <<<$(cat $tmp_file | jq -r '.request.url' | sort -u | awk '{ print length, $0 }' | sort -n -s -r | cut -d" " -f2-)
 }
@@ -92,7 +89,8 @@ function fetch_js() {
     trap "rm $tmp $tmp2" EXIT
 
     while read url || [ -n "$url" ]; do
-        echo $url | tr -d '\r' | unfurl format %s://%a%p | awk '{print "<script src=\"" $0 "\"></script>"}' >$tmp
+        echo "Fetching $url"
+        echo $url | tr -d '\r' | awk '{print "<script src=\"" $0 "\"></script>"}' >$tmp
         stealthy-har-capturer -A '--headless' -t 10000 -o $tmp2 file://$tmp
         unhar $tmp2
     done
@@ -174,6 +172,10 @@ function logMsg() {
 		cat $tmp |
 			jq -c 'select(.ext == "domlogger++")' |
 			anew -q domlogger.json
+
+		cat $tmp |
+			jq -c 'select(.scannerType != null)' |
+			anew -q cspt-finder.json
 	done ) &
 
 	webhook_listener.py &
