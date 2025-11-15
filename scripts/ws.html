@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <div id="output"></div>
+    <script>
+        let socket = new WebSocket(location.hash.substring(1));
+
+        socket.addEventListener("open", (event) => {
+            let message = new URLSearchParams(location.search).get('message') || "Hello Server!";
+            socket.send(message);
+            output.innerText += `Sending to server: ${message}\r\n`;
+        });
+
+        socket.addEventListener("message", (event) => {
+            output.innerText += `Received from server: ${event.data}\r\n`;
+        });
+</script>
+</html>
