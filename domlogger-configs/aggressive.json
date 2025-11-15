@@ -1,0 +1,180 @@
+{
+    "config": {
+      "Element.prototype.setAttribute": {
+        "match": [
+          "\\[\"href",
+          "\\[\"src",
+          "\\[\"action",
+          "\\[\"formaction",
+          "\\[\"srcdoc",
+          "\\[\"style"
+        ]
+      },
+      "URL_SOURCES": {
+        "match": [
+          "exec:return typeof thisArg == 'string' && location.search != '' && (thisArg == location.search || '?'+thisArg == location.search) ? /./ : /^$/",
+          "exec:return typeof thisArg == 'string' && location.hash != '' && (thisArg == location.hash || '#'+thisArg == location.hash) ? /./ : /^$/",
+          "exec:return typeof thisArg == 'string' && thisArg == location.href ? /./ : /^$/",
+          "exec:return typeof thisArg != 'string' ? /./ : /^$/"
+        ],
+        "showThis": true
+      },
+      "COOKIES": {
+        "match": [
+          "exec:return typeof thisArg == 'string' && thisArg == document.cookie ? /./ : /^$/",
+          "exec:return typeof thisArg != 'string' ? /./ : /^$/"
+        ],
+        "showThis": true
+      }
+    },
+    "hooks": {
+      "CROSS_WINDOW": {
+        "attribute": [
+          "get:window.name",
+          "set:window.name",
+          "set:document.domain"
+        ],
+        "class": [
+          "BroadcastChannel",
+          "MessageChannel"
+        ],
+        "function": [
+          "window.postMessage",
+          "MessagePort.prototype.start",
+          "MessagePort.prototype.postMessage",
+          "MessagePort.prototype.addEventListener",
+          "BroadcastChannel.prototype.postMessage",
+          "Worker.prototype.postMessage",
+          "ServiceWorker.prototype.postMessage",
+          "navigator.serviceWorker.register",
+          "window.open"
+        ]
+      },
+      "CSS": {
+        "attribute": [
+          "set:Element.prototype.cssText",
+          "set:CSSRule.prototype.cssText",
+          "set:HTMLStyleElement.prototype.src",
+          "set:HTMLStyleElement.prototype.text",
+          "set:HTMLStyleElement.prototype.innerText",
+          "set:HTMLStyleElement.prototype.innerHTML",
+          "set:HTMLStyleElement.prototype.textContent",
+          "set:HTMLLinkElement.prototype.href"
+        ]
+      },
+      "URL_SOURCES": {
+        "attribute": [
+            "get:URL.prototype.hash",
+            "get:URL.prototype.search",
+            "get:URL.prototype.searchParams",
+            "get:document.documentURI",
+            "get:document.baseURI",
+            "get:document.URL"
+          ],
+        "function": [
+          "URLSearchParams.prototype.get",
+          "URLSearchParams.prototype.has",
+          "URLSearchParams.prototype.delete",
+          "String.prototype.indexOf",
+          "String.prototype.includes",
+          "String.prototype.match",
+          "URLSearchParams.prototype.entries",
+          "URLSearchParams.prototype.forEach",
+          "URLSearchParams.prototype.getAll",
+          "URLSearchParams.prototype.keys",
+          "URLSearchParams.prototype.values"
+        ]
+      },
+      "XSS": {
+        "attribute": [
+          "jsinitiatednav",
+          "set:Element.prototype.innerHTML",
+          "set:Element.prototype.outerHTML",
+          "set:HTMLAnchorElement.prototype.href",
+          "set:HTMLButtonElement.prototype.formAction",
+          "set:HTMLInputElement.prototype.formAction",
+          "set:HTMLFormElement.prototype.action",
+          "set:HTMLIFrameElement.prototype.src",
+          "set:HTMLIFrameElement.prototype.srcdoc",
+          "set:HTMLFrameElement.prototype.src",
+          "set:HTMLFrameElement.prototype.srcdoc",
+          "set:HTMLMediaElement.prototype.src",
+          "set:HTMLSourceElement.prototype.src",
+          "set:HTMLAreaElement.prototype.href",
+          "set:HTMLInputElement.prototype.src",
+          "set:HTMLBaseElement.prototype.href",
+          "set:HTMLTrackElement.prototype.src",
+          "set:HTMLEmbededElement.prototype.src",
+          "set:HTMLScriptElement.prototype.src",
+          "set:HTMLScriptElement.prototype.text",
+          "set:HTMLScriptElement.prototype.innerText",
+          "set:HTMLScriptElement.prototype.innerHTML",
+          "set:HTMLScriptElement.prototype.textContent"
+        ],
+        "class": [
+          "Location",
+          "Blob"
+        ],
+        "function": [
+          "URL.createObjectURL",
+          "document.evaluate",
+          "Element.prototype.evaluate",
+          "//Object.assign",
+          "eval",
+          "//Function",
+          "document.write",
+          "document.writeln",
+          "Range.prototype.createContextualFragment",
+          "$",
+          "$.globalEval",
+          "jQuery",
+          "jQuery.globalEval",
+          "jQuery.parseHTML",
+          "jQuery.prototype.add",
+          "jQuery.prototype.after",
+          "jQuery.prototype.attr",
+          "jQuery.prototype.append",
+          "jQuery.prototype.appendTo",
+          "jQuery.prototype.before",
+          "jQuery.prototype.constructor",
+          "jQuery.prototype.has",
+          "jQuery.prototype.html",
+          "jQuery.prototype.index",
+          "jQuery.prototype.init",
+          "jQuery.prototype.insertAfter",
+          "jQuery.prototype.insertBefore",
+          "jQuery.prototype.prepend",
+          "jQuery.prototype.prependTo",
+          "jQuery.prototype.prop",
+          "jQuery.prototype.replaceAll",
+          "jQuery.prototype.replaceWith",
+          "jQuery.prototype.wrap",
+          "jQuery.prototype.wrapAll",
+          "jQuery.prototype.wrapInner",
+          "Element.prototype.insertAdjacentHTML",
+          "Element.prototype.setAttribute",
+          "HTMLScriptElement.prototype.append",
+          "HTMLScriptElement.prototype.appendChild"
+        ]
+      },
+      "STORAGE": {
+        "function": [
+          "localStorage.getItem",
+          "localStorage.setItem",
+          "sessionStorage.getItem",
+          "sessionStorage.setItem"
+        ]
+      },
+      "COOKIES": {
+        "attribute": [
+            "set:document.cookie"
+        ],
+        "function": [
+          "String.prototype.indexOf",
+          "String.prototype.includes",
+          "String.prototype.match"
+        ]
+      }
+    },
+    "onload": "origBeforeUnload=onbeforeunload;onbeforeunload=(ne)=>{try{throw Error()}catch(e){if(e.stack.split('\\n').length>2){jsinitiatednav=`js initiated nav \\n${e.stack.split('\\n').slice(1).join('\\n')}`}}origBeforeUnload&&origBeforeUnload(ne)}"
+  }
