@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="output"></div>
+        <script>
+            let popup = new URLSearchParams(location.search).get('popup');
+
+            onmessage = (e) => {
+                output.innerText = `${e.origin}: ${e.data}\r\n` + output.innerText;
+            }
+
+            if (popup == "true") {
+                let button = document.createElement('button');
+                button.innerText = 'Open Window';
+                button.onclick = () => {
+                    open(location.hash.substring(1));
+                }
+                document.body.insertBefore(button, window.output);
+            } else {
+                let frame = document.createElement('iframe');
+                frame.src = location.hash.substring(1);
+                document.body.insertBefore(frame, window.output);
+            }            
+        </script>
+    </body>
+</html>
