@@ -4,7 +4,7 @@
   "description": "Monitors and indicates postMessage-listeners in the current window.",
   "version": "1.0.0",
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js"
   },
 
   "content_scripts": [
@@ -12,23 +12,23 @@
       "run_at": "document_start",
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["content_script.js"]
+      "js": ["src/content_script.js"]
     },
     {
       "world": "MAIN",
       "run_at": "document_start",
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["injected.js"]
+      "js": ["src/injected.js"]
     }
   ],
 
   "options_ui": {
-    "page": "options.html"
+    "page": "src/options/options.html"
   },
 
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_title": "postMessage-tracker"
   },
 

@@ -1,13 +1,15 @@
 var tab_listeners = {};
+var tab_messages = {};
 var tab_push = {}, tab_lasturl = {};
 var selectedId = -1;
 
 function refreshCount() {
-	txt = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
+	listenerCount = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
+	messageCount = tab_messages[selectedId] ? tab_messages[selectedId].length : 0;
 	chrome.tabs.get(selectedId, function() {
 		if (!chrome.runtime.lastError) {
-			chrome.action.setBadgeText({"text": ''+txt, tabId: selectedId});
-			if(txt > 0) {
+			chrome.action.setBadgeText({"text": listenerCount+':'+messageCount, tabId: selectedId});
+			if(listenerCount > 0) {
 				chrome.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
 			} else {
 				chrome.action.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
@@ -44,27 +46,70 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	if(msg.listener) {
 		if(msg.listener == 'function () { [native code] }') return;
 		msg.parent_url = sender.tab.url;
+
 		if(!tab_listeners[tabId]) tab_listeners[tabId] = [];
 		if (tab_listeners[tabId].some(l => l.hops == msg.hops && l.stack == msg.stack)) return;
 		tab_listeners[tabId][tab_listeners[tabId].length] = msg;
+
 		logToWebhook(msg);
-	}
-	if (msg.message) {
+	} else if (msg.message) {
 		msg.parent_url = sender.tab.url;
+
+		if(!tab_messages[tabId]) tab_messages[tabId] = [];
+		if (isInterestingMessage(msg))
+			tab_messages[tabId][tab_messages[tabId].length] = msg;
+
 		logToWebhook(msg);
 	}
+
 	if (msg.pushState) {
 		tab_push[tabId] = true;
+		tab_listeners[tabId] = [];
+		tab_messages[tabId] = [];
 	}
+
 	if(msg.changePage) {
 		delete tab_lasturl[tabId];
+		tab_listeners[tabId] = [];
+		tab_messages[tabId] = [];
 	}
+
 	if(msg.log) {
 		console.log(msg.log);
 	} else {
 		refreshCount();
 	}
 });
+
+function isInterestingMessage(msg) {
+	msg.matches = {};
+
+	const data = msg.message.split(':').slice(3).join(':');
+	const uuidRegex = /[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}/ig;
+	const urlWithParamsRegex = /(https?|wss?):\/\/[a-z0-9_\-\.]+\/[a-z0-9_\/%\-\.]*[\?#]/ig;
+	const blobUrlRegex = /blob:[a-z0-9_\-\.]+/ig;
+	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
+	const htmlTagRegex = /(<\/[a-z]+>|<[a-z]+ )/ig;
+
+
+	data.matchAll(uuidRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	data.matchAll(urlWithParamsRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	data.matchAll(blobUrlRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
+	data.matchAll(htmlTagRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+    
+	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
+					...msg.localStorage,
+					...msg.sessionStorage]) {
+		if (!value) continue;
+
+		let regex = RegExp(RegExp.escape(value), "ig");
+		if (value.length >= 12)
+			data.matchAll(regex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	}
+	
+	return Object.keys(msg.matches).length > 0;
+}
 
 chrome.tabs.onUpdated.addListener(function(tabId, props) {
 	if (props.status == "complete") {
@@ -80,6 +125,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, props) {
 			if(!tab_lasturl[tabId]) {
 				//wipe on other statuses, but only if lastpage is not set (aka, changePage did not run)
 				tab_listeners[tabId] = [];
+				tab_messages[tabId] = [];
 			}
 		}
 	}
@@ -99,6 +145,6 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
 chrome.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function(msg) {
-		port.postMessage({listeners:tab_listeners});
+		port.postMessage({listeners:tab_listeners, messages:tab_messages});
 	});
 })

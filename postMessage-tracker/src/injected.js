@@ -173,13 +173,21 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		const me = whois(window.origin);
         const source = whois(e.origin);
 		var msg = '%c' + h(e.source) + `%c <${source}> → %c` + h() + `%c <${me}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		var logMsg = h(e.source) + " <" + source + "> → " + h() + " <" + me + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		var logMsg = h(e.source) + " <" + source + "> → " + h() + " <" + me + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: red", '', "color: green", '', "color: blue", '');
 		} else {
 			console.log(msg, "color: red", '', "color: green", '');
 		}
-		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
+		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { 
+			href: location.href,
+			cookie: document.cookie, 
+			localStorage: Object.values(localStorage),
+			sessionStorage: Object.values(sessionStorage),
+			message: logMsg, 
+			isObj: !(typeof e.data == 'string'), 
+			source: h(e.source) + " <" + source + ">", 
+			destination: h() + " <" + me + ">" }});
 		document.dispatchEvent(storeEvent);
 	};
 	window.addEventListener('message', onmsg)

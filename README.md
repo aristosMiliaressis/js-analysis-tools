@@ -32,6 +32,7 @@ go install github.com/denandz/sourcemapper@latest
 <br>
 Changes:
 - unwraps binded message listeners
+- added a new tab for messages matching certain interesting values like uuids, html tags, current href, blob urls & urls with params
 - Logs message content (not just message handlers) to webhook
 - Filters postMessage handlers registered by extensions
 - Filters postMessages in the console coming from the following extensions
@@ -54,6 +55,8 @@ Changes:
 
 `dom-tracker` tracks several potentially interesting elements like iframes, any element with a target attribute and any element with a path relative uri, also detects quirks mode and supports sending localStorage, sessionStorage, cookies & full DOM to a webhook.
   
+<br>
+
 <p align="center">
   <img src="https://github.com/aristosMiliaressis/js-analysis-tools/blob/master/images/dom-tracker.png?raw=true">
 </p>
