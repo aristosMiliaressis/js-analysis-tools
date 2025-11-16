@@ -151,9 +151,12 @@ function isPathRelative(href) {
 function getPathRelativeUriTargetingElements() {
 	let elements = new Array();
 
+	var bases = document.getElementsByTagName('base');
 	var styles = document.getElementsByTagName('style');
 	var links = document.getElementsByTagName('link');
 	var anchors = document.getElementsByTagName('a');
+
+	elements.push(...bases);
 
 	for (let style of styles) {
 		if (isPathRelative(style.getAttribute('src'))) {
@@ -182,19 +185,25 @@ function getPathRelativeUriTargetingElements() {
 function getCrossWindowTargetingElements() {
 	let elements = new Array();
 
-	for (let form of document.querySelectorAll('form[target]'))
-		elements.push(form);
+	for (let form of document.querySelectorAll('form[target]')){
+		if (!["_blank", "_self", ""].includes(form.getAttribute('target')))
+			elements.push(form);
+	}
 
-	for (let base of document.querySelectorAll('base[target]'))
-		elements.push(base);
+	for (let base of document.querySelectorAll('base[target]')) {
+		if (!["_blank", "_self", ""].includes(base.getAttribute('target')))
+			elements.push(base);
+	}
 
 	for (let anchor of document.querySelectorAll('a[target]')) {
-		if (anchor.getAttribute('target') != "_blank" && anchor.getAttribute('target') != "_self" && anchor.getAttribute('target') != "")
+		if (!["_blank", "_self", "_parent", "_top", ""].includes(anchor.getAttribute('target')))
 			elements.push(anchor);
 	}
 
-	for (let area of document.querySelectorAll('area[target]'))
-		elements.push(area);
+	for (let area of document.querySelectorAll('area[target]')) {
+		if (!["_blank", "_self", ""].includes(area.getAttribute('target')))
+			elements.push(area);
+	}
 
 	return elements;
 }

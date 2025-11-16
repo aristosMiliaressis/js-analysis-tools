@@ -26,31 +26,30 @@ function refreshCount(tab) {
 	});
 }
 
-function logToWebhook(msg) {
+function logToWebhook(data) {
 	extensionAPI.storage.local.get({
 		options: {}
 	}, function (i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
-		if (new URL(msg.location).origin.match(i.options.webhook_scope) == null) return;
+		if (new URL(data.location).origin.match(i.options.webhook_scope) == null) return;
 
-		if (!i.options.webhook_iframe) msg.frames = undefined;
-		if (!i.options.webhook_target) msg.targets = undefined;
-		if (!i.options.webhook_rpo) msg.rpo = undefined;
-		if (!i.options.webhook_dom) msg.dom = undefined;
-		if (!i.options.webhook_local_storage) msg.localStorage = undefined;
-		if (!i.options.webhook_session_storage) msg.sessionStorage = undefined;
-		if (!i.options.webhook_cookies) msg.cookies = undefined;
-		if (!msg.cookies && !msg.localStorage && !msg.sessionStorage && !msg.dom && !msg.rpo && !msg.targets && !msg.frames)
+		if (!i.options.webhook_iframe) data.frames = undefined;
+		if (!i.options.webhook_target) data.targets = undefined;
+		if (!i.options.webhook_rpo) data.rpo = undefined;
+		if (!i.options.webhook_dom) data.dom = undefined;
+		if (!i.options.webhook_local_storage) data.localStorage = undefined;
+		if (!i.options.webhook_session_storage) data.sessionStorage = undefined;
+		if (!i.options.webhook_cookies) data.cookies = undefined;
+		if (!data.cookies && !data.localStorage && !data.sessionStorage && !data.dom && !data.rpo && !data.targets && !data.frames)
 			return
 
-		var data = JSON.stringify(msg);
 		try {
 			fetch(i.options.webhook_url, {
 				method: 'post',
 				headers: {
 					"Content-type": "application/json; charset=UTF-8"
 				},
-				body: data
+				body: JSON.stringify(data)
 			});
 		} catch (e) { }
 	});

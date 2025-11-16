@@ -25,7 +25,8 @@ extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 function populatePopupData() {
-	var elementList = document.createElement('ul');
+	const MAX_URL_LENGTH = 200;
+	let elementList = document.createElement('ul');
 	elementList.id = 'x';
 
 	iframeTabButton.innerText = `IFRAMES (${data.frames.length})`;
@@ -40,14 +41,16 @@ function populatePopupData() {
 
 		element = document.createElement('li');
 
-		bel = document.createElement('code');
+		url = document.createElement('code');
 		br = document.createElement('br');
-		bel.innerText = frame.url.href;
-		win = document.createElement('code');
-		win.innerText = frame.path;
-		element.appendChild(bel);
+		url.innerText = frame.url.href.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', frame.url.href);
+		url.onclick = async () => { await navigator.clipboard.writeText(frame.url.href)};
+		path = document.createElement('code');
+		path.innerText = frame.path;
+		element.appendChild(url);
 		element.appendChild(br);
-		element.appendChild(win);
+		element.appendChild(path);
 
 		var parser = new DOMParser()
 		doc = parser.parseFromString(frame.outerHTML, 'text/html');
@@ -73,14 +76,16 @@ function populatePopupData() {
 
 		element = document.createElement('li');
 
-		bel = document.createElement('code');
+		url = document.createElement('code');
 		br = document.createElement('br');
-		bel.innerText = target.url.href;
-		win = document.createElement('code');
-		win.innerText = target.path;
-		element.appendChild(bel);
+		url.innerText = target.url.href.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', target.url.href);
+		url.onclick = async () => { await navigator.clipboard.writeText(target.url.href)};
+		path = document.createElement('code');
+		path.innerText = target.path;
+		element.appendChild(url);
 		element.appendChild(br);
-		element.appendChild(win);
+		element.appendChild(path);
 		
 		var parser = new DOMParser()
 		doc = parser.parseFromString(target.outerHTML, 'text/html');
@@ -106,14 +111,16 @@ function populatePopupData() {
 
 		element = document.createElement('li');
 
-		bel = document.createElement('code');
+		url = document.createElement('code');
 		br = document.createElement('br');
-		bel.innerText = rpo.url.href;
-		win = document.createElement('code');
-		win.innerText = rpo.path;
-		element.appendChild(bel);
+		url.innerText = rpo.url.href.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', rpo.url.href);
+		url.onclick = async () => { await navigator.clipboard.writeText(rpo.url.href)};
+		path = document.createElement('code');
+		path.innerText = rpo.path;
+		element.appendChild(url);
 		element.appendChild(br);
-		element.appendChild(win);
+		element.appendChild(path);
 
 		pre = document.createElement('pre');
 		pre.innerHTML = hljs.highlight(
