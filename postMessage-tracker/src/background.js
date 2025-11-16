@@ -90,13 +90,16 @@ function isInterestingMessage(msg) {
 	const blobUrlRegex = /blob:[a-z0-9_\-\.]+/ig;
 	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
 	const htmlTagRegex = /(<\/[a-z]+>|<[a-z]+ )/ig;
-
+	const hexRegex = /\b([a-f0-9]{2}){7,}/ig;
+	const jwtRegex = /\beyJ[a-z0-9+/\-_]([a-z0-9+/\-_]{4})*([a-z0-9+/\-_]{2}=?=?|[a-z0-9+/\-_]{3}=?)?\b/ig
 
 	data.matchAll(uuidRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
 	data.matchAll(urlWithParamsRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
 	data.matchAll(blobUrlRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
 	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
 	data.matchAll(htmlTagRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	data.matchAll(hexRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	data.matchAll(jwtRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
     
 	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
 					...msg.localStorage,
