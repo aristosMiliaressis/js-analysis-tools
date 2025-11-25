@@ -6,8 +6,7 @@ function loaded() {
 	port.postMessage("get-stuff");
 	port.onMessage.addListener(function(msg) {
 		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			selectedId = tabs[0].id;
-			listListeners(msg.listeners[selectedId]);
+			listListeners(msg.listeners[tabs[0].id]);
 		});
 	});
 }
@@ -15,9 +14,7 @@ function loaded() {
 window.onload = loaded
 
 function listListeners(listeners) {
-	var x = document.getElementById('x');
-	x.parentElement.removeChild(x);
-	x = document.createElement('ul');
+	let x = document.createElement('ul');
 	x.id = 'x';
 
 	for(var i = 0; i < listeners.length; i++) {
@@ -49,5 +46,7 @@ function listListeners(listeners) {
 
 		x.appendChild(el);
 	}
+
+	document.getElementById('content').innerHTML = '';
 	document.getElementById('content').appendChild(x);
 }
