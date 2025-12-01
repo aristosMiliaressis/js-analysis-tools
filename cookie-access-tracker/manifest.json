@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "cookie-access-tracker",
+  "version": "1.0.0",
+  "description": "Trackts access to the document.cookie setter",
+  "icons": {
+    "512": "icons/icon.png"
+  },
+  
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "512": "icons/icon.png"
+    },
+    "default_title": "cookie-access-tracker"
+  },
+    
+  "options_ui": {
+    "page": "src/options/options.html"
+  },
+   
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": ["src/content_script.js"]
+    },
+    {
+      "world": "MAIN",
+      "run_at": "document_start",
+      "all_frames": true,
+      "matches": ["<all_urls>"],
+      "js": ["src/injected.js"]
+    }
+  ],
+  
+  "permissions": [
+    "tabs", 
+    "storage"
+  ], 
+  
+  "host_permissions":[
+    "http://*/*", 
+    "https://*/*"
+  ]
+}

@@ -1,0 +1,5 @@
+^CookieConsent=
+^ajs_(anonymous|user|group)_id=
+^_ga(_|(0-9A-Z))?=
+^OptanonConsent=
+^_tld_=
