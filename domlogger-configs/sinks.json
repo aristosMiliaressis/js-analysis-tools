@@ -1,5 +1,19 @@
 {
   "config": {
+    "*": {
+      "alert": {
+        "match": [
+          "//exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[0]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[1]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInCookies)(args[2]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInCookies)(args) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[0]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[1]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInQuery)(args[2]) ? /./ : /^$/",
+          "//exec:return new Function('c',domlogger.globals.isPresentInQuery)(args) ? /./ : /^$/"
+        ]
+      }
+    },
     "Element.prototype.setAttribute": {
       "match": [
         "\\[\"href",
@@ -10,6 +24,12 @@
         "\\[\"style"
       ]
     }
+  },
+  "globals": {
+    "isPresentInCookies": "return c.length>4 && unescape(unescape(unescape(document.cookie))).includes(`=${c};`)",
+    "isPresentInLocalStorage": "for(var k in localStorage){if(typeof localStorage[k]==='string'){var v=localStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false",
+    "isPresentInQuery": "return c.length>4 && unescape(unescape(unescape(location.search))).includes(`=${c}`)",
+    "isPresentInSessionStorage": "for(var k in sessionStorage){if(typeof sessionStorage[k]==='string'){var v=sessionStorage[k];do{b=v;v=unescape(b)}while(b!=v);if(v.includes(c)||v.includes(JSON.stringify(c)))return c.length>4;}}return false"
   },
   "hooks": {
     "CSS": {
@@ -26,31 +46,15 @@
     },
     "DOM": {
       "attribute": [
-        "set:Element.prototype.innerHTML",
-        "set:Element.prototype.outerHTML",
-        "set:HTMLAnchorElement.prototype.href",
-        "set:HTMLButtonElement.prototype.formAction",
-        "set:HTMLInputElement.prototype.formAction",
-        "set:HTMLFormElement.prototype.action",
-        "set:HTMLIFrameElement.prototype.src",
-        "set:HTMLIFrameElement.prototype.srcdoc",
-        "set:HTMLFrameElement.prototype.src",
-        "set:HTMLFrameElement.prototype.srcdoc",
         "set:HTMLMediaElement.prototype.src",
         "set:HTMLSourceElement.prototype.src",
         "set:HTMLAreaElement.prototype.href",
         "set:HTMLInputElement.prototype.src",
         "set:HTMLBaseElement.prototype.href",
         "set:HTMLTrackElement.prototype.src",
-        "set:HTMLEmbededElement.prototype.src",
-        "set:HTMLScriptElement.prototype.src",
-        "set:HTMLScriptElement.prototype.text",
-        "set:HTMLScriptElement.prototype.innerText",
-        "set:HTMLScriptElement.prototype.innerHTML",
-        "set:HTMLScriptElement.prototype.textContent"
+        "set:HTMLEmbededElement.prototype.src"
       ],
       "function": [
-        "Element.prototype.insertAdjacentHTML",
         "Element.prototype.setAttribute",
         "HTMLScriptElement.prototype.append",
         "HTMLScriptElement.prototype.appendChild"
@@ -92,25 +96,20 @@
       ]
     },
     "MISC": {
-      "attribute": ["set:document.domain","set:window.name"],
+      "attribute": [
+        "set:document.domain",
+        "set:window.name"
+      ],
       "class": [
         "FileReader",
-        "BroadcastChannel",
-        "MessageChannel",
         "Blob"
       ],
       "function": [
         "document.evaluate",
         "Element.prototype.evaluate",
         "URL.createObjectURL",
-        "MessagePort.prototype.postMessage",
-        "BroadcastChannel.prototype.postMessage",
-        "window.postMessage",
-        "Worker.prototype.postMessage",
-        "ServiceWorker.prototype.postMessage",
         "navigator.serviceWorker.register",
-        "window.open",
-        "Object.assign"
+        "window.open"
       ]
     },
     "NETWORK": {
@@ -133,14 +132,37 @@
       "attribute": [
         "set:document.cookie"
       ],
-      "function": ["localStorage.setItem", "sessionStorage.setItem"]
+      "function": [
+        "localStorage.setItem",
+        "sessionStorage.setItem"
+      ]
     },
     "XSS": {
-      "class": ["Location"],
+      "attribute": [
+        "set:Element.prototype.innerHTML",
+        "set:Element.prototype.outerHTML",
+        "set:HTMLAnchorElement.prototype.href",
+        "set:HTMLButtonElement.prototype.formAction",
+        "set:HTMLInputElement.prototype.formAction",
+        "set:HTMLFormElement.prototype.action",
+        "set:HTMLIFrameElement.prototype.src",
+        "set:HTMLIFrameElement.prototype.srcdoc",
+        "set:HTMLFrameElement.prototype.src",
+        "set:HTMLFrameElement.prototype.srcdoc",
+        "set:HTMLScriptElement.prototype.src",
+        "set:HTMLScriptElement.prototype.text",
+        "set:HTMLScriptElement.prototype.innerText",
+        "set:HTMLScriptElement.prototype.innerHTML",
+        "set:HTMLScriptElement.prototype.textContent"
+      ],
+      "class": [
+        "Location"
+      ],
       "function": [
         "eval",
         "document.write",
         "document.writeln",
+        "Element.prototype.insertAdjacentHTML",
         "Range.prototype.createContextualFragment"
       ]
     }

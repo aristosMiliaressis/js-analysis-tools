@@ -21,11 +21,6 @@
         "get:window.name"
       ],
       "function": [
-        "window.postMessage",
-        "MessagePort.prototype.start",
-        "MessagePort.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
-        "BroadcastChannel.prototype.postMessage",
         "window.open"
       ]
     },
@@ -87,8 +82,6 @@
         "ServiceWorkerContainer"
       ],
       "function": [
-        "Worker.prototype.postMessage",
-        "ServiceWorker.prototype.postMessage",
         "Worker.prototype.addEventListener",
         "ServiceWorker.prototype.addEventListener",
         "navigator.serviceWorker.register",

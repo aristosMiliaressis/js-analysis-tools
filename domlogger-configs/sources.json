@@ -10,22 +10,12 @@
     }
   },
   "hooks": {
-    "CrossWindow": {
+    "MISC": {
       "attribute": [
-        "get:window.name"
-      ],
-      "class": [
-        "BroadcastChannel",
-        "MessageChannel"
+        "get:window.name",
+        "get:Document.prototype.referrer"
       ],
       "function": [
-        "window.postMessage",
-        "MessagePort.prototype.start",
-        "MessagePort.prototype.postMessage",
-        "MessagePort.prototype.addEventListener",
-        "BroadcastChannel.prototype.postMessage",
-        "Worker.prototype.postMessage",
-        "ServiceWorker.prototype.postMessage",
         "navigator.serviceWorker.register",
         "window.open"
       ]
@@ -34,10 +24,7 @@
       "function": [
         "URLSearchParams.prototype.get",
         "URLSearchParams.prototype.has",
-        "URLSearchParams.prototype.delete",
-        "String.prototype.indexOf",
-        "String.prototype.includes",
-        "String.prototype.match"
+        "URLSearchParams.prototype.delete"
       ]
     },
     "URLParsing": {
@@ -54,7 +41,10 @@
         "URLSearchParams.prototype.forEach",
         "URLSearchParams.prototype.getAll",
         "URLSearchParams.prototype.keys",
-        "URLSearchParams.prototype.values"
+        "URLSearchParams.prototype.values",
+        "String.prototype.indexOf",
+        "String.prototype.includes",
+        "String.prototype.match"
       ]
     },
     "clipboard": {
