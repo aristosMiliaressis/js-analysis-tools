@@ -7,7 +7,7 @@ beforeunload to track page changes (since we see no diff btw fragmentchange/push
 we also look for event.dispatch.apply in the listener, if it exists, we find a earlier stack-row and use that one
 also, we look for jQuery-expandos to identify events being added later on by jQuery's dispatcher
 */
-(function (pushstate, msgeventlistener, msgporteventlistener) {
+(function (pushstate, msgeventlistener, msgporteventlistener, broadcastChannelEventListener) {
 	var loaded = false;
 	var originalFunctionToString = Function.prototype.toString;
 
@@ -19,10 +19,11 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		return bindedFunction;
 	}
 
-	var m = function (detail) {
+	var sendToContentScript = function (detail) {
 		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': detail });
 		document.dispatchEvent(storeEvent);
 	};
+
 	var h = function (p) {
 		var hops = "";
 		try {
@@ -50,10 +51,10 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		if (!instance || !instance.message || !instance.message.length) return;
 		var j = 0; while (e = instance.message[j++]) {
 			listener = e.handler; if (!listener) return;
-			m({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
+			sendToContentScript({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
 		};
 	};
-	var l = function (listener, pattern_before, additional_offset) {
+	var logListener = function (listener, pattern_before, additional_offset) {
 		offset = 2 + (additional_offset || 0)
 		try { throw new Error(''); } catch (error) { stack = error.stack || ''; }
 		// ignore chrome extensions
@@ -80,26 +81,26 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 			stack = last;
 		}
 		listener_str = listener.__postmessagetrackername__ || listener.toString();
-		m({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
+		sendToContentScript({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
 	};
 	var jqc = function (key) {
-		m({ log: ['Found key', key, typeof window[key], window[key] ? window[key].toString() : window[key]] });
+		sendToContentScript({ log: ['Found key', key, typeof window[key], window[key] ? window[key].toString() : window[key]] });
 		if (typeof window[key] == 'function' && typeof window[key]._data == 'function') {
-			m({ log: ['found jq function', window[key].toString()] });
+			sendToContentScript({ log: ['found jq function', window[key].toString()] });
 			ev = window[key]._data(window, 'events');
 			jq(ev);
 		} else if (window[key] && (expando = window[key].expando)) {
-			m({ log: ['Use expando', expando] });
+			sendToContentScript({ log: ['Use expando', expando] });
 			var i = 1; while (instance = window[expando + i++]) {
 				jq(instance.events);
 			}
 		} else if (window[key]) {
-			m({ log: ['Use events directly', window[key].toString()] });
+			sendToContentScript({ log: ['Use events directly', window[key].toString()] });
 			jq(window[key].events);
 		}
 	};
 	var j = function () {
-		m({ log: 'Run jquery fetcher' });
+		sendToContentScript({ log: 'Run jquery fetcher' });
 		var all = Object.getOwnPropertyNames(window);
 		var len = all.length;
 		for (var i = 0; i < len; i++) {
@@ -110,17 +111,8 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		}
 		loaded = true;
 	};
-	History.prototype.pushState = function (state, title, url) {
-		m({ pushState: true });
-		return pushstate.apply(this, arguments);
-	};
-	var original_setter = window.__lookupSetter__('onmessage');
-	window.__defineSetter__('onmessage', function (listener) {
-		if (listener) {
-			l(listener.toString());
-		}
-		original_setter(listener);
-	});
+
+
 	var c = function (listener) {
 		var listener_str = originalFunctionToString.apply(listener)
 		if (listener_str.match(/\.deep.*apply.*captureException/s)) return 'raven';
@@ -133,30 +125,6 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		return false;
 	}
 
-	var onmsgport = function (e) {
-		if (e.data && (e.data.wappalyzer !== undefined || e.data.ext == "domlogger" || e.data.ext == "domlogger++" || e.data.untrustedTypes !== undefined)) {
-			return
-		}
-        try {
-            obj = JSON.parse(e.data) // hides DOM INvader messages
-            if (Array.isArray(obj) && obj.length == 3 && obj[1].length == 1) {
-                return
-            }
-        } catch (e) {
-            // not a json
-        }
-		var p = (e.ports.length ? '%cport' + e.ports.length + '%c ' : '');
-		var msg = '%cport%c→%c' + h(e.source) + '%c ' + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		var logMsg = "port → " + h(e.source) + " <" + location.href + "> " + (e.ports.length ? 'port' + e.ports.length + ' : ' : ' : ') + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		if (p.length) {
-			console.log(msg, "color: blue", '', "color: red", '', "color: blue", '');
-		} else {
-			console.log(msg, "color: blue", '', "color: red", '');
-		}
-
-		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { message: logMsg } });
-		document.dispatchEvent(storeEvent);
-	};
 	const anarchyDomains = new Set(['https://firebasestorage.googleapis.com', 'https://www.gstatic.com', 'https://ssl.gstatic.com', 'https://googlechromelabs.github.io', 'https://storage.googleapis.com']);
 	function whois(origin) {
         if (origin === 'null') return 'OPAQUE ' + origin;
@@ -165,50 +133,178 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
         if (anarchyDomains.has(origin)) return 'UNSAFE ' + origin;
         return origin;
     }
+
+	var onmsgchannel = function (e) {
+		const me = whois(window.origin);
+		var msg = '%cbroadcast%c → %c' + h() + `%c <${me}> :` + (typeof e == 'string' ? e : 'j ' + JSON.stringify(e));
+		var logMsg = `broadcast → ${h()} <${me}> : ` + (typeof e == 'string' ? e : 'j ' + JSON.stringify(e));
+		console.log(msg, "color: orange", '', "color: green", '');
+
+		sendToContentScript({ href: location.href,
+			cookie: document.cookie, 
+			localStorage: Object.values(localStorage),
+			sessionStorage: Object.values(sessionStorage),
+			message: logMsg, 
+			isObj: !(typeof e == 'string'), 
+			destination: h() + " <" + me + ">" });
+	};
+
+	var onmsgport = function(e){
+        var p = (e.ports.length?'%cport'+e.ports.length+'%c ':'');
+		const destOrigin = whois(window.origin);
+        const sourceOrigin = whois(e.origin == '' ? window.origin : e.origin);
+        var msg = `%cport%c→%c${h(e.source)}%c <${destOrigin}> ${p}` + (typeof e.data == 'string'?e.data:'j '+JSON.stringify(e.data));
+        var logMsg = `port→${h(e.source)} <${destOrigin}> ${p}` + (typeof e.data == 'string'?e.data:'j '+JSON.stringify(e.data));
+        if (p.length) {
+            console.log(msg, "color: blue", '', "color: red", '', "color: blue", '');
+        } else {
+            console.log(msg, "color: blue", '', "color: red", '');
+        }
+		// sendToContentScript({ href: location.href,
+		// 	cookie: document.cookie, 
+		// 	localStorage: Object.values(localStorage),
+		// 	sessionStorage: Object.values(sessionStorage),
+		// 	message: logMsg, 
+		// 	isObj: !(typeof e.data == 'string'), 
+		// 	source: h(e.source) + " <" + sourceOrigin + ">", 
+		// 	destination: h() + " <" + destOrigin + ">" });
+    };
+
 	var onmsg = function (e) {
 		if (e.data && (e.data.wappalyzer !== undefined || e.data.ext == "domlogger" || e.data.ext == "domlogger++" || e.data.untrustedTypes !== undefined)) {
 			return
 		}
-		var p = (e.ports.length ? '%cport' + e.ports.length + '%c ' : '');
-		const me = whois(window.origin);
-        const source = whois(e.origin);
-		var msg = '%c' + h(e.source) + `%c <${source}> → %c` + h() + `%c <${me}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		var logMsg = h(e.source) + " <" + source + "> → " + h() + " <" + me + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : JSON.stringify(e.data));
+		var p = (e.target instanceof MessagePort ? '%cport%c ' : '');
+		const destOrigin = whois(window.origin);
+        const sourceOrigin = whois(e.origin == '' ? window.origin : e.origin);
+		const sourceEntity = (e.target instanceof Worker ? 'worker' : h(e.source))
+		var msg = `%c${sourceEntity}%c <${sourceOrigin}> → %c` + h() + `%c <${destOrigin}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
+		var logMsg = sourceEntity + " <" + sourceOrigin + "> → " + h() + " <" + destOrigin + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: red", '', "color: green", '', "color: blue", '');
 		} else {
 			console.log(msg, "color: red", '', "color: green", '');
 		}
-		var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { 
-			href: location.href,
+		sendToContentScript({ href: location.href,
 			cookie: document.cookie, 
 			localStorage: Object.values(localStorage),
 			sessionStorage: Object.values(sessionStorage),
 			message: logMsg, 
 			isObj: !(typeof e.data == 'string'), 
-			source: h(e.source) + " <" + source + ">", 
-			destination: h() + " <" + me + ">" }});
-		document.dispatchEvent(storeEvent);
+			source: h(e.source) + " <" + sourceOrigin + ">", 
+			destination: h() + " <" + destOrigin + ">" });
 	};
+
+	History.prototype.pushState = function (state, title, url) {
+		sendToContentScript({ pushState: true });
+		return pushstate.apply(this, arguments);
+	};
+	
+	var originalWindowOnmessageSetter = window.__lookupSetter__('onmessage');
+	window.__defineSetter__('onmessage', function (listener) {
+		if (listener) {
+			logListener(listener.toString());
+		}
+		originalWindowOnmessageSetter(listener);
+	});
+
+	var originalWindowOnmessageerrorSetter = window.__lookupSetter__('onmessageerror');
+	window.__defineSetter__('onmessageerror', function (listener) {
+		if (listener) {
+			logListener(listener.toString());
+		}
+		originalWindowOnmessageerrorSetter(listener);
+	});
+
+	var originalMessagePortOnmessageSetter = Object.getOwnPropertyDescriptor(MessagePort.prototype, "onmessage").set;
+	Object.defineProperty(MessagePort.prototype, "onmessage", {
+		set: function onmessage() {
+			logListener(arguments[0].toString())
+			originalMessagePortOnmessageSetter.call(this, (e) => {onmsgport(e); arguments[0].call(this, e)});
+		}
+	});
+
+	var originalMessagePortOnmessageerrorSetter = Object.getOwnPropertyDescriptor(MessagePort.prototype, "onmessageerror").set;
+	Object.defineProperty(MessagePort.prototype, "onmessageerror", {
+		set: function onmessageerror() {
+			logListener(arguments[0].toString())
+			originalMessagePortOnmessageerrorSetter.call(this, (e) => {onmsgport(e); arguments[0].call(this, e)});
+		}
+	});
+
+	var originalBroadcastChannelOnmessageSetter = Object.getOwnPropertyDescriptor(BroadcastChannel.prototype, "onmessage").set;
+	Object.defineProperty(BroadcastChannel.prototype, "onmessage", {
+		set: function onmessage() {
+			logListener(arguments[0].toString())
+			originalBroadcastChannelOnmessageSetter.call(this, (e) => {onmsgchannel(e); arguments[0].call(this, e)});
+		}
+	});
+
+	var originalBroadcastChannelOnmessageerrorSetter = Object.getOwnPropertyDescriptor(BroadcastChannel.prototype, "onmessageerror").set;
+	Object.defineProperty(BroadcastChannel.prototype, "onmessageerror", {
+		set: function onmessageerror() {
+			logListener(arguments[0].toString())
+			originalBroadcastChannelOnmessageerrorSetter.call(this, (e) => {onmsgchannel(e); arguments[0].call(this, e)});
+		}
+	});
+
+	var originalWorkerOnmessageSetter = Object.getOwnPropertyDescriptor(Worker.prototype, "onmessage").set;
+	Object.defineProperty(Worker.prototype, "onmessage", {
+		set: function onmessage() {
+			logListener(arguments[0].toString())
+			originalWorkerOnmessageSetter.call(this, (e) => {onmsg(e); arguments[0].call(this, e)});
+		}
+	});
+	
 	window.addEventListener('message', onmsg)
+
+	BroadcastChannel.prototype.addEventListener = function (type, listener, useCapture) {
+		if (!this.__postmessagetrackername__) {
+			this.__postmessagetrackername__ = true;
+			logListener(listener, false, 0);
+			this.addEventListener('message', onmsgchannel);
+		}
+		return broadcastChannelEventListener.apply(this, arguments);
+	}
+
 	MessagePort.prototype.addEventListener = function (type, listener, useCapture) {
 		if (!this.__postmessagetrackername__) {
 			this.__postmessagetrackername__ = true;
+			logListener(listener, false, 0);
 			this.addEventListener('message', onmsgport);
 		}
 		return msgporteventlistener.apply(this, arguments);
+	}
+
+	var originalWorkerAddEventListener = Worker.prototype.addEventListener;
+	Worker.prototype.addEventListener = function (type, listener, useCapture) {
+		if (!this.__postmessagetrackername__) {
+			this.__postmessagetrackername__ = true;
+			logListener(listener, false, 0);
+			this.addEventListener('message', onmsg);
+		}
+		return originalWorkerAddEventListener.apply(this, arguments);
+	}
+
+	var originalServiceWorkerAddEventListener = ServiceWorker.prototype.addEventListener;
+	ServiceWorker.prototype.addEventListener = function (type, listener, useCapture) {
+		if (!this.__postmessagetrackername__) {
+			this.__postmessagetrackername__ = true;
+			logListener(listener, false, 0);
+			this.addEventListener('message', onmsg);
+		}
+		return originalServiceWorkerAddEventListener.apply(this, arguments);
 	}
 
 	Window.prototype.addEventListener = function (type, listener, useCapture) {
 		if (type == 'message') {
 			var pattern_before = false, offset = 0;
 			if (listener.toString().indexOf('event.dispatch.apply') !== -1) {
-				m({ log: 'We got a jquery dispatcher' });
+				sendToContentScript({ log: 'We got a jquery dispatcher' });
 				pattern_before = /init\.on|init\..*on\]/;
 				if (loaded) { setTimeout(j, 100); }
 			}
-			//console.log('yo')
-			//debugger;
+
 			var unwrap = function (listener) {
 				found = c(listener);
 				//console.log('found', found)
@@ -220,27 +316,27 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 						if (typeof v == "boolean") fb++;
 					}
 					if (ff == 1 && fb == 1) {
-						m({ log: 'We got a raven wrapper' });
+						sendToContentScript({ log: 'We got a raven wrapper' });
 						offset++;
 						listener = unwrap(f);
 					}
 				} else if (found == 'newrelic') {
-					m({ log: 'We got a newrelic wrapper' });
+					sendToContentScript({ log: 'We got a newrelic wrapper' });
 					offset++;
 					listener = unwrap(listener["nr@original"]);
 				} else if (found == 'sentry') {
-					m({ log: 'We got a sentry wrapper' });
+					sendToContentScript({ log: 'We got a sentry wrapper' });
 					offset++;
 					listener = unwrap(listener["__sentry_original__"]);
 				} else if (found == 'rollbar') {
-					m({ log: 'We got a rollbar wrapper' });
+					sendToContentScript({ log: 'We got a rollbar wrapper' });
 					offset += 2;
 				} else if (found == 'bugsnag') {
 					offset++;
 					var clr = null;
 					try { clr = arguments.callee.caller.caller.caller } catch (e) { }
 					if (clr && !c(clr)) { //dont care if its other wrappers
-						m({ log: 'We got a bugsnag wrapper' });
+						sendToContentScript({ log: 'We got a bugsnag wrapper' });
 						listener.__postmessagetrackername__ = clr.toString();
 					} else if (clr) { offset++ }
 				} else if (found == 'bugsnag2') {
@@ -249,7 +345,7 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 					try { clr = arguments.callee.caller.caller.arguments[1]; } catch (e) { }
 					if (clr && !c(clr)) { //dont care if its other wrappers
 						listener = unwrap(clr);
-						m({ log: 'We got a bugsnag2 wrapper' });
+						sendToContentScript({ log: 'We got a bugsnag2 wrapper' });
 						listener.__postmessagetrackername__ = clr.toString();
 					} else if (clr) { offset++; }
 				}
@@ -261,11 +357,11 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 
 			if (typeof listener == "function") {
 				listener = unwrap(listener);
-				l(listener, pattern_before, offset);
+				logListener(listener, pattern_before, offset);
 			}
 		}
 		return msgeventlistener.apply(this, arguments);
 	};
 	window.addEventListener('load', j);
 	window.addEventListener('postMessageTrackerUpdate', j);
-})(History.prototype.pushState, Window.prototype.addEventListener, MessagePort.prototype.addEventListener)
+})(History.prototype.pushState, Window.prototype.addEventListener, MessagePort.prototype.addEventListener, BroadcastChannel.prototype.addEventListener)

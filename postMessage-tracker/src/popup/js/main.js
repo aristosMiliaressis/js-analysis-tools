@@ -40,7 +40,7 @@ async function populatePopupData() {
 	listenersTabButton.innerText = `LISTENERS (${data.listeners.length})`;
 	messagesTabButton.innerText = `MESSAGES (${data.messages.length})`;
 
-	for (let listener of data.listeners) {
+	for (let listener of data.listeners.reverse()) {
 		if (!listenersTab.classList.contains('active-content'))
 			continue;
 
@@ -77,7 +77,7 @@ async function populatePopupData() {
 		x.appendChild(element);
 	}
 
-	for (let message of data.messages) {
+	for (let message of data.messages.reverse()) {
 		if (!messagesTab.classList.contains('active-content'))
 			continue;
 
