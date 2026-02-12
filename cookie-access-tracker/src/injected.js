@@ -38,8 +38,12 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 				}
 
 				var storeEvent = new CustomEvent('cookieAccessTracker', { 'detail': { 
-					value: val, 
+					assignment: val, 
+					name:val.split('=')[0],
+					value:val.split('=')[1].split(';')[0],
+					attributes:val.split('=').slice(1).join('=').split(';').slice(1).join('; '),
 					origin: window.origin, 
+					href: location.href,
 					window: window.top == window ? '' : window.name,
 					fullstack: stack,
 					stack: stack[stack.length-1],
@@ -52,24 +56,4 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 		});
 	}
 
-	// sends data to webhook & reset tab data
-	onhashchange = onbeforeunload = (e) => {
-		var storeEvent = new CustomEvent('cookieAccessTracker',  { 'detail': { reset: true } });
-		document.dispatchEvent(storeEvent);
-	};
-
-	// detect History API based navigations
-	var origPushState = History.prototype.pushState;
-	History.prototype.pushState = function (state, title, url) {
-		var storeEvent = new CustomEvent('cookieAccessTracker', { 'detail': { reset: true } });
-		document.dispatchEvent(storeEvent);
-		return origPushState.apply(this, arguments);
-	};
-
-	var origReplaceState = History.prototype.replaceState;
-	History.prototype.replaceState = function (state, title, url) {
-		var storeEvent = new CustomEvent('cookieAccessTracker', { 'detail': { reset: true } });
-		document.dispatchEvent(storeEvent);
-		return origReplaceState.apply(this, arguments);
-	};	
 })();

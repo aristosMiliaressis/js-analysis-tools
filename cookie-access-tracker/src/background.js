@@ -22,14 +22,15 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 		return;
 	}
 
-	if (tab_data[sender.tab.id].some(l => l.hops == msg.hops && l.value.split('=')[0] == msg.value.split('=')[0])) return;
+	if (tab_data[sender.tab.id] == undefined) tab_data[sender.tab.id] = []
+	if (tab_data[sender.tab.id].some(l => l.origin == msg.origin && l.name == msg.name && l.value == msg.value)) return;
 
 	extensionAPI.storage.local.get({
         options: { PatternBlacklist: [] }
     }, function (i) {
         for (let pattern of i.options.PatternBlacklist) {
             let re = new RegExp(pattern)
-			if (re.test(msg.value))
+			if (re.test(msg.assignment))
 				return;
         }
 
