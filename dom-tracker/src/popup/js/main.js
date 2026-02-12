@@ -33,7 +33,7 @@ function populatePopupData() {
 	targetTabButton.innerText = `TARGET (${data.targets.length})`;
 	rpoTabButton.innerText = `RPO (${data.rpo.length})`;
 
-	for (let frame of data.frames) {
+	for (let frame of data.frames.reverse()) {
 		if (!iframeTab.classList.contains('active-content'))
 			continue;
 
@@ -68,7 +68,7 @@ function populatePopupData() {
 		elementList.appendChild(element);
 	}
 
-	for (let target of data.targets) {
+	for (let target of data.targets.reverse()) {
 		if (!targetTab.classList.contains('active-content'))
 			continue;
 
@@ -103,7 +103,7 @@ function populatePopupData() {
 		elementList.appendChild(element);
 	}
 
-	for (let rpo of data.rpo) {
+	for (let rpo of data.rpo.reverse()) {
 		if (!rpoTab.classList.contains('active-content'))
 			continue;
 
