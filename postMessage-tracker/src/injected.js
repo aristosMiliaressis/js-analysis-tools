@@ -232,22 +232,6 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		}
 	});
 
-	var originalBroadcastChannelOnmessageSetter = Object.getOwnPropertyDescriptor(BroadcastChannel.prototype, "onmessage").set;
-	Object.defineProperty(BroadcastChannel.prototype, "onmessage", {
-		set: function onmessage() {
-			logListener(arguments[0].toString())
-			originalBroadcastChannelOnmessageSetter.call(this, (e) => {onmsgchannel(e); arguments[0].call(this, e)});
-		}
-	});
-
-	var originalBroadcastChannelOnmessageerrorSetter = Object.getOwnPropertyDescriptor(BroadcastChannel.prototype, "onmessageerror").set;
-	Object.defineProperty(BroadcastChannel.prototype, "onmessageerror", {
-		set: function onmessageerror() {
-			logListener(arguments[0].toString())
-			originalBroadcastChannelOnmessageerrorSetter.call(this, (e) => {onmsgchannel(e); arguments[0].call(this, e)});
-		}
-	});
-
 	var originalWorkerOnmessageSetter = Object.getOwnPropertyDescriptor(Worker.prototype, "onmessage").set;
 	Object.defineProperty(Worker.prototype, "onmessage", {
 		set: function onmessage() {
@@ -257,15 +241,6 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 	});
 	
 	window.addEventListener('message', onmsg)
-
-	BroadcastChannel.prototype.addEventListener = function (type, listener, useCapture) {
-		if (!this.__postmessagetrackername__) {
-			this.__postmessagetrackername__ = true;
-			logListener(listener, false, 0);
-			this.addEventListener('message', onmsgchannel);
-		}
-		return broadcastChannelEventListener.apply(this, arguments);
-	}
 
 	MessagePort.prototype.addEventListener = function (type, listener, useCapture) {
 		if (!this.__postmessagetrackername__) {
@@ -364,4 +339,4 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 	};
 	window.addEventListener('load', j);
 	window.addEventListener('postMessageTrackerUpdate', j);
-})(History.prototype.pushState, Window.prototype.addEventListener, MessagePort.prototype.addEventListener, BroadcastChannel.prototype.addEventListener)
+})(History.prototype.pushState, Window.prototype.addEventListener, MessagePort.prototype.addEventListener)
