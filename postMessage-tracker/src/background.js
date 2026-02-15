@@ -87,30 +87,26 @@ function isInterestingMessage(msg) {
 	msg.matches = {};
 
 	const data = msg.message.split(':').slice(3).join(':');
-	const uuidRegex = /[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}/ig;
-	const urlWithParamsRegex = /(https?|wss?):\/\/[a-z0-9_\-\.]+\/[a-z0-9_\/%\-\.]*[\?#]/ig;
-	const blobUrlRegex = /blob:[a-z0-9_\-\.]+/ig;
 	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
-	const htmlTagRegex = /(<\/[a-z]+>|<[a-z]+ )/ig;
-	const hexRegex = /\b([a-f0-9]{2}){7,}/ig;
-	const jwtRegex = /\beyJ[a-z0-9+/\-_]([a-z0-9+/\-_]{4})*([a-z0-9+/\-_]{2}=?=?|[a-z0-9+/\-_]{3}=?)?\b/ig
-
-	data.matchAll(uuidRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-	data.matchAll(urlWithParamsRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-	data.matchAll(blobUrlRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
 	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
-	data.matchAll(htmlTagRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-	data.matchAll(hexRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-	data.matchAll(jwtRegex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-    
+
+	extensionAPI.storage.sync.get({
+		options: { }
+	}, function(i) {
+		for (let pattern of i.options.messageMatchers) {
+			data.matchAll(RegExp(pattern, "g")).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+		}
+});
+
 	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
 					...msg.localStorage,
 					...msg.sessionStorage]) {
 		if (!value) continue;
 
-		let regex = RegExp(RegExp.escape(value), "ig");
-		if (value.length >= 12)
+		if (value.length >= 12 && value.length < 32*1024) {
+			let regex = RegExp(RegExp.escape(value), "ig");
 			data.matchAll(regex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+		}		
 	}
 	
 	return Object.keys(msg.matches).length > 0;
