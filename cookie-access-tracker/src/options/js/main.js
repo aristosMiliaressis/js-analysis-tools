@@ -1,7 +1,16 @@
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
-addBtn.onclick = () => { addPattern(patternInput.value) };
-rmvBtn.onclick = rmvPattern
+function addPattern(pattern) {
+    var option = document.createElement('option');
+    option.innerText = pattern;
+    option.setAttribute('value', pattern);
+    patternBlacklist.appendChild(option);
+    patternInput.value = '';
+}
+
+function rmvPattern() {
+    patternBlacklist.options[patternBlacklist.selectedIndex].remove()
+}
 
 function save_options() {
     let blacklist = [];
@@ -27,18 +36,8 @@ function restore_options() {
     });
 }
 
-function addPattern(pattern) {
-    var option = document.createElement('option');
-    option.innerText = pattern;
-    option.setAttribute('value', pattern);
-    patternBlacklist.appendChild(option);
-    patternInput.value = '';
-}
-
-function rmvPattern() {
-    patternBlacklist.options[patternBlacklist.selectedIndex].remove()
-}
+addBtn.onclick = () => { addPattern(patternInput.value) };
+rmvBtn.onclick = rmvPattern
+saveBtn.onclick = save_options;
 
 restore_options();
-
-save.onclick = save_options;

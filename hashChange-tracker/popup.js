@@ -1,11 +1,13 @@
-var port = chrome.runtime.connect({
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
+
+var port = extensionAPI.runtime.connect({
 	name: "Sample Communication"
 });
 
 function loaded() {
 	port.postMessage("get-stuff");
 	port.onMessage.addListener(function(msg) {
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		extensionAPI.tabs.query({active: true, currentWindow: true}, function(tabs) {
 			listListeners(msg.listeners[tabs[0].id]);
 		});
 	});

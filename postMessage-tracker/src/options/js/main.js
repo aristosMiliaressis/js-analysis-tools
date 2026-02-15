@@ -1,3 +1,5 @@
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
+
 function save_options() {
 	chrome.storage.sync.set({
 		options: {
@@ -17,7 +19,7 @@ function save_options() {
 }
 
 function restore_options() {
-	chrome.storage.sync.get({
+	extensionAPI.storage.sync.get({
 		options: { }
 	}, function(i) {
 		webhook_url.value = i.options.webhook_url || '';

@@ -1,12 +1,14 @@
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
+
 let data = {};
-let port = chrome.runtime.connect({ name: "Sample Communication" });
+let port = extensionAPI.runtime.connect({ name: "Sample Communication" });
 
 listenersTabButton.onclick = async (evt) => await openTab('listeners');
 messagesTabButton.onclick = async (evt) => await openTab('messages');
 
 port.postMessage("get-stuff");
 port.onMessage.addListener(async (msg) => {
-	chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
+	extensionAPI.tabs.query({active: true, currentWindow: true}, async (tabs) => {
 		selectedId = tabs[0].id;
 		data.listeners = msg.listeners[selectedId];
         data.messages = msg.messages[selectedId];

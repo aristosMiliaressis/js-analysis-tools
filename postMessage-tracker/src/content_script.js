@@ -1,6 +1,7 @@
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
 document.addEventListener('postMessageTracker', function (event) {
-	chrome.runtime.sendMessage(event.detail);
+	extensionAPI.runtime.sendMessage(event.detail);
 });
 
 //we use this to separate fragment changes with location changes

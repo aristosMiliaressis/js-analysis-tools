@@ -1,4 +1,5 @@
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
 document.addEventListener('cookieAccessTracker', function (event) {
-	chrome.runtime.sendMessage(event.detail);
+	extensionAPI.runtime.sendMessage(event.detail);
 });

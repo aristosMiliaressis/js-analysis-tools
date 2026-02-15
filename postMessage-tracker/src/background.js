@@ -1,3 +1,5 @@
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
+
 var tab_listeners = {};
 var tab_messages = {};
 var tab_push = {}, tab_lasturl = {};
@@ -6,20 +8,20 @@ var selectedId = -1;
 function refreshCount() {
 	listenerCount = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
 	messageCount = tab_messages[selectedId] ? tab_messages[selectedId].length : 0;
-	chrome.tabs.get(selectedId, function() {
-		if (!chrome.runtime.lastError) {
-			chrome.action.setBadgeText({"text": listenerCount+':'+messageCount, tabId: selectedId});
+	extensionAPI.tabs.get(selectedId, function() {
+		if (!extensionAPI.runtime.lastError) {
+			extensionAPI.action.setBadgeText({"text": listenerCount+':'+messageCount, tabId: selectedId});
 			if(listenerCount > 0) {
-				chrome.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
+				extensionAPI.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
 			} else {
-				chrome.action.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
+				extensionAPI.action.setBadgeBackgroundColor({ color: [0, 0, 255, 0] });
 			}
 		}
 	});
 }
 
 function logToWebhook(data) {
-	chrome.storage.sync.get({
+	extensionAPI.storage.sync.get({
 		options: { }
 	}, function(i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
@@ -41,7 +43,7 @@ function logToWebhook(data) {
 	});
 }
 
-chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	tabId = sender.tab.id;
 	if(msg.listener) {
 		if(msg.listener == 'function () { [native code] }') return;
@@ -114,7 +116,7 @@ function isInterestingMessage(msg) {
 	return Object.keys(msg.matches).length > 0;
 }
 
-chrome.tabs.onUpdated.addListener(function(tabId, props) {
+extensionAPI.tabs.onUpdated.addListener(function(tabId, props) {
 	if (props.status == "complete") {
 		if(tabId == selectedId) refreshCount();
 	} else if(props.status) {
@@ -136,17 +138,17 @@ chrome.tabs.onUpdated.addListener(function(tabId, props) {
 		tab_lasturl[tabId] = true;
 });
 
-chrome.tabs.onActivated.addListener(function(activeInfo) {
+extensionAPI.tabs.onActivated.addListener(function(activeInfo) {
 	selectedId = activeInfo.tabId;
 	refreshCount();
 });
 
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+extensionAPI.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	selectedId = tabs[0].id;
 	refreshCount();
 });
 
-chrome.runtime.onConnect.addListener(function(port) {
+extensionAPI.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function(msg) {
 		port.postMessage({listeners:tab_listeners, messages:tab_messages});
 	});
