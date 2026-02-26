@@ -39,11 +39,11 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 	var l = function(listener, pattern_before, additional_offset) {
 		offset = 0 + (additional_offset||0)
 		try { throw new Error(''); } catch (error) { stack = error.stack || ''; }
-		// ignore chrome extensions
-		if (document.currentScript != null && document.currentScript.src.includes("chrome-extension://")) {
+		// ignore extensions
+		if (document.currentScript != null && document.currentScript.src.includes("extension://")) {
 			return
 		}
-		stack = stack.split('\n').slice(3).map(function (line) { return line.trim(); });
+		stack = stack.split('\n').filter(l => !l.includes("extension://")).map(function (line) { return line.trim(); });
 		fullstack = stack.slice();
 		if(pattern_before) {
 			nextitem = false;
