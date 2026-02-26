@@ -102,7 +102,7 @@ async function populatePopupData() {
         element.appendChild(dst);
 
 		pre = document.createElement('pre');
-        let text = message.message.split(':').slice(3).join(':');
+        let text = typeof message.message.data == 'string' ? message.message.data : JSON.stringify(message.message.data);
         for (match of Object.values(message.matches)) {
             pre.innerHTML += text.substring(0, text.indexOf(match)).replaceAll("<", "&lt;");
             pre.innerHTML += `<b style="color:red">${match.replaceAll("<", "&lt;")}</b>`;

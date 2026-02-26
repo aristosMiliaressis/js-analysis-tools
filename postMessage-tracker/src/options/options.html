@@ -7,12 +7,16 @@
 		<fieldset>
 			<legend>Webhook Options</legend>
 			<input type="checkbox" id="webhook_listeners" />
-			<label for="webhook_listeners">send listeners</label>
+			<label for="webhook_listeners">Send Listeners</label>
 			<input type="checkbox" id="webhook_messages" />
-			<label for="webhook_messages">send messages</label>
+			<label for="webhook_messages">Send Messages</label>
 			<br>
-			Log-URL:
-			<input type="text" id="webhook_url" placeholder="http://127.0.0.1:31337" size="40" />
+			<br>
+			<label for="webhook_url">Webhook URL</label>
+			<input type="text" id="webhook_url" placeholder="http://127.0.0.1:31337" size="30" style="float: right" />
+			<br>
+			<label for="webhook_scope">Scope</label>
+			<input type="text" id="webhook_scope" placeholder=".*" value=".*" size="30" style="float: right" />
 		</fieldset>
 
 		<fieldset>
@@ -23,10 +27,6 @@
 			<button id=addBtn>Add</button>
 			<button id=rmvBtn>Remove</button>
 		</fieldset>
-		
-		<br>
-		Scope:
-		<input type="text" id="webhook_scope" placeholder=".*" value=".*" size="40" />
 		
 		<button id="saveBtn">Save</button>
 		

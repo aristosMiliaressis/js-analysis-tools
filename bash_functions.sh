@@ -112,15 +112,11 @@ function logMsg() {
 		sleep 1
 		echo > $tmp
 		mv .webhook.log $tmp 2>/dev/null
-		cat $tmp | jq -r 'select(.message != null) | .message' | anew -q messagelog.txt
-		cat $tmp | jq -c 'select(.listener != null)' |
-			while read -r msg; do
-				href=$(echo "$msg" | jq -r .parent_url | sed 's,\%,%%,g')
-				hops=$(echo "$msg" | jq -r .hops | sed 's,\%,%%,g')
-				stack=$(echo "$msg" | jq -r .stack | sed 's,\%,%%,g')
-				listener=$(echo "$msg" | jq -r .listener | sed 's,\%,%%,g')
-				printf "$href\n\`$hops\` \`$stack\`\n\`\`\`javascript\n$listener\n\`\`\`\n"
-			done | anew -q message_listeners.md
+
+		cat $tmp | jq -c 'select(.message != null) | {source,destination,href:.parent_url,message}' | anew -q messagelog.json
+
+		cat $tmp | jq -c 'select(.listener != null)' | anew -q message_listeners.json
+
 		cat $tmp |
 			jq -c 'select(.iframes != null) | .frames[]' |
 			while read -r msg; do

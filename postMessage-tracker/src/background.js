@@ -86,7 +86,7 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 function isInterestingMessage(msg) {
 	msg.matches = {};
 
-	const data = msg.message.split(':').slice(3).join(':');
+	const data = typeof msg.message.data == 'string' ? msg.message.data : JSON.stringify(msg.message.data);
 	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
 	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
 

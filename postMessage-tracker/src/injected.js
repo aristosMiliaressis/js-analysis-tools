@@ -24,7 +24,7 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		document.dispatchEvent(storeEvent);
 	};
 
-	var h = function (p) {
+	var getHops = function (p) {
 		var hops = "";
 		try {
 			if (!p) p = window;
@@ -51,17 +51,17 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		if (!instance || !instance.message || !instance.message.length) return;
 		var j = 0; while (e = instance.message[j++]) {
 			listener = e.handler; if (!listener) return;
-			sendToContentScript({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
+			sendToContentScript({ window: window.top == window ? '' : window.name, hops: getHops(), domain: document.domain, stack: 'jQuery', listener: listener.toString() });
 		};
 	};
 	var logListener = function (listener, pattern_before, additional_offset) {
 		offset = 2 + (additional_offset || 0)
 		try { throw new Error(''); } catch (error) { stack = error.stack || ''; }
-		// ignore chrome extensions
-		if (document.currentScript != null && document.currentScript.src.includes("chrome-extension://")) {
+		// ignore extensions
+		if (document.currentScript != null && document.currentScript.src.includes("extension://")) {
 			return
 		}
-		stack = stack.split('\n').map(function (line) { return line.trim(); });
+		stack = stack.split('\n').filter(l => !l.includes("extension://")).map(function (line) { return line.trim(); });
 		fullstack = stack.slice();
 		if (pattern_before) {
 			nextitem = false;
@@ -81,7 +81,7 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 			stack = last;
 		}
 		listener_str = listener.__postmessagetrackername__ || listener.toString();
-		sendToContentScript({ window: window.top == window ? '' : window.name, hops: h(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
+		sendToContentScript({ window: window.top == window ? '' : window.name, hops: getHops(), domain: document.domain, stack: stack, fullstack: fullstack, listener: listener_str });
 	};
 	var jqc = function (key) {
 		sendToContentScript({ log: ['Found key', key, typeof window[key], window[key] ? window[key].toString() : window[key]] });
@@ -136,25 +136,23 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 
 	var onmsgchannel = function (e) {
 		const me = whois(window.origin);
-		var msg = '%cbroadcast%c → %c' + h() + `%c <${me}> :` + (typeof e == 'string' ? e : 'j ' + JSON.stringify(e));
-		var logMsg = `broadcast → ${h()} <${me}> : ` + (typeof e == 'string' ? e : 'j ' + JSON.stringify(e));
+		var msg = '%cbroadcast%c → %c' + getHops() + `%c <${me}> :` + (typeof e == 'string' ? e : 'j ' + JSON.stringify(e));
 		console.log(msg, "color: orange", '', "color: green", '');
 
 		sendToContentScript({ href: location.href,
 			cookie: document.cookie, 
 			localStorage: Object.values(localStorage),
 			sessionStorage: Object.values(sessionStorage),
-			message: logMsg, 
+			message: {source:'broadcast', destination: getHops(), destinationOrigin:me, data:e.data}, 
 			isObj: !(typeof e == 'string'), 
-			destination: h() + " <" + me + ">" });
+			destination: getHops() + " <" + me + ">" });
 	};
 
 	var onmsgport = function(e){
         var p = (e.ports.length?'%cport'+e.ports.length+'%c ':'');
 		const destOrigin = whois(window.origin);
-        const sourceOrigin = whois(e.origin == '' ? window.origin : e.origin);
-        var msg = `%cport%c→%c${h(e.source)}%c <${destOrigin}> ${p}` + (typeof e.data == 'string'?e.data:'j '+JSON.stringify(e.data));
-        var logMsg = `port→${h(e.source)} <${destOrigin}> ${p}` + (typeof e.data == 'string'?e.data:'j '+JSON.stringify(e.data));
+        //const sourceOrigin = whois(e.origin == '' ? window.origin : e.origin);
+        var msg = `%cport%c→%c${getHops(e.source)}%c <${destOrigin}> ${p}` + (typeof e.data == 'string'?e.data:'j '+JSON.stringify(e.data));
         if (p.length) {
             console.log(msg, "color: blue", '', "color: red", '', "color: blue", '');
         } else {
@@ -164,10 +162,10 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		// 	cookie: document.cookie, 
 		// 	localStorage: Object.values(localStorage),
 		// 	sessionStorage: Object.values(sessionStorage),
-		// 	message: logMsg, 
+		//	message: {source:`port→${getHops(e.source)}`, destination: p, destinationOrigin:destOrigin, data:e.data}, 
 		// 	isObj: !(typeof e.data == 'string'), 
-		// 	source: h(e.source) + " <" + sourceOrigin + ">", 
-		// 	destination: h() + " <" + destOrigin + ">" });
+		// 	source: getHops(e.source) + " <" + sourceOrigin + ">", 
+		// 	destination: getHops() + " <" + destOrigin + ">" });
     };
 
 	var onmsg = function (e) {
@@ -177,9 +175,8 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 		var p = (e.target instanceof MessagePort ? '%cport%c ' : '');
 		const destOrigin = whois(window.origin);
         const sourceOrigin = whois(e.origin == '' ? window.origin : e.origin);
-		const sourceEntity = (e.target instanceof Worker ? 'worker' : h(e.source))
-		var msg = `%c${sourceEntity}%c <${sourceOrigin}> → %c` + h() + `%c <${destOrigin}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
-		var logMsg = sourceEntity + " <" + sourceOrigin + "> → " + h() + " <" + destOrigin + "> " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :') + (typeof e.data == 'string' ? e.data : JSON.stringify(e.data));
+		const sourceEntity = (e.target instanceof Worker ? 'worker' : getHops(e.source))
+		var msg = `%c${sourceEntity}%c <${sourceOrigin}> → %c` + getHops() + `%c <${destOrigin}> ` + p + (typeof e.data == 'string' ? e.data : 'j ' + JSON.stringify(e.data));
 		if (p.length) {
 			console.log(msg, "color: red", '', "color: green", '', "color: blue", '');
 		} else {
@@ -189,10 +186,10 @@ also, we look for jQuery-expandos to identify events being added later on by jQu
 			cookie: document.cookie, 
 			localStorage: Object.values(localStorage),
 			sessionStorage: Object.values(sessionStorage),
-			message: logMsg, 
+			message: {source:sourceEntity, origin:sourceOrigin, destination: getHops() + " " + (e.ports.length ? 'port' + e.ports.length + ' :' : ' :'), destinationOrigin:destOrigin, data:e.data}, 
 			isObj: !(typeof e.data == 'string'), 
-			source: h(e.source) + " <" + sourceOrigin + ">", 
-			destination: h() + " <" + destOrigin + ">" });
+			source: getHops(e.source) + " <" + sourceOrigin + ">", 
+			destination: getHops() + " <" + destOrigin + ">" });
 	};
 
 	History.prototype.pushState = function (state, title, url) {
