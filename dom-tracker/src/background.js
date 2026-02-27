@@ -67,14 +67,14 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 		tab_data[sender.tab.id] = { frames: [], targets: [], rpo: [] };
 	}
 
-	knownFrames = Object.assign({}, ...tab_data[sender.tab.id].frames.map((f) => ({ [f.path + ':' + f.url.href]: f })));
-	currentFrames = Object.assign({}, ...msg.frames.map((f) => ({ [f.path + ':' + f.url.href]: f })));
+	knownFrames = Object.assign({}, ...tab_data[sender.tab.id].frames.map((f) => ({ [f.path + ':' + f.url]: f })));
+	currentFrames = Object.assign({}, ...msg.frames.map((f) => ({ [f.path + ':' + f.url]: f })));
 
-	knownTargets = Object.assign({}, ...tab_data[sender.tab.id].targets.map((f) => ({ [f.path + ':' + f.url.href]: f })));
-	currentTargets = Object.assign({}, ...msg.targets.map((f) => ({ [f.path + ':' + f.url.href]: f })));
+	knownTargets = Object.assign({}, ...tab_data[sender.tab.id].targets.map((f) => ({ [f.path + ':' + f.url]: f })));
+	currentTargets = Object.assign({}, ...msg.targets.map((f) => ({ [f.path + ':' + f.url]: f })));
 
-	knownRPO = Object.assign({}, ...tab_data[sender.tab.id].rpo.map((f) => ({ [f.path + ':' + f.url.href]: f })));
-	currentRPO = Object.assign({}, ...msg.rpo.map((f) => ({ [f.path + ':' + f.url.href]: f })));
+	knownRPO = Object.assign({}, ...tab_data[sender.tab.id].rpo.map((f) => ({ [f.path + ':' + f.url]: f })));
+	currentRPO = Object.assign({}, ...msg.rpo.map((f) => ({ [f.path + ':' + f.url]: f })));
 
 	tab_data[sender.tab.id].frames = Object.values(Object.assign({}, knownFrames, currentFrames));
 	tab_data[sender.tab.id].targets = Object.values(Object.assign({}, knownTargets, currentTargets));

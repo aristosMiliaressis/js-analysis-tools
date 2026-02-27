@@ -9,9 +9,9 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 	// query data out of the dom on interval
 	var interval = setInterval(() => {
 		var details = {}
-		details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
-		details.targets = getCrossWindowTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
-		details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location, path: getDomPath(elm) } });
+		details.frames = [].slice.call(document.getElementsByTagName('iframe')).map((elm) => { return { outerHTML: elm.outerHTML, url: document.location.href, path: getDomPath(elm) } });
+		details.targets = getCrossWindowTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location.href, path: getDomPath(elm) } });
+		details.rpo = getPathRelativeUriTargetingElements().map((elm) => { return { outerHTML: elm.outerHTML, url: document.location.href, path: getDomPath(elm) } });
 		details.dom = document.documentElement.outerHTML;
 		details.location = document.location.href;
 		details.localStorage = localStorage;

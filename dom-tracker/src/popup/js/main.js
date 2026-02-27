@@ -43,9 +43,9 @@ function populatePopupData() {
 
 		url = document.createElement('code');
 		br = document.createElement('br');
-		url.innerText = frame.url.href.substring(0, MAX_URL_LENGTH);
-		url.setAttribute('title', frame.url.href);
-		url.onclick = async () => { await navigator.clipboard.writeText(frame.url.href)};
+		url.innerText = frame.url.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', frame.url);
+		url.onclick = async () => { await navigator.clipboard.writeText(frame.url)};
 		path = document.createElement('code');
 		path.innerText = frame.path;
 		element.appendChild(url);
@@ -78,9 +78,9 @@ function populatePopupData() {
 
 		url = document.createElement('code');
 		br = document.createElement('br');
-		url.innerText = target.url.href.substring(0, MAX_URL_LENGTH);
-		url.setAttribute('title', target.url.href);
-		url.onclick = async () => { await navigator.clipboard.writeText(target.url.href)};
+		url.innerText = target.url.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', target.url);
+		url.onclick = async () => { await navigator.clipboard.writeText(target.url)};
 		path = document.createElement('code');
 		path.innerText = target.path;
 		element.appendChild(url);
@@ -113,9 +113,9 @@ function populatePopupData() {
 
 		url = document.createElement('code');
 		br = document.createElement('br');
-		url.innerText = rpo.url.href.substring(0, MAX_URL_LENGTH);
-		url.setAttribute('title', rpo.url.href);
-		url.onclick = async () => { await navigator.clipboard.writeText(rpo.url.href)};
+		url.innerText = rpo.url.substring(0, MAX_URL_LENGTH);
+		url.setAttribute('title', rpo.url);
+		url.onclick = async () => { await navigator.clipboard.writeText(rpo.url)};
 		path = document.createElement('code');
 		path.innerText = rpo.path;
 		element.appendChild(url);

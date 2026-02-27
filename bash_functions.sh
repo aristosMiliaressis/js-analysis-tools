@@ -119,15 +119,11 @@ function logMsg() {
 
 		cat $tmp | jq -c 'select(.assignment != null)' | anew -q cookies.json
 
+		cat $tmp | jq -c 'select(.frames != null) | .frames[]' | anew -q iframes.json
 
-		cat $tmp |
-			jq -c 'select(.iframes != null) | .frames[]' |
-			while read -r msg; do
-				html=$(echo "$msg" | jq -r .frame | sed 's,\%,%%,g')
-				domPath=$(echo "$msg" | jq -r .path | sed 's,\%,%%,g')
-				href=$(echo "$msg" | jq -r .url.href | sed 's,\%,%%,g')
-				printf "$href\n\n\`$domPath\`\n\`\`\`html\n$html\n\`\`\`\n"
-			done | anew -q iframes.md
+		cat $tmp | jq -c 'select(.ext == "domlogger++")' | anew -q domlogger.json
+
+		cat $tmp | jq -c 'select(.scannerType != null)' | anew -q cspt-finder.json
 
 		cat $tmp |
 			jq -c 'select(.dom != null)' |
@@ -143,38 +139,6 @@ function logMsg() {
 				echo "$dom" > "$path"
 				cat "$path" | htmlq -t 'script:not([src])' > "${path}.inline.js"
 			done
-
-		cat $tmp |
-			jq -c 'select(.localStorage != null)' |
-			while read -r msg; do
-				storage=$(echo "$msg" | jq -r .localStorage | sed 's,\%,%%,g')
-				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q localStorage.tsv
-			done
-
-		cat $tmp |
-			jq -c 'select(.sessionStorage != null)' |
-			while read -r msg; do
-				storage=$(echo "$msg" | jq -r .sessionStorage | sed 's,\%,%%,g')
-				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$(echo $storage | jq -c)" | anew -q sessionStorage.tsv
-			done
-
-		cat $tmp |
-			jq -c 'select(.cookies != null)' |
-			while read -r msg; do
-				storage=$(echo "$msg" | jq -r .cookies | sed 's,\%,%%,g')
-				location=$(echo "$msg" | jq -r .location | sed 's,\%,%%,g')
-				echo "$location"$(printf "\t")"$storage" | anew -q cookies.tsv
-			done
-
-		cat $tmp |
-			jq -c 'select(.ext == "domlogger++")' |
-			anew -q domlogger.json
-
-		cat $tmp |
-			jq -c 'select(.scannerType != null)' |
-			anew -q cspt-finder.json
 	done ) &
 
 	webhook_listener.py &
