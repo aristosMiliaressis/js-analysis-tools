@@ -117,6 +117,9 @@ function logMsg() {
 
 		cat $tmp | jq -c 'select(.listener != null)' | anew -q message_listeners.json
 
+		cat $tmp | jq -c 'select(.assignment != null)' | anew -q cookies.json
+
+
 		cat $tmp |
 			jq -c 'select(.iframes != null) | .frames[]' |
 			while read -r msg; do

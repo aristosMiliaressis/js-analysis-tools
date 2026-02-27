@@ -33,9 +33,7 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 					} else {
 						hops = "top";
 					}
-				} catch (e) {
-
-				}
+				} catch (e) { }
 
 				var storeEvent = new CustomEvent('cookieAccessTracker', { 'detail': { 
 					assignment: val, 
@@ -55,5 +53,4 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 			}
 		});
 	}
-
 })();

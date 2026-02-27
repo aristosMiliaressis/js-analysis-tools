@@ -15,6 +15,25 @@ function refreshCount(tab) {
 	});
 }
 
+function logToWebhook(data) {
+	extensionAPI.storage.local.get({
+		options: { }
+	}, function(i) {
+		if (i.options.WebhookUrl == "" || i.options.WebhookUrl == undefined) return;
+		if (new URL(data.href).origin.match(i.options.WebhookScope) == null) return;
+
+		try {
+			fetch(i.options.WebhookUrl, {
+				method: 'post',
+				headers: {
+					"Content-type": "application/json; charset=UTF-8"
+				},
+				body: JSON.stringify(data)
+			});
+		} catch(e) { }
+	});
+}
+
 extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 	if (msg.reset) {
 		tab_data[sender.tab.id] = [];
@@ -35,6 +54,7 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
         }
 
 		tab_data[sender.tab.id].push(msg);
+		logToWebhook(msg);
 	
 		refreshCount(sender.tab);
     });
