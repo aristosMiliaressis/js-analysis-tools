@@ -3,9 +3,12 @@
   "name": "hashChange-tracker",
   "description": "Monitors and indicates hashChange-listeners in the current window.",
   "version": "1.0.0",
+  "icons": {
+    "512": "icons/icon.png"
+  },
   
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js"
   },
 
   "content_scripts": [
@@ -13,20 +16,27 @@
       "run_at": "document_start",
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["content_script.js"]
+      "js": ["src/content_script.js"]
     },
     {
       "world": "MAIN",
       "run_at": "document_start",
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["injected.js"]
+      "js": ["src/injected.js"]
     }
   ],
 
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "512": "icons/icon.png"
+    },
     "default_title": "hashChange-tracker"
+  },
+
+  "options_ui": {
+    "page": "src/options/options.html"
   },
 
   "permissions": [

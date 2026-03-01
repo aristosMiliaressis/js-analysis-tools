@@ -113,15 +113,19 @@ function logMsg() {
 		echo > $tmp
 		mv .webhook.log $tmp 2>/dev/null
 
-		cat $tmp | jq -c 'select(.message != null) | {source,destination,href:.parent_url,message}' | anew -q messagelog.json
+		cat $tmp | jq -c 'select(.message != null) | {source,destination,href,message}' | anew -q messagelog.json
 
-		cat $tmp | jq -c 'select(.listener != null)' | anew -q message_listeners.json
+		cat $tmp | jq -c 'select(.ext == "postMessage-tracker") | .data' | anew -q message_listeners.json
+
+		cat $tmp | jq -c 'select(.ext == "hashChange-tracker") | .data' | anew -q hashchange_listeners.json
 
 		cat $tmp | jq -c 'select(.assignment != null)' | anew -q cookies.json
 
 		cat $tmp | jq -c 'select(.frames != null) | .frames[]' | anew -q iframes.json
+        
+		cat $tmp | jq -c 'select(.targets != null) | .targets[]' | anew -q targets.json
 
-		cat $tmp | jq -c 'select(.ext == "domlogger++")' | anew -q domlogger.json
+		cat $tmp | jq -c 'select(.ext == "domlogger++") | .data[]' | anew -q domlogger.json
 
 		cat $tmp | jq -c 'select(.scannerType != null)' | anew -q cspt-finder.json
 

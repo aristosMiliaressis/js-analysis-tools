@@ -25,19 +25,18 @@ function logToWebhook(data) {
 		options: { }
 	}, function(i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
-		if (new URL(data.parent_url).origin.match(i.options.webhook_scope) == null) return;
+		if (new URL(data.href).origin.match(i.options.webhook_scope) == null) return;
 
 		if (!i.options.webhook_listeners && data.listener != undefined) return;
 		if (!i.options.webhook_messages && data.message != undefined) return;
 
-		data = JSON.stringify(data);
 		try {
 			fetch(i.options.webhook_url, {
 				method: 'post',
 				headers: {
 					"Content-type": "application/json; charset=UTF-8"
 				},
-				body: data
+				body: JSON.stringify({ ext: 'postMessage-tracker', data: data})
 			});
 		} catch(e) { }
 	});
@@ -47,7 +46,7 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	tabId = sender.tab.id;
 	if(msg.listener) {
 		if(msg.listener == 'function () { [native code] }') return;
-		msg.parent_url = sender.tab.url;
+		msg.href = sender.tab.url;
 
 		if(!tab_listeners[tabId]) tab_listeners[tabId] = [];
 		if (tab_listeners[tabId].some(l => l.hops == msg.hops && l.stack == msg.stack)) return;
@@ -55,7 +54,7 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 
 		logToWebhook(msg);
 	} else if (msg.message) {
-		msg.parent_url = sender.tab.url;
+		msg.href = sender.tab.url;
 
 		if(!tab_messages[tabId]) tab_messages[tabId] = [];
 		if (isInterestingMessage(msg))
