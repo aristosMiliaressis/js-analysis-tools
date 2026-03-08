@@ -42,7 +42,7 @@ function logToWebhook(data) {
 	});
 }
 
-extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+extensionAPI.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
 	tabId = sender.tab.id;
 	if(msg.listener) {
 		if(msg.listener == 'function () { [native code] }') return;
@@ -57,8 +57,11 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 		msg.href = sender.tab.url;
 
 		if(!tab_messages[tabId]) tab_messages[tabId] = [];
-		if (isInterestingMessage(msg))
-			tab_messages[tabId][tab_messages[tabId].length] = msg;
+		if (await isInterestingMessage(msg)) {
+			if (!tab_messages[tabId].some(m => m.href == msg.href && m.message == msg.message))
+				tab_messages[tabId][tab_messages[tabId].length] = msg;
+			tab_messages[tabId] = tab_messages[tabId].slice(-100);
+		}
 
 		logToWebhook(msg);
 	}
@@ -82,20 +85,21 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	}
 });
 
-function isInterestingMessage(msg) {
+async function isInterestingMessage(msg) {
 	msg.matches = {};
 
 	const data = typeof msg.message.data == 'string' ? msg.message.data : JSON.stringify(msg.message.data);
 	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
 	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
 
-	extensionAPI.storage.sync.get({
-		options: { }
-	}, function(i) {
-		for (let pattern of i.options.messageMatchers) {
-			data.matchAll(RegExp(pattern, "g")).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-		}
-});
+	const i = await extensionAPI.storage.sync.get();
+
+	for (let pattern of i.options.messageMatchers) {
+		data.matchAll(RegExp(pattern, "g")).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	}
+
+	if (!i.options.detectBrowserStorageReflections)
+		return Object.keys(msg.matches).length > 0;
 
 	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
 					...msg.localStorage,
@@ -110,6 +114,13 @@ function isInterestingMessage(msg) {
 	
 	return Object.keys(msg.matches).length > 0;
 }
+
+// popup connect
+extensionAPI.runtime.onConnect.addListener(function(port) {
+	port.onMessage.addListener(function(msg) {
+		port.postMessage({listeners:tab_listeners, messages:tab_messages});
+	});
+})
 
 extensionAPI.tabs.onUpdated.addListener(function(tabId, props) {
 	if (props.status == "complete") {
@@ -142,9 +153,3 @@ extensionAPI.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	selectedId = tabs[0].id;
 	refreshCount();
 });
-
-extensionAPI.runtime.onConnect.addListener(function(port) {
-	port.onMessage.addListener(function(msg) {
-		port.postMessage({listeners:tab_listeners, messages:tab_messages});
-	});
-})

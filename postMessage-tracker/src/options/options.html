@@ -2,14 +2,13 @@
 <html>
 <head></head>
 <body>
-	<div id='response'></div>
 	<div id="options">
 		<fieldset>
 			<legend>Webhook Options</legend>
-			<input type="checkbox" id="webhook_listeners" />
-			<label for="webhook_listeners">Send Listeners</label>
 			<input type="checkbox" id="webhook_messages" />
 			<label for="webhook_messages">Send Messages</label>
+			<input type="checkbox" id="webhook_listeners" />
+			<label for="webhook_listeners">Send Listeners</label>
 			<br>
 			<br>
 			<label for="webhook_url">Webhook URL</label>
@@ -20,7 +19,45 @@
 		</fieldset>
 
 		<fieldset>
-			<legend>Message Matchers</legend>
+			<legend>Listener Options</legend>
+			<input type="checkbox" id="detectMessagePortListeners" />
+			<label for="detectMessagePortListeners">Detect MessagePort Listeners</label>
+			<br>
+			<input type="checkbox" id="detectWorkerListeners" />
+			<label for="detectWorkerListeners">Detect Worker Listeners</label>
+			<br>
+			<input type="checkbox" id="detectServiceWorkerListeners" />
+			<label for="detectServiceWorkerListeners">Detect ServiceWorker Listeners</label>
+			<br>
+			<input type="checkbox" id="detectSharedWorkerListeners" />
+			<label for="detectSharedWorkerListeners">Detect SharedWorker Listeners</label>
+			<br>
+			<input type="checkbox" id="detectBroadcastChannelListeners" />
+			<label for="detectBroadcastChannelListeners">Detect BoadcastChannel Listeners</label>
+			<br>
+		</fieldset>
+
+		<fieldset>
+			<legend>Message Options</legend>
+			<input type="checkbox" id="detectMessagePortMessages" />
+			<label for="detectMessagePortMessages">Detect MessagePort Messages</label>
+			<br>
+			<input type="checkbox" id="detectWorkerMessages" />
+			<label for="detectWorkerMessages">Detect Worker Messages</label>
+			<br>
+			<input type="checkbox" id="detectServiceWorkerMessages" />
+			<label for="detectServiceWorkerMessages">Detect ServiceWorker Messages</label>
+			<br>
+			<input type="checkbox" id="detectSharedWorkerMessages" />
+			<label for="detectSharedWorkerMessages">Detect SharedWorker Messages</label>
+			<br>
+			<input type="checkbox" id="detectBoadcastChannelMessages" />
+			<label for="detectBoadcastChannelMessages">Detect BoadcastChannel Messages</label>
+			<br>
+			<input type="checkbox" id="detectBrowserStorageReflections" />
+			<label for="detectBrowserStorageReflections">Match browser storage reflections</label>
+			<br><br>
+			<label for="messageMatchers">Message Matchers</label>
 			<select id="messageMatchers" multiple style="width: 100%"></select>
 			<br><br>
 			<input id=patternInput type="text" style="width: 64%" placeholder="Regex pattern">

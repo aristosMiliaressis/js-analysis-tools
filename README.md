@@ -31,9 +31,10 @@ go install github.com/denandz/sourcemapper@latest
 `postMessage-tracker` this is Frans Rosen's extension with a few changes, original [here](https://github.com/fransr/postMessage-tracker).
 <br>
 Changes:
-- unwraps binded message listeners
-- added a new tab for messages matching certain interesting values like uuids, html tags, current href, blob urls & urls with params
-- Logs message content (not just message handlers) to webhook
+- added configurable support for MesssagePort/BroadcastChannel/Worker/SharedWorker/ServiceWorker messaging
+- added a new tab for messages matching with configurable regex matchers
+- [unwraps binded message listeners](./postMessage-tracker/src/injected.js#L320)
+- extended webhook support to send messages also
 - Filters postMessage handlers registered by extensions
 - Filters postMessages in the console coming from the following extensions
   - DOMInvador

@@ -113,9 +113,9 @@ function logMsg() {
 		echo > $tmp
 		mv .webhook.log $tmp 2>/dev/null
 
-		cat $tmp | jq -c 'select(.message != null) | {source,destination,href,message}' | anew -q messagelog.json
+		cat $tmp | jq -c 'select(.ext == "postMessage-tracker" and .data.message != null) | {source,destination,href,message}' | anew -q messagelog.json
 
-		cat $tmp | jq -c 'select(.ext == "postMessage-tracker") | .data' | anew -q message_listeners.json
+		cat $tmp | jq -c 'select(.ext == "postMessage-tracker" and .data.listener != null) | .data' | anew -q message_listeners.json
 
 		cat $tmp | jq -c 'select(.ext == "hashChange-tracker") | .data' | anew -q hashchange_listeners.json
 

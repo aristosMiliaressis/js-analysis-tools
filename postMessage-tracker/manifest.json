@@ -3,6 +3,10 @@
   "name": "postMessage-tracker",
   "description": "Monitors and indicates postMessage-listeners in the current window.",
   "version": "1.0.0",
+  "icons": {
+    "512": "icons/icon.png"
+  },
+
   "background": {
     "service_worker": "src/background.js"
   },
@@ -29,7 +33,10 @@
 
   "action": {
     "default_popup": "src/popup/popup.html",
-    "default_title": "postMessage-tracker"
+    "default_title": "postMessage-tracker",
+    "default_icon": {
+      "512": "icons/icon.png"
+    }
   },
 
   "permissions": [

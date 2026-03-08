@@ -1,11 +1,11 @@
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
-document.addEventListener('postMessageTracker', function (event) {
+document.addEventListener('postMessageTracker:data', function (event) {
 	extensionAPI.runtime.sendMessage(event.detail);
 });
 
-//we use this to separate fragment changes with location changes
-window.addEventListener('beforeunload', function (event) {
-	var storeEvent = new CustomEvent('postMessageTracker', { 'detail': { changePage: true } });
-	document.dispatchEvent(storeEvent);
+document.addEventListener('postMessageTracker:init', function (_) {
+  extensionAPI.storage.sync.get({	options: { } }, function(config) {
+		document.dispatchEvent(new CustomEvent("postMessageTracker:conf", { detail: config }));
+	});
 });
