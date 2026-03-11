@@ -16,9 +16,7 @@ function refreshCount(tab) {
 }
 
 function logToWebhook(data) {
-	extensionAPI.storage.local.get({
-		options: { }
-	}, function(i) {
+	extensionAPI.storage.local.get(null, function(i) {
 		if (i.options.WebhookUrl == "" || i.options.WebhookUrl == undefined) return;
 		if (new URL(data.href).origin.match(i.options.WebhookScope) == null) return;
 
@@ -44,9 +42,7 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	if (tab_data[sender.tab.id] == undefined) tab_data[sender.tab.id] = []
 	if (tab_data[sender.tab.id].some(l => l.origin == msg.origin && l.name == msg.name && l.value == msg.value)) return;
 
-	extensionAPI.storage.local.get({
-        options: { PatternBlacklist: [] }
-    }, function (i) {
+	extensionAPI.storage.local.get(null, function (i) {
         for (let pattern of i.options.PatternBlacklist) {
             let re = new RegExp(pattern)
 			if (re.test(msg.assignment))

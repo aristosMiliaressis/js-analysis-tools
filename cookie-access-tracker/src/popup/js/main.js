@@ -45,7 +45,17 @@ function populatePopupData() {
 		pre = document.createElement('pre');
 		pre.innerText = setCookie.assignment;
 		element.appendChild(pre);
-
+		if (setCookie.findings.length > 0) {
+			let findings = '';
+			setCookie.findings.forEach(f => {
+				findings += `reflection from ${f.type} ${f.argumentValue}\n`;
+			});
+			p = document.createElement('p');
+			p.innerText = findings;
+			p.style = 'color:red';
+			element.appendChild(p);
+		}
+		element.appendChild(document.createElement('hr'));
 		elementList.appendChild(element);
 	}
 
