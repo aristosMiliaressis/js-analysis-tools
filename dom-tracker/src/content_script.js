@@ -52,9 +52,7 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 })();
 
 function applyTabOptions(skipMsg) {
-	extensionAPI.storage.local.get({
-		options: {}
-	}, function (i) {
+	extensionAPI.storage.local.get(null, function (i) {
 		if (document.getElementById('dom-tracker-stylesheet') == null) {
 			var style = document.createElement('style');
 			style.id = 'dom-tracker-stylesheet';

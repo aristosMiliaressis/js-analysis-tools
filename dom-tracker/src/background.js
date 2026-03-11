@@ -27,19 +27,17 @@ function refreshCount(tab) {
 }
 
 function logToWebhook(data) {
-	extensionAPI.storage.local.get({
-		options: {}
-	}, function (i) {
+	extensionAPI.storage.local.get(null, function (i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
 		if (new URL(data.location).origin.match(i.options.webhook_scope) == null) return;
 
-		if (!i.options.webhook_iframe) data.frames = undefined;
-		if (!i.options.webhook_target) data.targets = undefined;
-		if (!i.options.webhook_rpo) data.rpo = undefined;
-		if (!i.options.webhook_dom) data.dom = undefined;
-		if (!i.options.webhook_local_storage) data.localStorage = undefined;
-		if (!i.options.webhook_session_storage) data.sessionStorage = undefined;
-		if (!i.options.webhook_cookies) data.cookies = undefined;
+		if (!i.options.webhook_iframe) delete data.frames;
+		if (!i.options.webhook_target) delete data.targets;
+		if (!i.options.webhook_rpo) delete data.rpo;
+		if (!i.options.webhook_dom) delete data.dom;
+		if (!i.options.webhook_local_storage) delete data.localStorage;
+		if (!i.options.webhook_session_storage) delete data.sessionStorage;
+		if (!i.options.webhook_cookies) delete data.cookies;
 		if (!data.cookies && !data.localStorage && !data.sessionStorage && !data.dom && !data.rpo && !data.targets && !data.frames)
 			return
 

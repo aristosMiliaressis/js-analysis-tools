@@ -2,13 +2,13 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
 var tab_listeners = {};
 var tab_push = {}, tab_lasturl = {};
-var selectedId = -1;
+var activeTabId = -1;
 
 function refreshCount() {
-	txt = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
-	extensionAPI.tabs.get(selectedId, function() {
+	txt = tab_listeners[activeTabId] ? tab_listeners[activeTabId].length : 0;
+	extensionAPI.tabs.get(activeTabId, function() {
 		if (!extensionAPI.runtime.lastError) {
-			extensionAPI.action.setBadgeText({"text": ''+txt, tabId: selectedId});
+			extensionAPI.action.setBadgeText({"text": ''+txt, tabId: activeTabId});
 			if(txt > 0) {
 				extensionAPI.action.setBadgeBackgroundColor({ color: [0, 255, 0, 255]});
 			} else {
@@ -19,9 +19,7 @@ function refreshCount() {
 }
 
 function logToWebhook(data) {
-	extensionAPI.storage.sync.get({
-		options: { }
-	}, function(i) {
+	extensionAPI.storage.sync.get(null, function(i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
 		if (new URL(data.href).origin.match(i.options.webhook_scope) == null) return;
 
@@ -65,39 +63,40 @@ extensionAPI.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 	}
 });
 
-extensionAPI.tabs.onUpdated.addListener(function(tabId, props) {
-	if (props.status == "complete") {
-		if(tabId == selectedId) refreshCount();
-	} else if(props.status) {
-		if(tab_push[tabId]) {
-			//this was a pushState, ignore
-			delete tab_push[tabId];
-		} else {
-			//if(props.url && tab_lasturl[tabId] && props.url.split('#')[0] == tab_lasturl[tabId]) {
-				//same url as before, only a hash change, ignore
-			//} else 
-			if(!tab_lasturl[tabId]) {
-				//wipe on other statuses, but only if lastpage is not set (aka, changePage did not run)
-				tab_listeners[tabId] = [];
-			}
-		}
-	}
-	if(props.status == "loading")
-		tab_lasturl[tabId] = true;
-});
-
-extensionAPI.tabs.onActivated.addListener(function(activeInfo) {
-	selectedId = activeInfo.tabId;
-	refreshCount();
-});
-
-extensionAPI.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	selectedId = tabs[0].id;
-	refreshCount();
-});
-
+// popup connect
 extensionAPI.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function(msg) {
 		port.postMessage({listeners:tab_listeners});
 	});
 })
+
+// tab changed
+extensionAPI.tabs.onActivated.addListener(function(activeInfo) {
+	activeTabId = activeInfo.tabId;
+	refreshCount();
+});
+
+// tab url changed
+extensionAPI.tabs.onUpdated.addListener(function(tabId, props) {
+	if (props.status == "complete") {
+		if (tabId == activeTabId) {
+			// avtive tab changed url, refresh badge count
+			refreshCount();
+		}
+	} else if (props.status) {
+		if (tab_push[tabId]) {
+			//this was a pushState, ignore
+			delete tab_push[tabId];
+		} else {
+			if (props.url && tab_lasturl[tabId] && props.url.split('#')[0] == tab_lasturl[tabId]) {
+				//same url as before, only a hash change, ignore
+			} else if (!tab_lasturl[tabId]) {
+				//wipe on other statuses, but only if lastpage is not set (aka, changePage did not run)
+				tab_listeners[tabId] = [];
+				tab_messages[tabId] = [];
+			}
+		}
+	}
+	if (props.status == "loading")
+		tab_lasturl[tabId] = true;
+});

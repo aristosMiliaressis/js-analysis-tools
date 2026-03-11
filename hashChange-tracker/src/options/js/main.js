@@ -16,9 +16,7 @@ function save_options() {
 }
 
 function restore_options() {
-	extensionAPI.storage.sync.get({
-		options: { }
-	}, function(i) {
+	extensionAPI.storage.sync.get(null, function(i) {
 		webhook_url.value = i.options.webhook_url || '';
 		webhook_scope.value = i.options.webhook_scope || '';
 	});

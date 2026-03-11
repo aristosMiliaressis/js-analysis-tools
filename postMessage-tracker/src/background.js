@@ -3,14 +3,14 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 var tab_listeners = {};
 var tab_messages = {};
 var tab_push = {}, tab_lasturl = {};
-var selectedId = -1;
+var activeTabId = -1;
 
 function refreshCount() {
-	listenerCount = tab_listeners[selectedId] ? tab_listeners[selectedId].length : 0;
-	messageCount = tab_messages[selectedId] ? tab_messages[selectedId].length : 0;
-	extensionAPI.tabs.get(selectedId, function() {
+	listenerCount = tab_listeners[activeTabId] ? tab_listeners[activeTabId].length : 0;
+	messageCount = tab_messages[activeTabId] ? tab_messages[activeTabId].length : 0;
+	extensionAPI.tabs.get(activeTabId, function() {
 		if (!extensionAPI.runtime.lastError) {
-			extensionAPI.action.setBadgeText({"text": listenerCount+':'+messageCount, tabId: selectedId});
+			extensionAPI.action.setBadgeText({"text": listenerCount+':'+messageCount, tabId: activeTabId});
 			if(listenerCount > 0) {
 				extensionAPI.action.setBadgeBackgroundColor({ color: [255, 0, 0, 255]});
 			} else {
@@ -21,9 +21,7 @@ function refreshCount() {
 }
 
 function logToWebhook(data) {
-	extensionAPI.storage.sync.get({
-		options: { }
-	}, function(i) {
+	extensionAPI.storage.sync.get(null, function(i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
 		if (new URL(data.href).origin.match(i.options.webhook_scope) == null) return;
 
@@ -40,6 +38,36 @@ function logToWebhook(data) {
 			});
 		} catch(e) { }
 	});
+}
+
+async function isInterestingMessage(msg) {
+	msg.matches = {};
+
+	const data = typeof msg.message.data == 'string' ? msg.message.data : JSON.stringify(msg.message.data);
+	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
+	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
+
+	const i = await extensionAPI.storage.sync.get();
+
+	for (let pattern of i.options.messageMatchers) {
+		data.matchAll(RegExp(pattern, "g")).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+	}
+
+	if (!i.options.detectBrowserStorageReflections)
+		return Object.keys(msg.matches).length > 0;
+
+	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
+					...msg.localStorage,
+					...msg.sessionStorage]) {
+		if (!value) continue;
+
+		if (value.length >= 12 && value.length < 32*1024) {
+			let regex = RegExp(RegExp.escape(value), "ig");
+			data.matchAll(regex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
+		}		
+	}
+	
+	return Object.keys(msg.matches).length > 0;
 }
 
 extensionAPI.runtime.onMessage.addListener(async function(msg, sender, sendResponse) {
@@ -85,36 +113,6 @@ extensionAPI.runtime.onMessage.addListener(async function(msg, sender, sendRespo
 	}
 });
 
-async function isInterestingMessage(msg) {
-	msg.matches = {};
-
-	const data = typeof msg.message.data == 'string' ? msg.message.data : JSON.stringify(msg.message.data);
-	const currentHrefRegex = RegExp(RegExp.escape(msg.href), "ig");
-	data.matchAll(currentHrefRegex).toArray().forEach(match => msg.matches[cdata.indexOf(match[0])] = match[0])
-
-	const i = await extensionAPI.storage.sync.get();
-
-	for (let pattern of i.options.messageMatchers) {
-		data.matchAll(RegExp(pattern, "g")).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-	}
-
-	if (!i.options.detectBrowserStorageReflections)
-		return Object.keys(msg.matches).length > 0;
-
-	for (value of [...msg.cookie.split(';').map(c => c.split('=')[1]),
-					...msg.localStorage,
-					...msg.sessionStorage]) {
-		if (!value) continue;
-
-		if (value.length >= 12 && value.length < 32*1024) {
-			let regex = RegExp(RegExp.escape(value), "ig");
-			data.matchAll(regex).toArray().forEach(match => msg.matches[data.indexOf(match[0])] = match[0])
-		}		
-	}
-	
-	return Object.keys(msg.matches).length > 0;
-}
-
 // popup connect
 extensionAPI.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function(msg) {
@@ -122,34 +120,34 @@ extensionAPI.runtime.onConnect.addListener(function(port) {
 	});
 })
 
+// tab changed
+extensionAPI.tabs.onActivated.addListener(function(activeInfo) {
+	activeTabId = activeInfo.tabId;
+	refreshCount();
+});
+
+// tab url changed
+
 extensionAPI.tabs.onUpdated.addListener(function(tabId, props) {
 	if (props.status == "complete") {
-		if(tabId == selectedId) refreshCount();
-	} else if(props.status) {
-		if(tab_push[tabId]) {
+		if (tabId == activeTabId) {
+			// avtive tab changed url, refresh badge count
+			refreshCount();
+		}
+	} else if (props.status) {
+		if (tab_push[tabId]) {
 			//this was a pushState, ignore
 			delete tab_push[tabId];
 		} else {
-			//if(props.url && tab_lasturl[tabId] && props.url.split('#')[0] == tab_lasturl[tabId]) {
+			if (props.url && tab_lasturl[tabId] && props.url.split('#')[0] == tab_lasturl[tabId]) {
 				//same url as before, only a hash change, ignore
-			//} else 
-			if(!tab_lasturl[tabId]) {
+			} else if (!tab_lasturl[tabId]) {
 				//wipe on other statuses, but only if lastpage is not set (aka, changePage did not run)
 				tab_listeners[tabId] = [];
 				tab_messages[tabId] = [];
 			}
 		}
 	}
-	if(props.status == "loading")
+	if (props.status == "loading")
 		tab_lasturl[tabId] = true;
-});
-
-extensionAPI.tabs.onActivated.addListener(function(activeInfo) {
-	selectedId = activeInfo.tabId;
-	refreshCount();
-});
-
-extensionAPI.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	selectedId = tabs[0].id;
-	refreshCount();
 });

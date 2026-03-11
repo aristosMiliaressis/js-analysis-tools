@@ -45,9 +45,7 @@ function save_options() {
 }
 
 function restore_options() {
-	extensionAPI.storage.sync.get({
-		options: { messageMatchers: [] }
-	}, function(i) {
+	extensionAPI.storage.sync.get(null, function(i) {
 		webhook_url.value = i.options.webhook_url || '';
 		webhook_scope.value = i.options.webhook_scope || '';
 		webhook_listeners.checked = i.options.webhook_listeners === undefined ? false : i.options.webhook_listeners;

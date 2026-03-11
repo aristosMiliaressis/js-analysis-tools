@@ -140,9 +140,7 @@ function setupCheckboxes() {
 	if (checkbox == undefined)
 		return
 	
-	extensionAPI.storage.local.get({
-		options: {}
-	}, function (i) {	
+	extensionAPI.storage.local.get(null, function (i) {	
 		if (document.querySelector('#iframeTab.active-content') != null && i.options.highlight_iframe) {
 			checkbox.checked = true;
 		} else if (document.querySelector('#targetTab.active-content') != null && i.options.highlight_target) {
@@ -151,9 +149,7 @@ function setupCheckboxes() {
 	});
 	
 	checkbox.addEventListener('change', (event) => {
-		extensionAPI.storage.local.get({
-			options: {}
-		}, function (i) {
+		extensionAPI.storage.local.get(null, function (i) {
 			if (document.querySelector('#iframeTab.active-content') != null) {
 				i.options.highlight_iframe = checkbox.checked;
 			} else if (document.querySelector('#targetTab.active-content') != null) {

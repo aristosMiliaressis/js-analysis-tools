@@ -25,9 +25,7 @@ function save_options() {
 }
 
 function restore_options() {
-    extensionAPI.storage.local.get({
-        options: { }
-    }, function (i) {
+    extensionAPI.storage.local.get(null, function (i) {
         webhook_url.value = i.options.webhook_url || '';
         webhook_scope.value = i.options.webhook_scope || '';
         popup_iframe.checked = i.options.popup_iframe === undefined ? true : i.options.popup_iframe;

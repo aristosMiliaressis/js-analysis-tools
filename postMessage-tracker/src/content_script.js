@@ -5,7 +5,7 @@ document.addEventListener('postMessageTracker:data', function (event) {
 });
 
 document.addEventListener('postMessageTracker:init', function (_) {
-  extensionAPI.storage.sync.get({	options: { } }, function(config) {
+  extensionAPI.storage.sync.get(null, function(config) {
 		document.dispatchEvent(new CustomEvent("postMessageTracker:conf", { detail: config }));
 	});
 });
