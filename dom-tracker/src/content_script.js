@@ -203,5 +203,15 @@ function getCrossWindowTargetingElements() {
 			elements.push(area);
 	}
 
+	for (let button of document.querySelectorAll('button[formtarget]')) {
+		if (!["_blank", "_self", ""].includes(button.getAttribute('formtarget')))
+			elements.push(button);
+	}
+
+	for (let input of document.querySelectorAll('input[formtarget]')) {
+		if (!["_blank", "_self", ""].includes(input.getAttribute('formtarget')))
+			elements.push(input);
+	}
+
 	return elements;
 }
