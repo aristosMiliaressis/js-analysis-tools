@@ -93,14 +93,14 @@ function queryValuesScan(name, value) {
     const findings = [];
 
     queryValues.forEach((queryValue) => {
-        if (queryValue === name || matchInBase64Regex(name).test(queryValue)) {
+        if (queryValue === name || (name.length > 4 && matchInBase64Regex(name).test(queryValue))) {
             findings.push({
                 type: "QueryValue",
                 argumentValue: queryValue
             });
         }
 
-        if (queryValue === value || matchInBase64Regex(value).test(queryValue)) {
+        if (queryValue === value || (value.length > 4 && matchInBase64Regex(value).test(queryValue))) {
             findings.push({
                 type: "QueryValue",
                 argumentValue: queryValue
@@ -121,14 +121,14 @@ function hashFragmentScan(name, value) {
     const findings = [];
 
     hashValues.forEach((hashValue) => {
-        if (hashValue === name || matchInBase64Regex(name).test(hashValue)) {
+        if (hashValue === name || (name.length > 4 && matchInBase64Regex(name).test(hashValue))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashValue
             });
         }
 
-        if (hashValue === value || matchInBase64Regex(value).test(hashValue)) {
+        if (hashValue === value || (value.length > 4 && matchInBase64Regex(value).test(hashValue))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashValue
@@ -137,28 +137,28 @@ function hashFragmentScan(name, value) {
     });
 
     const hashNoQuery = hash.split("?")[0];
-    if (hashNoQuery === name || matchInBase64Regex(name).test(hashNoQuery)) {
+    if (hashNoQuery === name || (name.length > 4 && matchInBase64Regex(name).test(hashNoQuery))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hashNoQuery
         });
     }
 
-    if (hashNoQuery === value || matchInBase64Regex(value).test(hashNoQuery)) {
+    if (hashNoQuery === value || (value.length > 4 && matchInBase64Regex(value).test(hashNoQuery))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hashNoQuery
         });
     }
 
-    if (hash === name || matchInBase64Regex(name).test(hash)) {
+    if (hash === name || (name.length > 4 && matchInBase64Regex(name).test(hash))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hash
         });
     }
 
-    if (hash === value || matchInBase64Regex(value).test(hash)) {
+    if (hash === value || (value.length > 4 && matchInBase64Regex(value).test(hash))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hash
@@ -174,14 +174,14 @@ function hashFragmentScan(name, value) {
         && !isEmail.test(hashSegment))
             return;
 
-        if (hashSegment === name || matchInBase64Regex(name).test(hashSegment)) {
+        if (hashSegment === name || (name.length > 4 && matchInBase64Regex(name).test(hashSegment))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashSegment
             });
         }
 
-        if (hashSegment === value || matchInBase64Regex(value).test(hashSegment)) {
+        if (hashSegment === value || (value.length > 4 && matchInBase64Regex(value).test(hashSegment))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashSegment
@@ -205,14 +205,14 @@ function pathArgumentScan(name, value) {
             && !isEmail.test(navSegment))
             return;
 
-        if (navSegment === name || matchInBase64Regex(name).test(navSegment)) {
+        if (navSegment === name || (name.length > 4 && matchInBase64Regex(name).test(navSegment))) {
             findings.push({
                 type: "PathArgument",
                 argumentValue: navSegment
             });
         }
 
-        if (navSegment === value || matchInBase64Regex(value).test(navSegment)) {
+        if (navSegment === value || (value.length > 4 && matchInBase64Regex(value).test(navSegment))) {
             findings.push({
                 type: "PathArgument",
                 argumentValue: navSegment

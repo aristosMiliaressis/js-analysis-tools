@@ -7,9 +7,11 @@ extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 	port.postMessage({ tabId: tabs[0].id });
 });
 
+port.postMessage("get-stuff");
 port.onMessage.addListener(function (cookies) {
 	_cookies = cookies;
-	populatePopupData();
+	if (!!_cookies)
+		populatePopupData();
 });
 
 exportBtn.onclick = exportCookies;
@@ -45,7 +47,7 @@ function populatePopupData() {
 		pre = document.createElement('pre');
 		pre.innerText = setCookie.assignment;
 		element.appendChild(pre);
-		if (setCookie.findings.length > 0) {
+		if (!!setCookie.findings && setCookie.findings.length > 0) {
 			let findings = '';
 			setCookie.findings.forEach(f => {
 				findings += `reflection from ${f.type} ${f.argumentValue}\n`;
