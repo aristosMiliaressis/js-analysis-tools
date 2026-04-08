@@ -1,8 +1,6 @@
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
-var port = extensionAPI.runtime.connect({
-	name: "Sample Communication"
-});
+var port = extensionAPI.runtime.connect({ name: "hashChange-tracker" });
 
 function loaded() {
 	port.postMessage("get-stuff");

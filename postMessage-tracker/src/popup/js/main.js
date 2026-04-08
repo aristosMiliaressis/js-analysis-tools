@@ -1,7 +1,7 @@
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
 let data = {};
-let port = extensionAPI.runtime.connect({ name: "Sample Communication" });
+let port = extensionAPI.runtime.connect({ name: "postMessage-tracker" });
 
 listenersTabButton.onclick = async (evt) => await openTab('listeners');
 messagesTabButton.onclick = async (evt) => await openTab('messages');

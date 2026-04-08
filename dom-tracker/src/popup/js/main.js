@@ -13,7 +13,8 @@ extensionAPI.storage.local.get({
 });
 
 let data = {};
-var port = extensionAPI.runtime.connect({ name: "Extension MessageChannel" });
+port.postMessage("get-stuff");
+var port = extensionAPI.runtime.connect({ name: "dom-tracker" });
 
 port.onMessage.addListener(function (msg) {
 	data = msg;
