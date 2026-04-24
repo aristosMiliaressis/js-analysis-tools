@@ -58,7 +58,7 @@ function extractQueryValues(q) {
 }
 
 function matchInBase64Regex(text) {
-    const results = [text];
+    const results = [RegExp.escape(text)];
     const bytes = new TextEncoder().encode(text);
 
     const toBase64 = (buffer) => btoa(String.fromCharCode(...buffer)).replace(/=/g, '');
