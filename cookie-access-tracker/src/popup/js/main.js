@@ -1,13 +1,12 @@
 var _cookies = [];
 
 const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
-const port = extensionAPI.runtime.connect({ name: "Extension MessageChannel" });
+const port = extensionAPI.runtime.connect({ name: "cookie-access-tracker" });
 
 extensionAPI.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 	port.postMessage({ tabId: tabs[0].id });
 });
 
-port.postMessage("get-stuff");
 port.onMessage.addListener(function (cookies) {
 	_cookies = cookies;
 	if (!!_cookies)

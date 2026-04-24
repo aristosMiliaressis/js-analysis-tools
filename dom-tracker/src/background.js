@@ -29,7 +29,7 @@ function refreshCount(tab) {
 function logToWebhook(data) {
 	extensionAPI.storage.local.get(null, function (i) {
 		if (i.options.webhook_url == "" || i.options.webhook_url == undefined) return;
-		if (new URL(data.location).origin.match(i.options.webhook_scope) == null) return;
+		if (data.location == undefined || new URL(data.location).origin.match(i.options.webhook_scope) == null) return;
 
 		if (!i.options.webhook_iframe) delete data.frames;
 		if (!i.options.webhook_target) delete data.targets;
