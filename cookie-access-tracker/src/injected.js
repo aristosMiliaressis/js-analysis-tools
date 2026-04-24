@@ -51,12 +51,6 @@ function getPathCombinations(url) {
     return uniqueCombinations;
 }
 
-function extractQueryValues(q) {
-    return Array.from(new URLSearchParams(q))
-        .map((p) => p[1])
-        .filter((p) => p.length > 0);
-}
-
 function matchInBase64Regex(text) {
     const results = [RegExp.escape(text)];
     const bytes = new TextEncoder().encode(text);
@@ -88,22 +82,25 @@ function matchInBase64Regex(text) {
 }
 
 function queryValuesScan(name, value) {
-    const queryValues = extractQueryValues(location.search);
 
     const findings = [];
 
-    queryValues.forEach((queryValue) => {
-        if (queryValue === name || (name.length > 4 && matchInBase64Regex(name).test(queryValue))) {
+    location.search.slice(1).split("&")
+        .map(p => { return { name:p.split("=")[0],value:p.split("=")[1] } })
+        .forEach((param) => {
+        if (param.value === name || (name.length > 4 && matchInBase64Regex(name).test(param.value))) {
             findings.push({
                 type: "QueryValue",
-                argumentValue: queryValue
+                parameterName: param.name,
+                argumentValue: param.value
             });
         }
 
-        if (queryValue === value || (value.length > 4 && matchInBase64Regex(value).test(queryValue)) || (queryValue.length > 4 && matchInBase64Regex(queryValue).test(value))) {
+        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value.length > 4 && matchInBase64Regex(param.value).test(value))) {
             findings.push({
                 type: "QueryValue",
-                argumentValue: queryValue
+                parameterName: param.name,
+                argumentValue: param.value
             });
         }
     });
@@ -113,25 +110,28 @@ function queryValuesScan(name, value) {
 
 function hashFragmentScan(name, value) {
     const hash = location.hash.split("#")[1];
-    const hashValues = extractQueryValues(hash);
 
     if (hash === undefined) 
         return [];
 
     const findings = [];
 
-    hashValues.forEach((hashValue) => {
-        if (hashValue === name || (name.length > 4 && matchInBase64Regex(name).test(hashValue))) {
+    location.hash.slice(1).split("&")
+        .map(p => { return { name:p.split("=")[0],value:p.split("=")[1] } })
+        .forEach((param) => {
+        if (param.value === name || (name.length > 4 && matchInBase64Regex(name).test(param.value))) {
             findings.push({
                 type: "HashFragment",
-                argumentValue: hashValue
+                argumentValue: param.value,
+                parameterName: param.name
             });
         }
 
-        if (hashValue === value || (value.length > 4 && matchInBase64Regex(value).test(hashValue)) || (hashValue.length > 4 && matchInBase64Regex(hashValue).test(value))) {
+        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value.length > 4 && matchInBase64Regex(param.value).test(value))) {
             findings.push({
                 type: "HashFragment",
-                argumentValue: hashValue
+                argumentValue: param.value,
+                parameterName: param.name
             });
         }
     });
@@ -140,6 +140,7 @@ function hashFragmentScan(name, value) {
     if (hashNoQuery === name || (name.length > 4 && matchInBase64Regex(name).test(hashNoQuery))) {
         findings.push({
             type: "HashFragment",
+            parameterName: "",
             argumentValue: hashNoQuery
         });
     }
@@ -147,6 +148,7 @@ function hashFragmentScan(name, value) {
     if (hashNoQuery === value || (value.length > 4 && matchInBase64Regex(value).test(hashNoQuery)) || (hashNoQuery.length > 4 && matchInBase64Regex(hashNoQuery).test(value))) {
         findings.push({
             type: "HashFragment",
+            parameterName: "",
             argumentValue: hashNoQuery
         });
     }
@@ -154,6 +156,7 @@ function hashFragmentScan(name, value) {
     if (hash === name || (name.length > 4 && matchInBase64Regex(name).test(hash))) {
         findings.push({
             type: "HashFragment",
+            parameterName: "",
             argumentValue: hash
         });
     }
@@ -161,6 +164,7 @@ function hashFragmentScan(name, value) {
     if (hash === value || (value.length > 4 && matchInBase64Regex(value).test(hash)) || (hash.length > 4 && matchInBase64Regex(hash).test(value))) {
         findings.push({
             type: "HashFragment",
+            parameterName: "",
             argumentValue: hash
         });
     }
@@ -177,14 +181,16 @@ function hashFragmentScan(name, value) {
         if (hashSegment === name || (name.length > 4 && matchInBase64Regex(name).test(hashSegment))) {
             findings.push({
                 type: "HashFragment",
-                argumentValue: hashSegment
+                argumentValue: hashSegment,
+                parameterName: ""
             });
         }
 
         if (hashSegment === value || (value.length > 4 && matchInBase64Regex(value).test(hashSegment)) || (hashSegment.length > 4 && matchInBase64Regex(hashSegment).test(value))) {
             findings.push({
                 type: "HashFragment",
-                argumentValue: hashSegment
+                argumentValue: hashSegment,
+                parameterName: ""
             });
         }
     });
@@ -208,14 +214,16 @@ function pathArgumentScan(name, value) {
         if (navSegment === name || (name.length > 4 && matchInBase64Regex(name).test(navSegment))) {
             findings.push({
                 type: "PathArgument",
-                argumentValue: navSegment
+                argumentValue: navSegment,
+                parameterName: ""
             });
         }
 
         if (navSegment === value || (value.length > 4 && matchInBase64Regex(value).test(navSegment)) || (navSegment.length > 4 && matchInBase64Regex(navSegment).test(value))) {
             findings.push({
                 type: "PathArgument",
-                argumentValue: navSegment
+                argumentValue: navSegment,
+                parameterName: ""
             });
         }
     });
