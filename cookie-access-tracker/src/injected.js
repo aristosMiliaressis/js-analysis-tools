@@ -100,7 +100,7 @@ function queryValuesScan(name, value) {
             });
         }
 
-        if (queryValue === value || (value.length > 4 && matchInBase64Regex(value).test(queryValue)) || (value.length > 4 && matchInBase64Regex(queryValue).test(value))) {
+        if (queryValue === value || (value.length > 4 && matchInBase64Regex(value).test(queryValue)) || (queryValue.length > 4 && matchInBase64Regex(queryValue).test(value))) {
             findings.push({
                 type: "QueryValue",
                 argumentValue: queryValue
@@ -128,7 +128,7 @@ function hashFragmentScan(name, value) {
             });
         }
 
-        if (hashValue === value || (value.length > 4 && matchInBase64Regex(value).test(hashValue)) || (value.length > 4 && matchInBase64Regex(hashValue).test(value))) {
+        if (hashValue === value || (value.length > 4 && matchInBase64Regex(value).test(hashValue)) || (hashValue.length > 4 && matchInBase64Regex(hashValue).test(value))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashValue
@@ -144,7 +144,7 @@ function hashFragmentScan(name, value) {
         });
     }
 
-    if (hashNoQuery === value || (value.length > 4 && matchInBase64Regex(value).test(hashNoQuery)) || (value.length > 4 && matchInBase64Regex(hashNoQuery).test(value))) {
+    if (hashNoQuery === value || (value.length > 4 && matchInBase64Regex(value).test(hashNoQuery)) || (hashNoQuery.length > 4 && matchInBase64Regex(hashNoQuery).test(value))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hashNoQuery
@@ -158,7 +158,7 @@ function hashFragmentScan(name, value) {
         });
     }
 
-    if (hash === value || (value.length > 4 && matchInBase64Regex(value).test(hash)) || (value.length > 4 && matchInBase64Regex(hash).test(value))) {
+    if (hash === value || (value.length > 4 && matchInBase64Regex(value).test(hash)) || (hash.length > 4 && matchInBase64Regex(hash).test(value))) {
         findings.push({
             type: "HashFragment",
             argumentValue: hash
@@ -181,7 +181,7 @@ function hashFragmentScan(name, value) {
             });
         }
 
-        if (hashSegment === value || (value.length > 4 && matchInBase64Regex(value).test(hashSegment)) || (value.length > 4 && matchInBase64Regex(hashSegment).test(value))) {
+        if (hashSegment === value || (value.length > 4 && matchInBase64Regex(value).test(hashSegment)) || (hashSegment.length > 4 && matchInBase64Regex(hashSegment).test(value))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: hashSegment
@@ -212,7 +212,7 @@ function pathArgumentScan(name, value) {
             });
         }
 
-        if (navSegment === value || (value.length > 4 && matchInBase64Regex(value).test(navSegment)) || (value.length > 4 && matchInBase64Regex(navSegment).test(value))) {
+        if (navSegment === value || (value.length > 4 && matchInBase64Regex(value).test(navSegment)) || (navSegment.length > 4 && matchInBase64Regex(navSegment).test(value))) {
             findings.push({
                 type: "PathArgument",
                 argumentValue: navSegment
