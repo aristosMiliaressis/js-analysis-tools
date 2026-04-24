@@ -31,6 +31,9 @@ function populatePopupData() {
 
 		origin = document.createElement('b');
 		origin.innerText = setCookie.href.substring(0, MAX_URL_LENGTH);
+		origin.setAttribute('title', setCookie.href);
+		origin.onclick = async () => { await navigator.clipboard.writeText(setCookie.href)};
+
 		win = document.createElement('code');
 		win.innerText = `${setCookie.hops} ${setCookie.window == '' ? '' : ' window.name: ' + setCookie.window}`;
 		element.appendChild(origin);
@@ -41,7 +44,7 @@ function populatePopupData() {
 		sel = document.createElement('span');
 		if(setCookie.fullstack) { 
             sel.setAttribute('title', setCookie.fullstack.join("\n\n"));
-            sel.onclick = async () => { await navigator.clipboard.writeText( setCookie.fullstack.join("\n\n"))};
+            sel.onclick = async () => { await navigator.clipboard.writeText(setCookie.fullstack.join("\n\n"))};
         }
 		seltxt = document.createTextNode(setCookie.stack);
 
@@ -50,6 +53,7 @@ function populatePopupData() {
 
 		pre = document.createElement('pre');
 		pre.innerText = setCookie.assignment;
+		pre.onclick = async () => { await navigator.clipboard.writeText(setCookie.assignment)};
 		element.appendChild(pre);
 		if (!!setCookie.findings && setCookie.findings.length > 0) {
 			let findings = '';
