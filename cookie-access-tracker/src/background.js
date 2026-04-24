@@ -43,7 +43,7 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	if (tab_data[sender.tab.id].some(l => l.origin == msg.origin && l.name == msg.name && l.value == msg.value)) return;
 
 	extensionAPI.storage.local.get(null, function (i) {
-        for (let pattern of i.options.PatternBlacklist) {
+        for (let pattern of i.options?.PatternBlacklist ?? []) {
             let re = new RegExp(pattern)
 			if (re.test(msg.assignment))
 				return;
@@ -61,3 +61,49 @@ extensionAPI.runtime.onConnect.addListener(function (port) {
 		port.postMessage(tab_data[msg.tabId]);
 	});
 })
+
+const addTrackingParams = () => {
+	const params = ['utm', 'utmac', 'utmdebug', 'utm_medium', 'utm_campaign', 'utm_source', 'utm_term', 
+		'utm_content', 'utmctr', 'utmgclid', 'utmsource', 'utmcsr', 'utmcct', 'utmcid', 'utmccn', 'utmcmd', 
+		'utmp', 'utmr', 'gclid', 'gdftrk', 'fbclid', 'msclkid', 'dclid', 'twclid', 'igshid', '_ga', 'amp_referrer'];
+
+    return {
+		id: Math.floor(Math.random() * 9999),
+		action: {
+			type: "redirect",
+			redirect: { 
+				transform: {
+					queryTransform: {
+						addOrReplaceParams: params.map(p => ({ key: p, value: `deadbeef${Math.floor(Math.random() * 99)}` }))
+					}
+				}
+			}
+		},
+		condition: { urlFilter: "*", resourceTypes: [ "main_frame", "sub_frame" ]}
+	};
+}
+
+extensionAPI.storage.local.onChanged.addListener(function(changes, area) {
+	console.log('extensionAPI.storage.local.onChanged', changes, area);
+	extensionAPI.declarativeNetRequest.getDynamicRules().then(rules => {
+		extensionAPI.declarativeNetRequest.updateDynamicRules({
+			removeRuleIds: rules.map(rule => rule.id)
+		});
+	});
+
+	if (changes.options.newValue?.injectTrackingParams) {
+		extensionAPI.declarativeNetRequest.updateDynamicRules({
+			addRules: [addTrackingParams()],
+			removeRuleIds: []
+		});
+	}
+});
+
+extensionAPI.storage.local.get({ options: { } }, function (i) {
+	if (i.options.injectTrackingParams) {
+		extensionAPI.declarativeNetRequest.updateDynamicRules({
+			addRules: [addTrackingParams()],
+			removeRuleIds: []
+		});
+	}
+});

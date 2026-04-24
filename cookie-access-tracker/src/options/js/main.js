@@ -30,7 +30,7 @@ function restore_options() {
     extensionAPI.storage.local.get(null, function (i) {
         webhook_scope.value = i.options.WebhookScope;
         webhook_url.value = i.options.WebhookUrl;
-        for (let pattern of i.options.PatternBlacklist) {
+        for (let pattern of i.options?.PatternBlacklist ?? []) {
             addPattern(pattern)
         }
     });

@@ -16,6 +16,11 @@ port.onMessage.addListener(function (cookies) {
 exportBtn.onclick = exportCookies;
 clearBtn.onclick = clearCookies;
 
+extensionAPI.storage.local.get({ options: { } }, function (i) {
+	injectTrackingParams.checked = i.options.injectTrackingParams;
+	injectTrackingParams.onchange = async () => await extensionAPI.storage.local.set({ options: { injectTrackingParams: injectTrackingParams.checked } });
+});
+
 function populatePopupData() {
 	const MAX_URL_LENGTH = 200;
 	let elementList = document.createElement('ul');
