@@ -33,6 +33,7 @@ function listListeners(listeners) {
 		sel = document.createElement('span');
 		if(listener.fullstack) sel.setAttribute('title', listener.fullstack.join("\n\n"));
 		seltxt = document.createTextNode(listener.stack);
+		sel.onclick = async () => { await navigator.clipboard.writeText(listener.fullstack)};
 		
 		sel.appendChild(seltxt);
 		el.appendChild(sel);

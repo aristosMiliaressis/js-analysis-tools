@@ -58,7 +58,7 @@ function populatePopupData() {
 		if (!!setCookie.findings && setCookie.findings.length > 0) {
 			let findings = '';
 			setCookie.findings.forEach(f => {
-				findings += `reflection from ${f.type} ${f.parameterName}\n`;
+				findings += `reflection from ${f.type} ${f.parameterName}=${f.argumentValue}\n`;
 			});
 			p = document.createElement('p');
 			p.innerText = findings;

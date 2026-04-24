@@ -109,6 +109,7 @@ async function populatePopupData() {
             text = text.substring(text.indexOf(match)+match.length);
         }
         pre.innerHTML += text.replaceAll("<", "&lt;");
+		pre.onclick = async () => { await navigator.clipboard.writeText(text)};
 
 		element.appendChild(pre);
 

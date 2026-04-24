@@ -74,7 +74,7 @@ const addTrackingParams = () => {
 			redirect: { 
 				transform: {
 					queryTransform: {
-						addOrReplaceParams: params.map(p => ({ key: p, value: `${Math.floor(Math.random() * 99)}deadbeef` }))
+						addOrReplaceParams: params.map(p => ({ key: p, value: Math.floor(Math.random() * 999999).toString().padStart(6, "0") }))
 					}
 				}
 			}
