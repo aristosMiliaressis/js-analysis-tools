@@ -84,7 +84,6 @@ const addTrackingParams = () => {
 }
 
 extensionAPI.storage.local.onChanged.addListener(function(changes, area) {
-	console.log('extensionAPI.storage.local.onChanged', changes, area);
 	extensionAPI.declarativeNetRequest.getDynamicRules().then(rules => {
 		extensionAPI.declarativeNetRequest.updateDynamicRules({
 			removeRuleIds: rules.map(rule => rule.id)
