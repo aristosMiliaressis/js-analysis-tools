@@ -10,7 +10,7 @@ function refreshCount(tab) {
 
 		if (!extensionAPI.runtime.lastError) {
 			extensionAPI.action.setBadgeText({ "text": cookieCount.toString(), tabId: tab.id });
-			extensionAPI.action.setBadgeBackgroundColor({ color: [255, 128, 0, 255] });
+			extensionAPI.action.setBadgeBackgroundColor({ color: [255, tab_data[tab.id].filter(c => c.findings?.length > 0).length === 0 ? 127 : 0, 0, 255], tabId: tab.id });
 		}
 	});
 }
