@@ -17,11 +17,11 @@ function refreshCount(tab) {
 
 function logToWebhook(data) {
 	extensionAPI.storage.local.get(null, function(i) {
-		if (i.options.WebhookUrl == "" || i.options.WebhookUrl == undefined) return;
-		if (new URL(data.href).origin.match(i.options.WebhookScope) == null) return;
+		if (i.WebhookUrl == "" || i.WebhookUrl == undefined) return;
+		if (new URL(data.href).origin.match(i.WebhookScope) == null) return;
 
 		try {
-			fetch(i.options.WebhookUrl, {
+			fetch(i.WebhookUrl, {
 				method: 'post',
 				headers: {
 					"Content-type": "application/json; charset=UTF-8"
@@ -43,7 +43,7 @@ extensionAPI.runtime.onMessage.addListener(function (msg, sender, sendResponse) 
 	if (tab_data[sender.tab.id].some(l => l.origin == msg.origin && l.name == msg.name && l.value == msg.value)) return;
 
 	extensionAPI.storage.local.get(null, function (i) {
-        for (let pattern of i.options?.PatternBlacklist ?? []) {
+        for (let pattern of i.PatternBlacklist ?? []) {
             let re = new RegExp(pattern)
 			if (re.test(msg.assignment))
 				return;
@@ -90,7 +90,7 @@ extensionAPI.storage.local.onChanged.addListener(function(changes, area) {
 		});
 	});
 
-	if (changes.options.newValue?.injectTrackingParams) {
+	if (changes.newValue?.injectTrackingParams) {
 		extensionAPI.declarativeNetRequest.updateDynamicRules({
 			addRules: [addTrackingParams()],
 			removeRuleIds: []
@@ -98,8 +98,8 @@ extensionAPI.storage.local.onChanged.addListener(function(changes, area) {
 	}
 });
 
-extensionAPI.storage.local.get({ options: { } }, function (i) {
-	if (i.options.injectTrackingParams) {
+extensionAPI.storage.local.get(null, function (i) {
+	if (i.injectTrackingParams) {
 		extensionAPI.declarativeNetRequest.updateDynamicRules({
 			addRules: [addTrackingParams()],
 			removeRuleIds: []

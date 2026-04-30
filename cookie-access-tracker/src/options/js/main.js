@@ -17,7 +17,7 @@ function save_options() {
     patternBlacklist.childNodes.forEach(o => blacklist.push(o.value));
 
     extensionAPI.storage.local.set({
-        options: { PatternBlacklist: blacklist, WebhookScope: webhook_scope.value, WebhookUrl: webhook_url.value }
+        PatternBlacklist: blacklist, WebhookScope: webhook_scope.value, WebhookUrl: webhook_url.value
     }, function () {
         statusMsg.textContent = 'Options saved.';
         setTimeout(function () {
@@ -28,9 +28,9 @@ function save_options() {
 
 function restore_options() {
     extensionAPI.storage.local.get(null, function (i) {
-        webhook_scope.value = i.options.WebhookScope;
-        webhook_url.value = i.options.WebhookUrl;
-        for (let pattern of i.options?.PatternBlacklist ?? []) {
+        webhook_scope.value = i.WebhookScope;
+        webhook_url.value = i.WebhookUrl;
+        for (let pattern of i.PatternBlacklist ?? []) {
             addPattern(pattern)
         }
     });

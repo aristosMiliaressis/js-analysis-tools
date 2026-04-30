@@ -16,9 +16,9 @@ port.onMessage.addListener(function (cookies) {
 exportBtn.onclick = exportCookies;
 clearBtn.onclick = clearCookies;
 
-extensionAPI.storage.local.get({ options: { } }, function (i) {
-	injectTrackingParams.checked = i.options.injectTrackingParams;
-	injectTrackingParams.onchange = async () => await extensionAPI.storage.local.set({ options: { injectTrackingParams: injectTrackingParams.checked } });
+extensionAPI.storage.local.get(null, function (i) {
+	injectTrackingParams.checked = i.injectTrackingParams;
+	injectTrackingParams.onchange = async () => await extensionAPI.storage.local.set({ injectTrackingParams: injectTrackingParams.checked });
 });
 
 function populatePopupData() {
