@@ -96,7 +96,7 @@ function queryValuesScan(name, value) {
             });
         }
 
-        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value.length > 4 && matchInBase64Regex(param.value).test(value))) {
+        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value?.length > 4 && matchInBase64Regex(param.value).test(value))) {
             findings.push({
                 type: "QueryValue",
                 parameterName: param.name,
@@ -127,7 +127,7 @@ function hashFragmentScan(name, value) {
             });
         }
 
-        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value.length > 4 && matchInBase64Regex(param.value).test(value))) {
+        if (param.value === value || (value.length > 4 && matchInBase64Regex(value).test(param.value)) || (param.value?.length > 4 && matchInBase64Regex(param.value).test(value))) {
             findings.push({
                 type: "HashFragment",
                 argumentValue: param.value,
