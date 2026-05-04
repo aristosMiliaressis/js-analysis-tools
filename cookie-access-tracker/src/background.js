@@ -90,7 +90,7 @@ extensionAPI.storage.local.onChanged.addListener(function(changes, area) {
 		});
 	});
 
-	if (changes.newValue?.injectTrackingParams) {
+	if (changes.injectTrackingParams.newValue) {
 		extensionAPI.declarativeNetRequest.updateDynamicRules({
 			addRules: [addTrackingParams()],
 			removeRuleIds: []
